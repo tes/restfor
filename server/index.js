@@ -6,9 +6,11 @@ const logger = require('morgan');
 const initModels = require('./models');
 const initRouters = require('./initRouters');
 const getRouteOverrides = require('./routes');
+const cors = require('cors');
 
 const initApp = async ({ config, models, sequelize }) => {
   const app = express();
+  app.use(cors());
   app.use(logger('dev'));
   app.use(bodyParser.json());
   app.use(bodyParser.urlencoded({ extended: false }));
