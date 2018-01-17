@@ -40,4 +40,4 @@ class App extends Component {
   }
 }
 
-export default connect(({ entities, isFetching }) => ({ entities, isFetching }), { fetchEntities })(App);
+export default connect(({ isFetching }) => ({ isFetching }), { fetchEntities })(App);

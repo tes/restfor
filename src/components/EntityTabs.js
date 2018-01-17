@@ -10,7 +10,7 @@ class EntityTabs extends React.PureComponent {
     const { entities } = this.props;
     return (
       <Tabs value={this.props.params.entity} onChange={this.handleTabChange}>
-        {entities.map(entity => (
+        {Object.keys(entities).map(entity => (
           <Tab key={entity.toLowerCase()} label={entity} value={entity.toLowerCase()}>
             <div>
               <h2>{entity}</h2>
