@@ -27,10 +27,10 @@ export const switchEntity = entity => (dispatch, getState, { hashHistory }) => {
 export const startInvoking = (method, path) => ({ type: START_INVOKING, method, path });
 export const resolveInvoking = (method, path, result) => ({ type: RESOLVE_INVOKING, method, path, result });
 export const rejectInvoking = (method, path, error) => ({ type: REJECT_INVOKING, method, path, error });
-export const invoke = (method, path, { query = {}, body } = {}) => async (dispatch, getState, { api }) => {
+export const invoke = (method, path, { params = {}, query = {}, body } = {}) => async (dispatch, getState, { api }) => {
   try {
     dispatch(startInvoking(method.toUpperCase(), path));
-    const result = await api[method.toLowerCase()](path);
+    const result = await api[method.toLowerCase()](path, { params, query, body });
     dispatch(resolveInvoking(method.toUpperCase(), path, result));
   } catch (error) {
     dispatch(rejectInvoking(method.toUpperCase(), path, error.message));
