@@ -1,8 +1,11 @@
 const express = require('express');
 const { find, findById, bulkCreate, updateById, bulkDelete } = require('./defaultRoutes');
 
-module.exports = ({ config, models, app, routeOverrides }) =>
-  Object.keys(models).map(initRouter({ config, models, app, routeOverrides }));
+module.exports = ({ config, models, app, routeOverrides }) => {
+  const modelNames = Object.keys(models);
+  modelNames.map(initRouter({ config, models, app, routeOverrides }));
+  app.get('/entities', (req, res) => res.json(modelNames));
+};
 
 const initRouter = ({ config, models, app, routeOverrides }) => name => {
   const key = name.toLowerCase();
@@ -18,5 +21,5 @@ const initRouter = ({ config, models, app, routeOverrides }) => name => {
 
   if (routeOverrides[key]) routeOverrides[key](dependencies, router);
 
-  app.use('/' + key, router);
+  app.use(`/resources/${key}`, router);
 };
