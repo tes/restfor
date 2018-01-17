@@ -1,5 +1,65 @@
 body {
   margin: 0;
   padding: 0;
-  font-family: sans-serif;
+  font-family: Roboto;
+  color: rgba(0, 0, 0, 0.87);
+  background-color: #f8f8f8;
+}
+
+body a {
+  cursor: pointer;
+  color: #01579b;
+}
+
+body a:hover {
+  text-decoration: underline;
+}
+
+.absolute {
+  position: absolute;
+  top: 0px;
+  bottom: 0px;
+  left: 0px;
+  right: 0px;
+}
+
+.layout {
+  display: flex;
+}
+
+.layout.row {
+  flex-direction: row;
+}
+
+.layout.column {
+  flex-direction: column;
+}
+
+.dynamic {
+  flex: 0 0 auto;
+}
+
+.fitted {
+  flex: 1 1 0;
+}
+
+.center {
+  justify-content: center;
+  align-items: center;
+}
+
+.overflow {
+  overflow: auto;
+}
+
+.overflow-x {
+  overflow-x: auto;
+}
+
+.overflow-y {
+  overflow-y: auto;
+}
+
+.high {
+  z-index: 1;
 }
