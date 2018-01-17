@@ -1,4 +1,4 @@
-const Op = Sequelize.Op;
+const Op = require('sequelize').Op;
 const requestHandler = require('./requestHandler');
 
 module.exports.find = name => ({ models }) =>

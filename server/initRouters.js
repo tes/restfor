@@ -11,7 +11,7 @@ const initRouter = ({ config, models, app, routeOverrides }) => name => {
   const dependencies = { config, models };
 
   router.get('/', find(name)(dependencies));
-  router.get('/:id', defaultFindByID(name)(dependencies));
+  router.get('/:id', findById(name)(dependencies));
   router.post('/', bulkCreate(name)(dependencies));
   router.put('/:id', updateById(name)(dependencies));
   router.delete('/', bulkDelete(name)(dependencies));
