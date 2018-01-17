@@ -11,6 +11,7 @@ module.exports = ({ config, models, app, routeOverrides }) => {
 
 const initRouter = (dependencies, resourceRouter, routeOverrides) => name => {
   const key = name.toLowerCase();
+  const overrideRouter = routeOverrides[key];
   const router = express.Router();
 
   router.get('/', find(name)(dependencies));
@@ -19,7 +20,7 @@ const initRouter = (dependencies, resourceRouter, routeOverrides) => name => {
   router.put('/:id', updateById(name)(dependencies));
   router.delete('/', bulkDelete(name)(dependencies));
 
-  if (routeOverrides[key]) routeOverrides[key](dependencies, router);
+  if (overrideRouter) overrideRouter(dependencies, router);
 
   resourceRouter.use(`/${key}`, router);
 };
