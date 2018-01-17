@@ -3,12 +3,24 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "body-parser": "^1.18.2",
+    "config": "^1.29.2",
+    "cookie-parser": "^1.4.3",
+    "express": "^4.16.2",
+    "fs-extra": "^5.0.0",
+    "morgan": "^1.9.0",
+    "mysql2": "^1.5.1",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
-    "react-scripts": "1.1.0"
+    "react-redux": "^5.0.6",
+    "react-scripts": "1.1.0",
+    "redux": "^3.7.2",
+    "redux-thunk": "^2.2.0",
+    "sequelize": "^4.31.2"
   },
   "scripts": {
     "start": "react-scripts start",
+    "server": "node server",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "eject": "react-scripts eject"
