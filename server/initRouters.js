@@ -18,5 +18,5 @@ const initRouter = ({ config, models, app, routeOverrides }) => name => {
 
   if (routeOverrides[key]) routeOverrides[key](dependencies, router);
 
-  app.use(key, router);
+  app.use('/' + key, router);
 };

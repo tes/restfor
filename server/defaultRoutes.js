@@ -7,7 +7,7 @@ module.exports.find = name => ({ models }) =>
 module.exports.findById = name => ({ models }) =>
   requestHandler(
     async ({ id }) => {
-      const record = await models[name].findById(req.params.id);
+      const record = await models[name].findById(id);
       if (!record) throw new Error('Resource not found|404');
       return record;
     },
