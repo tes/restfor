@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React from 'react';
 import { connect } from 'react-redux';
 import { Router, Route, hashHistory } from 'react-router';
 import AppBar from 'material-ui/AppBar';
@@ -7,7 +7,7 @@ import MenuItem from 'material-ui/MenuItem';
 import EntityTabs from './EntityTabs';
 import { fetchEntities } from '../actionCreators';
 
-class App extends Component {
+class App extends React.PureComponent {
   state = {
     isDrawerOpen: false
   };
@@ -22,19 +22,23 @@ class App extends Component {
 
   render() {
     return (
-      <div className="App">
-        <AppBar
-          title="Restfor"
-          iconClassNameRight="muidocs-icon-navigation-expand-more"
-          onLeftIconButtonClick={this.handleToggleDrawer}
-        />
+      <div className="absolute column layout">
+        <header className="dynamic">
+          <AppBar
+            title="Restfor"
+            iconClassNameRight="muidocs-icon-navigation-expand-more"
+            onLeftIconButtonClick={this.handleToggleDrawer}
+          />
+        </header>
         <Drawer open={this.state.isDrawerOpen} docked={false} onRequestChange={this.handleToggleDrawer}>
           <MenuItem onClick={this.handleToggleDrawer}>Menu Item</MenuItem>
           <MenuItem onClick={this.handleToggleDrawer}>Menu Item 2</MenuItem>
         </Drawer>
-        <Router history={hashHistory}>
-          <Route path="/:entity" component={EntityTabs} />
-        </Router>
+        <main className="relative fitted layout">
+          <Router history={hashHistory}>
+            <Route path="/:entity" component={EntityTabs} />
+          </Router>
+        </main>
       </div>
     );
   }

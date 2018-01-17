@@ -2,22 +2,26 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { Tabs, Tab } from 'material-ui/Tabs';
 import { switchEntity } from '../actionCreators';
+import Grid from './Grid';
+import './EntityTabs.css';
 
 class EntityTabs extends React.PureComponent {
   handleTabChange = entity => this.props.switchEntity(entity);
 
   render() {
-    const { entities } = this.props;
+    const { entityList } = this.props;
     return (
-      <Tabs value={this.props.params.entity} onChange={this.handleTabChange}>
-        {Object.keys(entities).map(entity => (
+      <Tabs
+        value={this.props.params.entity}
+        onChange={this.handleTabChange}
+        className="absolute column layout"
+        contentContainerClassName="relative fitted tab"
+        contentContainerStyle={{ height: '100%' }}
+      >
+        {entityList.map(entity => (
           <Tab key={entity.toLowerCase()} label={entity} value={entity.toLowerCase()}>
-            <div>
-              <h2>{entity}</h2>
-              <p>
-                Tabs are also controllable if you want to programmatically pass them their values. This allows for more
-                functionality in Tabs such as not having any Tab selected or assigning them different values.
-              </p>
+            <div className="absolute layout">
+              <Grid entityName={entity} />
             </div>
           </Tab>
         ))}
@@ -26,4 +30,6 @@ class EntityTabs extends React.PureComponent {
   }
 }
 
-export default connect(({ entities, isFetching }) => ({ entities, isFetching }), { switchEntity })(EntityTabs);
+export default connect(({ entities, isFetching }) => ({ entityList: Object.keys(entities), isFetching }), {
+  switchEntity
+})(EntityTabs);

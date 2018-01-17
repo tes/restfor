@@ -3,7 +3,7 @@ module.exports = (sequelize, DataTypes) => {
     username: DataTypes.STRING
   });
 
-  /* User.associate = ({ User, Task }) => User.hasMany(Task); */
+  User.associate = ({ User, Task }) => User.hasMany(Task);
 
   return User;
 };

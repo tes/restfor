@@ -11,6 +11,7 @@ module.exports = async ({ config }) => {
   const models = initDb(sequelize);
   associate(models);
   await sequelize.sync();
+
   return { models, sequelize };
 };
 

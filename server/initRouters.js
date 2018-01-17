@@ -1,4 +1,5 @@
 const express = require('express');
+const getJsonSchema = require('./getJsonSchema');
 const { find, findById, bulkCreate, updateById, bulkDelete } = require('./defaultRoutes');
 
 module.exports = ({ config, models, app, routeOverrides }) => {
@@ -6,7 +7,11 @@ module.exports = ({ config, models, app, routeOverrides }) => {
   const resourceRouter = express.Router();
   modelNames.forEach(initRouter({ config, models }, resourceRouter, routeOverrides));
   app.use('/resources', resourceRouter);
-  app.get('/entities', (req, res) => res.json(modelNames));
+  app.get('/entities', (req, res) => {
+    res.json(
+      modelNames.reduce((entities, name) => ({ ...entities, [name]: getJsonSchema(models[name].attributes) }), {})
+    );
+  });
 };
 
 const initRouter = (dependencies, resourceRouter, routeOverrides) => name => {

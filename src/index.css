@@ -23,6 +23,10 @@ body a:hover {
   right: 0px;
 }
 
+.relative {
+  position: relative;
+}
+
 .layout {
   display: flex;
 }
