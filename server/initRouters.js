@@ -4,7 +4,7 @@ const { find, findById, bulkCreate, updateById, bulkDelete } = require('./defaul
 module.exports = ({ config, models, app, routeOverrides }) => {
   const modelNames = Object.keys(models);
   const resourceRouter = express.Router();
-  modelNames.map(initRouter({ config, models, resourceRouter, routeOverrides }));
+  modelNames.forEach(initRouter({ config, models, resourceRouter, routeOverrides }));
   app.use('/resources', resourceRouter);
   app.get('/entities', (req, res) => res.json(modelNames));
 };
