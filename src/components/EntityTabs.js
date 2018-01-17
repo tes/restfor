@@ -9,10 +9,10 @@ class EntityTabs extends React.PureComponent {
   handleTabChange = entity => this.props.switchEntity(entity);
 
   render() {
-    const { entityList } = this.props;
+    const { entityList, params: { entity: activeTab } } = this.props;
     return (
       <Tabs
-        value={this.props.params.entity}
+        value={activeTab}
         onChange={this.handleTabChange}
         className="absolute column layout"
         contentContainerClassName="relative fitted tab"
@@ -21,7 +21,7 @@ class EntityTabs extends React.PureComponent {
         {entityList.map(entity => (
           <Tab key={entity.toLowerCase()} label={entity} value={entity.toLowerCase()}>
             <div className="absolute layout">
-              <Grid entityName={entity} />
+              <Grid entityName={entity} isActive={entity.toLowerCase() === activeTab} />
             </div>
           </Tab>
         ))}

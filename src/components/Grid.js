@@ -5,7 +5,15 @@ import { invoke } from '../actionCreators';
 
 class Grid extends React.PureComponent {
   componentDidMount() {
-    if (!this.props.items) {
+    this.ensureItems();
+  }
+
+  componentDidUpdate() {
+    this.ensureItems();
+  }
+
+  ensureItems() {
+    if (this.props.isActive && !this.props.items) {
       this.props.invoke('GET', `/${this.props.entityName.toLowerCase()}`);
     }
   }
@@ -18,7 +26,7 @@ class Grid extends React.PureComponent {
           <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
             <TableRow>
               {Object.keys(schema).map(propertyName => (
-                <TableHeaderColumn>
+                <TableHeaderColumn key={propertyName}>
                   <span className="sorter">{propertyName}</span>
                 </TableHeaderColumn>
               ))}
@@ -41,9 +49,7 @@ class Grid extends React.PureComponent {
 export default connect(
   ({ entities }, { entityName }) => {
     const entity = entities[entityName] || { schema: {}, items: null, page: null };
-    console.log(entity);
     return {
-      entityName,
       schema: entity.schema,
       items: entity.items,
       page: entity.page
