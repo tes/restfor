@@ -30,7 +30,7 @@ export const rejectInvoking = (method, path, error) => ({ type: REJECT_INVOKING,
 export const invoke = (method, path, { params = {}, query = {}, body } = {}) => async (dispatch, getState, { api }) => {
   try {
     dispatch(startInvoking(method.toUpperCase(), path));
-    const result = await api[method.toLowerCase()](path, { params, query, body });
+    const result = await api[method.toLowerCase()](`/resources${path}`, { params, query, body });
     dispatch(resolveInvoking(method.toUpperCase(), path, result));
   } catch (error) {
     dispatch(rejectInvoking(method.toUpperCase(), path, error.message));
