@@ -5,6 +5,8 @@ import FlatButton from 'material-ui/FlatButton';
 import RaisedButton from 'material-ui/RaisedButton';
 import ArrowBack from 'material-ui/svg-icons/navigation/arrow-back';
 import ArrowForward from 'material-ui/svg-icons/navigation/arrow-forward';
+import Check from 'material-ui/svg-icons/navigation/check';
+import Chip from 'material-ui/Chip';
 import { Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn } from 'material-ui/Table';
 import { invoke, openDetails } from '../actionCreators';
 import { getMaxPage } from '../selectors';
@@ -114,7 +116,9 @@ class Grid extends React.PureComponent {
               {(items || []).map((item, i) => (
                 <TableRow key={i} selected={selection.includes(i)}>
                   {Object.keys(item).map(propertyName => (
-                    <TableRowColumn key={propertyName}>{item[propertyName]}</TableRowColumn>
+                    <TableRowColumn key={propertyName}>
+                      {getCellComponent(schema[propertyName], item[propertyName])}
+                    </TableRowColumn>
                   ))}
                 </TableRow>
               ))}
@@ -125,6 +129,19 @@ class Grid extends React.PureComponent {
     );
   }
 }
+
+const getCellComponent = (schema, value) => {
+  switch (schema.type) {
+    case 'BOOLEAN':
+      return value ? <Check /> : '';
+    case 'ENUM':
+      return <Chip>{value}</Chip>;
+    case 'DATE':
+      return new Date(value).toLocaleString();
+    default:
+      return value;
+  }
+};
 
 export default connect(
   (state, { params: { resourceName } }) => {
