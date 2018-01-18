@@ -9,12 +9,21 @@ import MenuItem from 'material-ui/MenuItem';
 import DateTimePicker from 'material-ui-datetimepicker';
 import DatePickerDialog from 'material-ui/DatePicker/DatePickerDialog';
 import TimePickerDialog from 'material-ui/TimePicker/TimePickerDialog';
-import { closeDetails } from '../actionCreators';
+import { invoke, closeDetails } from '../actionCreators';
 import './Details.css';
 
 class Details extends React.PureComponent {
   handleSave = () => {};
-  handleRemove = () => {};
+  handleRemove = async () => {
+    const { invoke, closeDetails, params: { resourceName, id }, limit } = this.props;
+    await invoke('DELETE', resourceName, '/', { body: [ id ] });
+    await invoke('GET', resourceName, '/', { query: { offset: 0, limit } }, (state, error, result) => {
+      if (error) return state;
+      if (result) return { ...state, items: result.rows, count: result.count, page: 0 };
+      return state;
+    });
+    closeDetails();
+  };
   handleCancel = () => this.props.closeDetails();
 
   render() {
@@ -84,10 +93,11 @@ const getPropertyComponent = (schema, value) => {
 };
 
 export default connect(
-  ({ schemas, resources }, { params: { resourceName, id } }) => ({
+  ({ schemas, resources, settings: { limit } }, { params: { resourceName, id } }) => ({
     schema: schemas[resourceName] || {},
     record:
-      ((resources[resourceName] && resources[resourceName].items) || []).find(record => record.id === Number(id)) || {}
+      ((resources[resourceName] && resources[resourceName].items) || []).find(record => record.id === Number(id)) || {},
+    limit
   }),
-  { closeDetails }
+  { invoke, closeDetails }
 )(Details);
