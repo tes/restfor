@@ -34,7 +34,7 @@ class Details extends React.PureComponent {
 export default connect(
   ({ schemas, resources }, { params: { resourceName, id } }) => ({
     schema: schemas[resourceName],
-    record: resources[resourceName].find(record => record.id === id)
+    record: resources[resourceName].items.find(record => record.id === id)
   }),
   { closeDetails }
 )(Details);

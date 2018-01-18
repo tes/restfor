@@ -60,7 +60,8 @@ class Grid extends React.PureComponent {
     await this.fetchItems(resourceName, limit, page);
   };
 
-  handleRowClick = rowIndex => {
+  handleRowClick = (rowIndex, cellIndex) => {
+    if (cellIndex === -1) return;
     const id = this.props.items[rowIndex].id;
     this.props.openDetails(this.props.params.resourceName, id);
   };
