@@ -6,7 +6,7 @@ import RaisedButton from 'material-ui/RaisedButton';
 import ArrowBack from 'material-ui/svg-icons/navigation/arrow-back';
 import ArrowForward from 'material-ui/svg-icons/navigation/arrow-forward';
 import { Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn } from 'material-ui/Table';
-import { invoke } from '../actionCreators';
+import { invoke, openDetails } from '../actionCreators';
 import { getMaxPage } from '../selectors';
 
 const BACK = Symbol();
@@ -60,6 +60,11 @@ class Grid extends React.PureComponent {
     await this.fetchItems(resourceName, limit, page);
   };
 
+  handleRowClick = rowIndex => {
+    const id = this.props.items[rowIndex].id;
+    this.props.openDetails(this.props.resourceName, id);
+  };
+
   render() {
     const { schema, items, page, maxPage, resourceName } = this.props;
     const { selection } = this.state;
@@ -93,6 +98,7 @@ class Grid extends React.PureComponent {
             multiSelectable
             fixedHeader
             onRowSelection={this.handleRowSelection}
+            onCellClick={this.handleRowClick}
           >
             <TableHeader displaySelectAll={false}>
               <TableRow>
@@ -127,5 +133,5 @@ export default connect(
     const maxPage = getMaxPage(resourceName)(state);
     return { schema, items, page, maxPage, limit };
   },
-  { invoke }
+  { invoke, openDetails }
 )(Grid);
