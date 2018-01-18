@@ -36,7 +36,7 @@ class Details extends React.PureComponent {
             <ToolbarGroup>
               <RaisedButton label="Save" primary onClick={this.handleSave} />
               {id !== 'new' && <RaisedButton label="Remove" secondary onClick={this.handleRemove} />}
-              <RaisedButton label="Cancel" onClick={this.handleCancel} />
+              <RaisedButton label="Close" onClick={this.handleCancel} />
             </ToolbarGroup>
           </Toolbar>
         </header>
