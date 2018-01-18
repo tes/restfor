@@ -1,6 +1,6 @@
 const express = require('express');
 const getJsonSchema = require('./getJsonSchema');
-const { find, findById, bulkCreate, updateById, bulkDelete } = require('./defaultRoutes');
+const { findAll, findById, bulkCreate, updateById, bulkDelete } = require('./defaultRoutes');
 
 module.exports = ({ config, models, app, routeOverrides }) => {
   const modelNames = Object.keys(models);
@@ -19,7 +19,7 @@ const initRouter = (dependencies, resourceRouter, routeOverrides) => name => {
   const overrideRouter = routeOverrides[key];
   const router = express.Router();
 
-  router.get('/', find(name)(dependencies));
+  router.get('/', findAll(name)(dependencies));
   router.get('/:id', findById(name)(dependencies));
   router.post('/', bulkCreate(name)(dependencies));
   router.put('/:id', updateById(name)(dependencies));
