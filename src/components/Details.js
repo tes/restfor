@@ -15,6 +15,10 @@ import './Details.css';
 class Details extends React.PureComponent {
   state = this.props.record;
 
+  componentWillUpdate(nextProps) {
+    if (nextProps.record !== this.props.record) this.setState(nextProps.record);
+  }
+
   handleChange = propertyName => value => this.setState({ [propertyName]: value });
   handleSave = () => {};
   handleRemove = async () => {
