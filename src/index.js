@@ -6,6 +6,7 @@ import { Provider } from 'react-redux';
 import { Router, Route, hashHistory } from 'react-router';
 import App from './components/App';
 import Grid from './components/Grid';
+import Details from './components/Details';
 
 import store from './store';
 
@@ -15,6 +16,7 @@ ReactDOM.render(
       <Router history={hashHistory}>
         <Route path="/" component={App}>
           <Route path="/:resourceName" component={Grid} />
+          <Route path="/:resourceName/:id" component={Details} />
         </Route>
       </Router>
     </Provider>
