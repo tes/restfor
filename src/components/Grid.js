@@ -122,7 +122,7 @@ class Grid extends React.PureComponent {
 export default connect(
   (state, { resourceName }) => {
     const { resources: { [resourceName]: resource }, schemas, settings: { limit } } = state;
-    const { items, page } = resource || { items: null, page: null };
+    const { items, page } = resource || { items: null, page: 0 };
     const schema = schemas[resourceName] || {};
     const maxPage = getMaxPage(resourceName)(state);
     return { schema, items, page, maxPage, limit };
