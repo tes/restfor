@@ -1,5 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import { Link } from 'react-router';
 import { Toolbar, ToolbarGroup, ToolbarTitle } from 'material-ui/Toolbar';
 import FlatButton from 'material-ui/FlatButton';
 import RaisedButton from 'material-ui/RaisedButton';
@@ -64,6 +65,9 @@ class Grid extends React.PureComponent {
           <Toolbar style={{ width: '100%' }}>
             <ToolbarGroup>
               <ToolbarTitle text={resourceName.toUpperCase()} />
+              <Link to={`/${resourceName}/new`}>
+                <RaisedButton label="Add" primary />
+              </Link>
               {selection.length > 0 && (
                 <RaisedButton label="Remove selected items" secondary onClick={this.handleRemoveItems} />
               )}

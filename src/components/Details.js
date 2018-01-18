@@ -24,11 +24,11 @@ class Details extends React.PureComponent {
         <header className="dynamic layout">
           <Toolbar style={{ width: '100%' }}>
             <ToolbarGroup>
-              <ToolbarTitle text={`${resourceName.toUpperCase()} / ${id}`} />
+              <ToolbarTitle text={`${resourceName.toUpperCase()} / ${id.toString().toUpperCase()}`} />
             </ToolbarGroup>
             <ToolbarGroup>
               <RaisedButton label="Save" primary onClick={this.handleSave} />
-              <RaisedButton label="Remove" secondary onClick={this.handleRemove} />
+              {id !== 'new' && <RaisedButton label="Remove" secondary onClick={this.handleRemove} />}
               <RaisedButton label="Cancel" onClick={this.handleCancel} />
             </ToolbarGroup>
           </Toolbar>
@@ -36,7 +36,7 @@ class Details extends React.PureComponent {
         <main className="fitted column layout overflow-y">
           <table>
             <tbody>
-              {Object.keys(record).map(propertyName => (
+              {Object.keys(schema).map(propertyName => (
                 <tr key={propertyName}>
                   <td>{propertyName}</td>
                   <td>{getPropertyComponent(schema[propertyName], record[propertyName])}</td>
