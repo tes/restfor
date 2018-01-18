@@ -7,6 +7,7 @@
     "config": "^1.29.2",
     "cookie-parser": "^1.4.3",
     "cors": "^2.8.4",
+    "deep-equal": "^1.0.1",
     "express": "^4.16.2",
     "fs-extra": "^5.0.0",
     "material-ui": "^0.20.0",

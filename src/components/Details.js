@@ -1,5 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import isDeepEqual from 'deep-equal';
 import { Toolbar, ToolbarGroup, ToolbarTitle } from 'material-ui/Toolbar';
 import RaisedButton from 'material-ui/RaisedButton';
 import TextField from 'material-ui/TextField';
@@ -20,13 +21,21 @@ class Details extends React.PureComponent {
   }
 
   handleChange = propertyName => value => this.setState({ [propertyName]: value });
-  handleSave = () => {};
+  handleSave = async () => {
+    const { invoke, closeDetails, params: { resourceName, id } } = this.props;
+    await invoke('PUT', resourceName, '/:id', { params: { id }, body: this.state });
+    closeDetails();
+  };
   handleRemove = async () => {
     const { invoke, closeDetails, params: { resourceName, id } } = this.props;
     await invoke('DELETE', resourceName, '/', { body: [ id ] });
     closeDetails();
   };
   handleCancel = () => this.props.closeDetails();
+
+  isSaveButtonDisabled() {
+    return isDeepEqual(this.state, this.props.record);
+  }
 
   render() {
     const { params: { resourceName, id }, schema } = this.props;
@@ -38,7 +47,7 @@ class Details extends React.PureComponent {
               <ToolbarTitle text={`${resourceName.toUpperCase()} / ${id.toString().toUpperCase()}`} />
             </ToolbarGroup>
             <ToolbarGroup>
-              <RaisedButton label="Save" primary onClick={this.handleSave} />
+              <RaisedButton label="Save" primary onClick={this.handleSave} disabled={this.isSaveButtonDisabled()} />
               {id !== 'new' && <RaisedButton label="Remove" secondary onClick={this.handleRemove} />}
               <RaisedButton label="Close" onClick={this.handleCancel} />
             </ToolbarGroup>
