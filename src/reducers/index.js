@@ -1,10 +1,12 @@
 import { combineReducers } from 'redux';
-import entities from './entities';
+import schemas from './schemas';
+import resources from './resources';
 import isFetching from './isFetching';
 import error from './error';
 
 export default combineReducers({
-  entities,
+  schemas,
+  resources,
   isFetching,
   error
 });

@@ -4,8 +4,8 @@ import { Router, Route, hashHistory } from 'react-router';
 import AppBar from 'material-ui/AppBar';
 import Drawer from 'material-ui/Drawer';
 import MenuItem from 'material-ui/MenuItem';
-import EntityTabs from './EntityTabs';
-import { fetchEntities } from '../actionCreators';
+import ResourceTabs from './ResourceTabs';
+import { fetchSchemas } from '../actionCreators';
 
 class App extends React.PureComponent {
   state = {
@@ -13,7 +13,7 @@ class App extends React.PureComponent {
   };
 
   componentDidMount() {
-    this.props.fetchEntities();
+    this.props.fetchSchemas();
   }
 
   handleToggleDrawer = () => {
@@ -36,7 +36,7 @@ class App extends React.PureComponent {
         </Drawer>
         <main className="relative fitted layout">
           <Router history={hashHistory}>
-            <Route path="/:entity" component={EntityTabs} />
+            <Route path="/:resource" component={ResourceTabs} />
           </Router>
         </main>
       </div>
@@ -44,4 +44,4 @@ class App extends React.PureComponent {
   }
 }
 
-export default connect(({ isFetching }) => ({ isFetching }), { fetchEntities })(App);
+export default connect(({ isFetching }) => ({ isFetching }), { fetchSchemas })(App);

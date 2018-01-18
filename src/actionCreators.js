@@ -1,38 +1,48 @@
 import {
-  START_FETCHING_ENTITIES,
-  RESOLVE_FETCHING_ENTITIES,
-  REJECT_FETCHING_ENTITIES,
+  START_FETCHING_SCHEMAS,
+  RESOLVE_FETCHING_SCHEMAS,
+  REJECT_FETCHING_SCHEMAS,
   START_INVOKING,
   RESOLVE_INVOKING,
   REJECT_INVOKING
 } from './actionTypes';
 
-export const startFetchingEntities = () => ({ type: START_FETCHING_ENTITIES });
-export const resolveFetchingEntities = entities => ({ type: RESOLVE_FETCHING_ENTITIES, entities });
-export const rejectFetchingEntities = error => ({ type: REJECT_FETCHING_ENTITIES, error });
-export const fetchEntities = () => async (dispatch, getState, { api, hashHistory }) => {
+export const startFetchingSchemas = () => ({ type: START_FETCHING_SCHEMAS });
+export const resolveFetchingSchemas = schemas => ({ type: RESOLVE_FETCHING_SCHEMAS, schemas });
+export const rejectFetchingSchemas = error => ({ type: REJECT_FETCHING_SCHEMAS, error });
+
+export const fetchSchemas = () => async (dispatch, getState, { api, hashHistory }) => {
   try {
-    dispatch(startFetchingEntities());
-    const entities = await api.get('/entities');
-    dispatch(resolveFetchingEntities(entities));
-    if (entities.length > 0) hashHistory.push('/' + entities[0].toLowerCase());
+    dispatch(startFetchingSchemas());
+    const schemas = await api.get('/schemas');
+    dispatch(resolveFetchingSchemas(schemas));
+    if (schemas.length > 0) hashHistory.push('/' + schemas[0].toLowerCase());
   } catch (error) {
-    dispatch(rejectFetchingEntities(error.message));
+    dispatch(rejectFetchingSchemas(error.message));
   }
 };
-export const switchEntity = entity => (dispatch, getState, { hashHistory }) => {
-  hashHistory.push('/' + entity.toLowerCase());
+export const switchResource = resource => (dispatch, getState, { hashHistory }) => {
+  hashHistory.push('/' + resource.toLowerCase());
 };
 
-export const startInvoking = (method, path) => ({ type: START_INVOKING, method, path });
-export const resolveInvoking = (method, path, result) => ({ type: RESOLVE_INVOKING, method, path, result });
-export const rejectInvoking = (method, path, error) => ({ type: REJECT_INVOKING, method, path, error });
-export const invoke = (method, path, { params = {}, query = {}, body } = {}) => async (dispatch, getState, { api }) => {
+export const startInvoking = () => ({ type: START_INVOKING });
+export const resolveInvoking = (result, request, reducer) => ({ type: RESOLVE_INVOKING, result, request, reducer });
+export const rejectInvoking = (error, request, reducer) => ({ type: REJECT_INVOKING, error, request, reducer });
+
+export const invoke = (method, resourceName, path, ...args) => async (dispatch, getState, { api }) => {
+  const options = args.find(arg => typeof arg === 'object') || { params: {}, query: {} };
+  const reducer = args.find(arg => typeof arg === 'function');
+  const { params = {}, query = {}, body } = options;
+  const request = { method: method.toUpperCase(), resourceName, path, params, query, body };
   try {
-    dispatch(startInvoking(method.toUpperCase(), path));
-    const result = await api[method.toLowerCase()](`/resources${path}`, { params, query, body });
-    dispatch(resolveInvoking(method.toUpperCase(), path, result));
+    dispatch(startInvoking());
+    const result = await api[method.toLowerCase()](`/resources/${resourceName.toLowerCase()}${path}`, {
+      params,
+      query,
+      body
+    });
+    dispatch(resolveInvoking(result, request, reducer));
   } catch (error) {
-    dispatch(rejectInvoking(method.toUpperCase(), path, error.message));
+    dispatch(rejectInvoking(error.message, request, reducer));
   }
 };

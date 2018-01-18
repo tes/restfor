@@ -7,9 +7,9 @@ module.exports = ({ config, models, app, routeOverrides }) => {
   const resourceRouter = express.Router();
   modelNames.forEach(initRouter({ config, models }, resourceRouter, routeOverrides));
   app.use('/resources', resourceRouter);
-  app.get('/entities', (req, res) => {
+  app.get('/schemas', (req, res) => {
     res.json(
-      modelNames.reduce((entities, name) => ({ ...entities, [name]: getJsonSchema(models[name].attributes) }), {})
+      modelNames.reduce((schemas, name) => ({ ...schemas, [name]: getJsonSchema(models[name].attributes) }), {})
     );
   });
 };

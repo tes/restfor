@@ -13,9 +13,8 @@ class Grid extends React.PureComponent {
   }
 
   ensureItems() {
-    if (this.props.isActive && !this.props.items) {
-      this.props.invoke('GET', `/${this.props.entityName.toLowerCase()}`);
-    }
+    const { isActive, items, invoke, resourceName } = this.props;
+    if (isActive && !items) invoke('GET', resourceName, '/');
   }
 
   render() {
@@ -47,13 +46,10 @@ class Grid extends React.PureComponent {
 }
 
 export default connect(
-  ({ entities }, { entityName }) => {
-    const entity = entities[entityName] || { schema: {}, items: null, page: null };
-    return {
-      schema: entity.schema,
-      items: entity.items,
-      page: entity.page
-    };
+  ({ resources, schemas }, { resourceName }) => {
+    const { items, page } = resources[resourceName] || { items: null, page: null };
+    const schema = schemas[resourceName] || {};
+    return { schema, items, page };
   },
   { invoke }
 )(Grid);

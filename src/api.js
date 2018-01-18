@@ -10,7 +10,12 @@ const call = method => (path, { params = {}, query = {}, headers = {}, body } = 
     method: method.toUpperCase(),
     body: body ? JSON.stringify(body) : undefined,
     headers
-  }).then(res => res.json());
+  })
+    .then(res => res.json())
+    .catch(error => {
+      console.error(error);
+      throw error;
+    });
 
 export default {
   get: call('GET'),
