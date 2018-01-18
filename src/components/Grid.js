@@ -47,6 +47,7 @@ class Grid extends React.PureComponent {
     const { invoke, items, params: { resourceName } } = this.props;
     const itemIds = this.state.selection.map(index => items[index].id);
     await invoke('DELETE', resourceName, '/', { body: itemIds });
+    this.setState({ selection: [] });
     await this.fetchItems();
   };
 
