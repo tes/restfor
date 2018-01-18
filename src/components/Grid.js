@@ -14,15 +14,20 @@ class Grid extends React.PureComponent {
 
   ensureItems() {
     const { isActive, items, invoke, resourceName } = this.props;
-    if (isActive && !items) invoke('GET', resourceName, '/');
+    if (isActive && !items)
+      invoke('GET', resourceName, '/', (state, error, result) => {
+        if (error) return { ...state, items: null, count: 0, page: 0 };
+        if (result) return { ...state, items: result.rows, count: result.count, page: 0 };
+        return state;
+      });
   }
 
   render() {
     const { schema, items } = this.props;
     return (
-      <div className="fitted layout list card">
-        <Table ref="table" style={{ overflow: 'hidden' }}>
-          <TableHeader displaySelectAll={false} adjustForCheckbox={false}>
+      <div className="fitted layout">
+        <Table height={'calc(100% - 59px)'} wrapperStyle={{ height: '100%' }} multiSelectable fixedHeader>
+          <TableHeader enableSelectAll>
             <TableRow>
               {Object.keys(schema).map(propertyName => (
                 <TableHeaderColumn key={propertyName}>
@@ -35,7 +40,9 @@ class Grid extends React.PureComponent {
             {(items || [])
               .map(item => (
                 <TableRow key={item.id}>
-                  {Object.keys(item).map(propertyName => <TableRowColumn>{item[propertyName]}</TableRowColumn>)}
+                  {Object.keys(item).map(propertyName => (
+                    <TableRowColumn key={propertyName}>{item[propertyName]}</TableRowColumn>
+                  ))}
                 </TableRow>
               ))}
           </TableBody>
