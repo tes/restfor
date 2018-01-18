@@ -18,12 +18,12 @@ class App extends React.PureComponent {
   }
 
   componentDidUpdate(prevProps) {
-    if (prevProps.params.resourceName !== this.props.params.resourceName) this.ensureItems();
+    if (prevProps.location.pathname !== this.props.location.pathname) this.ensureItems();
   }
 
   ensureItems() {
-    const { params: { resourceName }, items, limit, page } = this.props;
-    if (resourceName && !items) this.fetchItems(resourceName, limit, page);
+    const { params: { resourceName }, limit, page } = this.props;
+    if (resourceName) this.fetchItems(resourceName, limit, page);
   }
 
   fetchItems(resourceName, limit, page) {
@@ -64,20 +64,8 @@ class App extends React.PureComponent {
 
 export default connect(
   (state, { resourceName }) => {
-    const {
-      resources: { [resourceName]: { items, page } = { items: null, page: 0 } },
-      schemas,
-      settings: { limit }
-    } = state;
-    return {
-      schemaList: Object.keys(schemas),
-      items,
-      page,
-      limit
-    };
+    const { resources: { [resourceName]: { page } = { page: 0 } }, schemas, settings: { limit } } = state;
+    return { schemaList: Object.keys(schemas), page, limit };
   },
-  {
-    fetchSchemas,
-    invoke
-  }
+  { fetchSchemas, invoke }
 )(App);

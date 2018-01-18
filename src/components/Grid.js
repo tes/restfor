@@ -137,7 +137,7 @@ const getCellComponent = (schema, value) => {
 export default connect(
   (state, { params: { resourceName } }) => {
     const { resources: { [resourceName]: resource }, schemas, settings: { limit } } = state;
-    const { items, page } = resource || { items: null, page: 0 };
+    const { items, page } = resource || { items: [], page: 0 };
     const schema = schemas[resourceName] || {};
     const maxPage = getMaxPage(resourceName)(state);
     return { schema, items, page, maxPage, limit };
