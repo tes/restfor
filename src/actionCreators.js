@@ -1,6 +1,4 @@
 import {
-  OPEN_DETAILS,
-  CLOSE_DETAILS,
   START_FETCHING_SCHEMAS,
   RESOLVE_FETCHING_SCHEMAS,
   REJECT_FETCHING_SCHEMAS,
@@ -9,8 +7,8 @@ import {
   REJECT_INVOKING
 } from './actionTypes';
 
-export const openDetails = (resourceName, id) => ({ type: OPEN_DETAILS, resourceName, id });
-export const closeDetails = () => ({ type: CLOSE_DETAILS });
+export const openDetails = (resourceName, id) => (dispatch, getState, { hashHistory }) => {};
+export const closeDetails = () => (dispatch, getState, { hashHistory }) => {};
 
 export const startFetchingSchemas = () => ({ type: START_FETCHING_SCHEMAS });
 export const resolveFetchingSchemas = schemas => ({ type: RESOLVE_FETCHING_SCHEMAS, schemas });
