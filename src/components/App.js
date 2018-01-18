@@ -6,6 +6,7 @@ import Drawer from 'material-ui/Drawer';
 import MenuItem from 'material-ui/MenuItem';
 import { fetchSchemas } from '../actionCreators';
 import { invoke } from '../actionCreators';
+import { getOffsetFromPage } from '../helpers/page';
 
 class App extends React.PureComponent {
   state = {
@@ -14,23 +15,24 @@ class App extends React.PureComponent {
 
   async componentDidMount() {
     await this.props.fetchSchemas();
-    await this.ensureItems();
+    await this.fetchItems();
   }
 
   componentDidUpdate(prevProps) {
-    if (prevProps.location.pathname !== this.props.location.pathname) this.ensureItems();
+    if (
+      prevProps.location.pathname !== this.props.location.pathname ||
+      prevProps.location.query.page !== this.props.location.query.page
+    )
+      this.fetchItems();
   }
 
-  ensureItems() {
-    const { params: { resourceName, id }, limit, page } = this.props;
-    if (resourceName) this.fetchItems(resourceName, limit, page, id);
-  }
-
-  fetchItems(resourceName, limit, page, id) {
+  fetchItems() {
+    const { params: { resourceName, id }, limit, location: { query: { page } } } = this.props;
+    if (!resourceName) return;
     if (id && id !== 'new') {
       this.props.invoke('GET', resourceName, '/:id', { params: { id: Number(id) } }, (state, error, result) => {
         if (error) return state;
-        if (result) return { ...state, items: [ result ], count: 1, page: 0 };
+        if (result) return { ...state, items: [ result ], count: 1 };
         return state;
       });
     } else {
@@ -38,10 +40,10 @@ class App extends React.PureComponent {
         'GET',
         resourceName,
         '/',
-        { query: { offset: page * limit, limit } },
+        { query: { offset: getOffsetFromPage(page, limit), limit } },
         (state, error, result) => {
           if (error) return state;
-          if (result) return { ...state, items: result.rows, count: result.count, page };
+          if (result) return { ...state, items: result.rows, count: result.count };
           return state;
         }
       );
@@ -65,7 +67,7 @@ class App extends React.PureComponent {
         </header>
         <Drawer open={this.state.isDrawerOpen} docked={false} onRequestChange={this.handleToggleDrawer}>
           {schemaList.map(name => (
-            <Link to={`/${name}`} key={name} onClick={this.handleToggleDrawer}>
+            <Link to={`/${name}?page=1`} key={name} onClick={this.handleToggleDrawer}>
               <MenuItem disabled={name === resourceName}>{name.toUpperCase()}</MenuItem>
             </Link>
           ))}
@@ -77,9 +79,6 @@ class App extends React.PureComponent {
 }
 
 export default connect(
-  (state, { resourceName }) => {
-    const { resources: { [resourceName]: { page } = { page: 0 } }, schemas, settings: { limit } } = state;
-    return { schemaList: Object.keys(schemas), page, limit };
-  },
+  ({ schemas, settings: { limit } }, { resourceName }) => ({ schemaList: Object.keys(schemas), limit }),
   { fetchSchemas, invoke }
 )(App);

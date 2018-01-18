@@ -6,7 +6,7 @@ export default (state = {}, action) => {
       return Object.keys(action.schemas).reduce(
         (resources, name) => ({
           ...resources,
-          [name]: state[name] || { items: [], count: 0, page: 0 }
+          [name]: state[name] || { items: [], count: 0 }
         }),
         {}
       );

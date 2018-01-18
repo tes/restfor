@@ -6,12 +6,19 @@ import {
   RESOLVE_INVOKING,
   REJECT_INVOKING
 } from './actionTypes';
+import { changePage } from './helpers/page';
 
-export const openDetails = (resourceName, id) => (dispatch, getState, { hashHistory }) => {
-  hashHistory.push(`/${resourceName}/${id}`);
+export const openDetails = id => (dispatch, getState, { hashHistory }) => {
+  const { pathname } = hashHistory.getCurrentLocation();
+  hashHistory.push(`${pathname}/${id}`);
 };
 export const closeDetails = () => (dispatch, getState, { hashHistory }) => {
   hashHistory.goBack();
+};
+
+export const switchPage = value => (dispatch, getState, { hashHistory }) => {
+  const { pathname, query: { page } } = hashHistory.getCurrentLocation();
+  hashHistory.push(`${pathname}?page=${changePage(page, value) + 1}`);
 };
 
 export const startFetchingSchemas = () => ({ type: START_FETCHING_SCHEMAS });

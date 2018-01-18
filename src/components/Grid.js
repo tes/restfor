@@ -9,29 +9,32 @@ import ArrowForward from 'material-ui/svg-icons/navigation/arrow-forward';
 import Check from 'material-ui/svg-icons/navigation/check';
 import Chip from 'material-ui/Chip';
 import { Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn } from 'material-ui/Table';
-import { invoke, openDetails } from '../actionCreators';
+import { invoke, openDetails, switchPage } from '../actionCreators';
 import { getMaxPage } from '../selectors';
-
-const BACK = Symbol();
-const FORWARD = Symbol();
+import { resolvePage, getOffsetFromPage } from '../helpers/page';
 
 class Grid extends React.PureComponent {
   state = {
     selection: []
   };
 
-  fetchItems(resourceName, limit, page) {
-    this.props.invoke('GET', resourceName, '/', { query: { offset: page * limit, limit } }, (state, error, result) => {
-      if (error) return state;
-      if (result) return { ...state, items: result.rows, count: result.count, page };
-      return state;
-    });
+  fetchItems() {
+    const { limit, params: { resourceName }, location: { query: { page } } } = this.props;
+    this.props.invoke(
+      'GET',
+      resourceName,
+      '/',
+      { query: { offset: getOffsetFromPage(page, limit), limit } },
+      (state, error, result) => {
+        if (error) return state;
+        if (result) return { ...state, items: result.rows, count: result.count };
+        return state;
+      }
+    );
   }
 
-  handlePagination = direction => () => {
-    const { params: { resourceName }, page, limit } = this.props;
-    const nextPage = page + (direction === FORWARD ? +1 : -1);
-    this.fetchItems(resourceName, limit, nextPage);
+  handlePagination = value => () => {
+    this.props.switchPage(value);
   };
 
   handleRowSelection = selections => {
@@ -41,23 +44,21 @@ class Grid extends React.PureComponent {
   };
 
   handleRemoveItems = async () => {
-    const { invoke, items, limit, page, params: { resourceName } } = this.props;
+    const { invoke, items, params: { resourceName } } = this.props;
     const itemIds = this.state.selection.map(index => items[index].id);
-    await invoke('DELETE', resourceName, '/', { body: itemIds }, (state, error, result) => {
-      console.log(result);
-      return state;
-    });
-    await this.fetchItems(resourceName, limit, page);
+    await invoke('DELETE', resourceName, '/', { body: itemIds });
+    await this.fetchItems();
   };
 
   handleRowClick = (rowIndex, cellIndex) => {
     if (cellIndex === -1) return;
     const id = this.props.items[rowIndex].id;
-    this.props.openDetails(this.props.params.resourceName, id);
+    this.props.openDetails(id);
   };
 
   render() {
-    const { schema, items, page, maxPage, params: { resourceName } } = this.props;
+    const { schema, items, maxPage, params: { resourceName }, location: { query: { page: rawPage } } } = this.props;
+    const page = resolvePage(rawPage);
     const { selection } = this.state;
     return (
       <div className="fitted column layout">
@@ -73,15 +74,11 @@ class Grid extends React.PureComponent {
               )}
             </ToolbarGroup>
             <ToolbarGroup>
-              <FlatButton icon={<ArrowBack />} disabled={page === 0} onClick={this.handlePagination(BACK)} />
+              <FlatButton icon={<ArrowBack />} disabled={page === 0} onClick={this.handlePagination(-1)} />
               <FlatButton disabled>
                 {page + 1} / {maxPage}
               </FlatButton>
-              <FlatButton
-                icon={<ArrowForward />}
-                disabled={page >= maxPage - 1}
-                onClick={this.handlePagination(FORWARD)}
-              />
+              <FlatButton icon={<ArrowForward />} disabled={page >= maxPage - 1} onClick={this.handlePagination(+1)} />
             </ToolbarGroup>
           </Toolbar>
         </header>
@@ -142,5 +139,5 @@ export default connect(
     const maxPage = getMaxPage(resourceName)(state);
     return { schema, items, page, maxPage, limit };
   },
-  { invoke, openDetails }
+  { invoke, openDetails, switchPage }
 )(Grid);
