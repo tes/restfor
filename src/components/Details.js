@@ -117,7 +117,7 @@ const getPropertyComponent = (propertyName, value, onChange, schema) => {
     case 'DATE':
       return (
         <DateTimePicker
-          value={new Date(value)}
+          value={value ? new Date(value) : null}
           DatePicker={DatePickerDialog}
           TimePicker={TimePickerDialog}
           onChange={value => onChange(value.toISOString())}
