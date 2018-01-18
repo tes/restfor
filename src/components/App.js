@@ -22,16 +22,30 @@ class App extends React.PureComponent {
   }
 
   ensureItems() {
-    const { params: { resourceName }, limit, page } = this.props;
-    if (resourceName) this.fetchItems(resourceName, limit, page);
+    const { params: { resourceName, id }, limit, page } = this.props;
+    if (resourceName) this.fetchItems(resourceName, limit, page, id);
   }
 
-  fetchItems(resourceName, limit, page) {
-    this.props.invoke('GET', resourceName, '/', { query: { offset: page * limit, limit } }, (state, error, result) => {
-      if (error) return state;
-      if (result) return { ...state, items: result.rows, count: result.count, page };
-      return state;
-    });
+  fetchItems(resourceName, limit, page, id) {
+    if (id && id !== 'new') {
+      this.props.invoke('GET', resourceName, '/:id', { params: { id: Number(id) } }, (state, error, result) => {
+        if (error) return state;
+        if (result) return { ...state, items: [ result ], count: 1, page: 0 };
+        return state;
+      });
+    } else {
+      this.props.invoke(
+        'GET',
+        resourceName,
+        '/',
+        { query: { offset: page * limit, limit } },
+        (state, error, result) => {
+          if (error) return state;
+          if (result) return { ...state, items: result.rows, count: result.count, page };
+          return state;
+        }
+      );
+    }
   }
 
   handleToggleDrawer = () => {
