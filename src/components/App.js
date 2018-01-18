@@ -4,7 +4,7 @@ import { Link } from 'react-router';
 import AppBar from 'material-ui/AppBar';
 import Drawer from 'material-ui/Drawer';
 import MenuItem from 'material-ui/MenuItem';
-import { fetchSchemas, switchResource } from '../actionCreators';
+import { fetchSchemas } from '../actionCreators';
 
 class App extends React.PureComponent {
   state = {
@@ -17,11 +17,6 @@ class App extends React.PureComponent {
 
   handleToggleDrawer = () => {
     this.setState({ isDrawerOpen: !this.state.isDrawerOpen });
-  };
-
-  handleSchemaClick = resourceName => () => {
-    this.props.switchResource(resourceName);
-    this.handleToggleDrawer();
   };
 
   render() {
@@ -37,7 +32,7 @@ class App extends React.PureComponent {
         </header>
         <Drawer open={this.state.isDrawerOpen} docked={false} onRequestChange={this.handleToggleDrawer}>
           {schemaList.map(name => (
-            <Link to={`/${name}`} key={name}>
+            <Link to={`/${name}`} key={name} onClick={this.handleToggleDrawer}>
               <MenuItem disabled={name === resourceName}>{name.toUpperCase()}</MenuItem>
             </Link>
           ))}
@@ -49,6 +44,5 @@ class App extends React.PureComponent {
 }
 
 export default connect(({ schemas, isFetching }) => ({ schemaList: Object.keys(schemas), isFetching }), {
-  fetchSchemas,
-  switchResource
+  fetchSchemas
 })(App);

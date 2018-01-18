@@ -28,9 +28,6 @@ export const fetchSchemas = () => async (dispatch, getState, { api, hashHistory 
     dispatch(rejectFetchingSchemas(error.message));
   }
 };
-export const switchResource = resource => (dispatch, getState, { hashHistory }) => {
-  hashHistory.push('/' + resource.toLowerCase());
-};
 
 export const startInvoking = () => ({ type: START_INVOKING });
 export const resolveInvoking = (result, request, reducer) => ({ type: RESOLVE_INVOKING, result, request, reducer });
