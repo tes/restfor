@@ -9,7 +9,7 @@ const call = method => (path, { params = {}, query = {}, headers = {}, body } = 
   fetch(`${API_URL}${injectParams(path, params)}?${stringify(query)}`, {
     method: method.toUpperCase(),
     body: body ? JSON.stringify(body) : undefined,
-    headers
+    headers: { ...headers, 'Content-Type': 'application/json' }
   })
     .then(res => res.json())
     .catch(error => {

@@ -2,7 +2,10 @@ const Op = require('sequelize').Op;
 const requestHandler = require('./requestHandler');
 
 module.exports.findAll = name => ({ models }) =>
-  requestHandler(({ offset, limit }) => models[name].findAndCount({ offset, limit }), req => req.query);
+  requestHandler(
+    ({ offset, limit }) => models[name].findAndCount({ offset, limit }),
+    req => ({ offset: Number(req.query.offset), limit: Number(req.query.limit) })
+  );
 
 module.exports.findById = name => ({ models }) =>
   requestHandler(

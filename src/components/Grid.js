@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { Toolbar, ToolbarGroup } from 'material-ui/Toolbar';
+import { Toolbar, ToolbarGroup, ToolbarTitle } from 'material-ui/Toolbar';
 import FlatButton from 'material-ui/FlatButton';
 import RaisedButton from 'material-ui/RaisedButton';
 import ArrowBack from 'material-ui/svg-icons/navigation/arrow-back';
@@ -9,7 +9,14 @@ import { Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowCol
 import { invoke } from '../actionCreators';
 import { getMaxPage } from '../selectors';
 
+const BACK = Symbol();
+const FORWARD = Symbol();
+
 class Grid extends React.PureComponent {
+  state = {
+    selection: []
+  };
+
   componentDidMount() {
     this.ensureItems();
   }
@@ -19,36 +26,75 @@ class Grid extends React.PureComponent {
   }
 
   ensureItems() {
-    const { isActive, items, invoke, resourceName } = this.props;
-    if (isActive && !items)
-      invoke('GET', resourceName, '/', (state, error, result) => {
-        if (error) return { ...state, items: null, count: 0, page: 0 };
-        if (result) return { ...state, items: result.rows, count: result.count, page: 1 };
-        return state;
-      });
+    const { isActive, items, resourceName, limit, page } = this.props;
+    if (isActive && !items) this.fetchItems(resourceName, limit, page);
   }
 
+  fetchItems(resourceName, limit, page) {
+    this.props.invoke('GET', resourceName, '/', { query: { offset: page * limit, limit } }, (state, error, result) => {
+      if (error) return state;
+      if (result) return { ...state, items: result.rows, count: result.count, page };
+      return state;
+    });
+  }
+
+  handlePagination = direction => () => {
+    const { resourceName, page, limit } = this.props;
+    const nextPage = page + (direction === FORWARD ? +1 : -1);
+    this.fetchItems(resourceName, limit, nextPage);
+  };
+
+  handleRowSelection = selections => {
+    const selection =
+      typeof selections === 'string' ? (selections === 'none' ? [] : this.props.items.map((_, i) => i)) : selections;
+    this.setState({ selection });
+  };
+
+  handleRemoveItems = async () => {
+    const { invoke, items, limit, page, resourceName } = this.props;
+    const itemIds = this.state.selection.map(index => items[index].id);
+    await invoke('DELETE', resourceName, '/', { body: itemIds }, (state, error, result) => {
+      console.log(result);
+      return state;
+    });
+    await this.fetchItems(resourceName, limit, page);
+  };
+
   render() {
-    const { schema, items, page, maxPage } = this.props;
+    const { schema, items, page, maxPage, resourceName } = this.props;
+    const { selection } = this.state;
     return (
       <div className="fitted column layout">
         <header className="dynamic layout">
           <Toolbar style={{ width: '100%' }}>
             <ToolbarGroup>
-              <RaisedButton label="Remove selected items" secondary />
+              <ToolbarTitle text={resourceName} />
+              {selection.length > 0 && (
+                <RaisedButton label="Remove selected items" secondary onClick={this.handleRemoveItems} />
+              )}
             </ToolbarGroup>
             <ToolbarGroup>
-              <FlatButton icon={<ArrowBack />} disabled={page === 1} />
+              <FlatButton icon={<ArrowBack />} disabled={page === 0} onClick={this.handlePagination(BACK)} />
               <FlatButton disabled>
-                {page} / {maxPage}
+                {page + 1} / {maxPage}
               </FlatButton>
-              <FlatButton icon={<ArrowForward />} disabled={page === maxPage} />
+              <FlatButton
+                icon={<ArrowForward />}
+                disabled={page >= maxPage - 1}
+                onClick={this.handlePagination(FORWARD)}
+              />
             </ToolbarGroup>
           </Toolbar>
         </header>
         <main className="fitted layout">
-          <Table height={'calc(100% - 59px)'} wrapperStyle={{ height: '100%' }} multiSelectable fixedHeader>
-            <TableHeader enableSelectAll>
+          <Table
+            height={'calc(100% - 59px)'}
+            wrapperStyle={{ height: '100%' }}
+            multiSelectable
+            fixedHeader
+            onRowSelection={this.handleRowSelection}
+          >
+            <TableHeader displaySelectAll={false}>
               <TableRow>
                 {Object.keys(schema).map(propertyName => (
                   <TableHeaderColumn key={propertyName}>
@@ -57,15 +103,14 @@ class Grid extends React.PureComponent {
                 ))}
               </TableRow>
             </TableHeader>
-            <TableBody>
-              {(items || [])
-                .map(item => (
-                  <TableRow key={item.id}>
-                    {Object.keys(item).map(propertyName => (
-                      <TableRowColumn key={propertyName}>{item[propertyName]}</TableRowColumn>
-                    ))}
-                  </TableRow>
-                ))}
+            <TableBody deselectOnClickaway={false}>
+              {(items || []).map((item, i) => (
+                <TableRow key={i} selected={selection.includes(i)}>
+                  {Object.keys(item).map(propertyName => (
+                    <TableRowColumn key={propertyName}>{item[propertyName]}</TableRowColumn>
+                  ))}
+                </TableRow>
+              ))}
             </TableBody>
           </Table>
         </main>
@@ -76,11 +121,11 @@ class Grid extends React.PureComponent {
 
 export default connect(
   (state, { resourceName }) => {
-    const { resources, schemas } = state;
-    const { items, page } = resources[resourceName] || { items: null, page: null };
+    const { resources: { [resourceName]: resource }, schemas, settings: { limit } } = state;
+    const { items, page } = resource || { items: null, page: null };
     const schema = schemas[resourceName] || {};
     const maxPage = getMaxPage(resourceName)(state);
-    return { schema, items, page, maxPage };
+    return { schema, items, page, maxPage, limit };
   },
   { invoke }
 )(Grid);
