@@ -101,7 +101,7 @@ class Grid extends React.PureComponent {
                 ))}
               </TableRow>
             </TableHeader>
-            <TableBody deselectOnClickaway={false}>
+            <TableBody deselectOnClickaway={false} showRowHover>
               {(items || []).map((item, i) => (
                 <TableRow key={i} selected={selection.includes(i)}>
                   {Object.keys(item).map(propertyName => (
