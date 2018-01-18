@@ -9,7 +9,10 @@ module.exports = ({ config, models, app, routeOverrides }) => {
   app.use('/resources', resourceRouter);
   app.get('/schemas', (req, res) => {
     res.json(
-      modelNames.reduce((schemas, name) => ({ ...schemas, [name]: getJsonSchema(models[name].attributes) }), {})
+      modelNames.reduce(
+        (schemas, name) => ({ ...schemas, [name.toLowerCase()]: getJsonSchema(models[name].attributes) }),
+        {}
+      )
     );
   });
 };

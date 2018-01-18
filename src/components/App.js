@@ -1,11 +1,10 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { Router, Route, hashHistory } from 'react-router';
 import AppBar from 'material-ui/AppBar';
 import Drawer from 'material-ui/Drawer';
 import MenuItem from 'material-ui/MenuItem';
-import ResourceTabs from './ResourceTabs';
-import { fetchSchemas } from '../actionCreators';
+import Grid from './Grid';
+import { fetchSchemas, switchResource } from '../actionCreators';
 
 class App extends React.PureComponent {
   state = {
@@ -20,7 +19,13 @@ class App extends React.PureComponent {
     this.setState({ isDrawerOpen: !this.state.isDrawerOpen });
   };
 
+  handleSchemaClick = resourceName => () => {
+    this.props.switchResource(resourceName);
+    this.handleToggleDrawer();
+  };
+
   render() {
+    const { schemaList, params: { resourceName } } = this.props;
     return (
       <div className="absolute column layout">
         <header className="dynamic">
@@ -31,17 +36,19 @@ class App extends React.PureComponent {
           />
         </header>
         <Drawer open={this.state.isDrawerOpen} docked={false} onRequestChange={this.handleToggleDrawer}>
-          <MenuItem onClick={this.handleToggleDrawer}>Menu Item</MenuItem>
-          <MenuItem onClick={this.handleToggleDrawer}>Menu Item 2</MenuItem>
+          {schemaList.map(name => (
+            <MenuItem key={name} onClick={this.handleSchemaClick(name)} disabled={name === resourceName}>
+              {name.toUpperCase()}
+            </MenuItem>
+          ))}
         </Drawer>
-        <main className="relative fitted layout">
-          <Router history={hashHistory}>
-            <Route path="/:resource" component={ResourceTabs} />
-          </Router>
-        </main>
+        <main className="relative fitted layout">{resourceName && <Grid resourceName={resourceName} />}</main>
       </div>
     );
   }
 }
 
-export default connect(({ isFetching }) => ({ isFetching }), { fetchSchemas })(App);
+export default connect(({ schemas, isFetching }) => ({ schemaList: Object.keys(schemas), isFetching }), {
+  fetchSchemas,
+  switchResource
+})(App);

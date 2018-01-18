@@ -21,13 +21,13 @@ class Grid extends React.PureComponent {
     this.ensureItems();
   }
 
-  componentDidUpdate() {
-    this.ensureItems();
+  componentDidUpdate(prevProps) {
+    if (prevProps.resourceName !== this.props.resourceName) this.ensureItems();
   }
 
   ensureItems() {
-    const { isActive, items, resourceName, limit, page } = this.props;
-    if (isActive && !items) this.fetchItems(resourceName, limit, page);
+    const { resourceName, items, limit, page } = this.props;
+    if (resourceName && !items) this.fetchItems(resourceName, limit, page);
   }
 
   fetchItems(resourceName, limit, page) {
@@ -68,7 +68,7 @@ class Grid extends React.PureComponent {
         <header className="dynamic layout">
           <Toolbar style={{ width: '100%' }}>
             <ToolbarGroup>
-              <ToolbarTitle text={resourceName} />
+              <ToolbarTitle text={resourceName.toUpperCase()} />
               {selection.length > 0 && (
                 <RaisedButton label="Remove selected items" secondary onClick={this.handleRemoveItems} />
               )}
