@@ -19,19 +19,6 @@ class Grid extends React.PureComponent {
     selection: []
   };
 
-  componentDidMount() {
-    this.ensureItems();
-  }
-
-  componentDidUpdate(prevProps) {
-    if (prevProps.params.resourceName !== this.props.params.resourceName) this.ensureItems();
-  }
-
-  ensureItems() {
-    const { params: { resourceName }, items, limit, page } = this.props;
-    if (resourceName && !items) this.fetchItems(resourceName, limit, page);
-  }
-
   fetchItems(resourceName, limit, page) {
     this.props.invoke('GET', resourceName, '/', { query: { offset: page * limit, limit } }, (state, error, result) => {
       if (error) return state;

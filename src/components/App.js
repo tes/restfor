@@ -5,14 +5,33 @@ import AppBar from 'material-ui/AppBar';
 import Drawer from 'material-ui/Drawer';
 import MenuItem from 'material-ui/MenuItem';
 import { fetchSchemas } from '../actionCreators';
+import { invoke } from '../actionCreators';
 
 class App extends React.PureComponent {
   state = {
     isDrawerOpen: false
   };
 
-  componentDidMount() {
-    this.props.fetchSchemas();
+  async componentDidMount() {
+    await this.props.fetchSchemas();
+    await this.ensureItems();
+  }
+
+  componentDidUpdate(prevProps) {
+    if (prevProps.params.resourceName !== this.props.params.resourceName) this.ensureItems();
+  }
+
+  ensureItems() {
+    const { params: { resourceName }, items, limit, page } = this.props;
+    if (resourceName && !items) this.fetchItems(resourceName, limit, page);
+  }
+
+  fetchItems(resourceName, limit, page) {
+    this.props.invoke('GET', resourceName, '/', { query: { offset: page * limit, limit } }, (state, error, result) => {
+      if (error) return state;
+      if (result) return { ...state, items: result.rows, count: result.count, page };
+      return state;
+    });
   }
 
   handleToggleDrawer = () => {
@@ -43,6 +62,22 @@ class App extends React.PureComponent {
   }
 }
 
-export default connect(({ schemas, isFetching }) => ({ schemaList: Object.keys(schemas), isFetching }), {
-  fetchSchemas
-})(App);
+export default connect(
+  (state, { resourceName }) => {
+    const {
+      resources: { [resourceName]: { items, page } = { items: null, page: 0 } },
+      schemas,
+      settings: { limit }
+    } = state;
+    return {
+      schemaList: Object.keys(schemas),
+      items,
+      page,
+      limit
+    };
+  },
+  {
+    fetchSchemas,
+    invoke
+  }
+)(App);
