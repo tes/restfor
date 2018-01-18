@@ -22,11 +22,11 @@ class Grid extends React.PureComponent {
   }
 
   componentDidUpdate(prevProps) {
-    if (prevProps.resourceName !== this.props.resourceName) this.ensureItems();
+    if (prevProps.params.resourceName !== this.props.params.resourceName) this.ensureItems();
   }
 
   ensureItems() {
-    const { resourceName, items, limit, page } = this.props;
+    const { params: { resourceName }, items, limit, page } = this.props;
     if (resourceName && !items) this.fetchItems(resourceName, limit, page);
   }
 
@@ -39,7 +39,7 @@ class Grid extends React.PureComponent {
   }
 
   handlePagination = direction => () => {
-    const { resourceName, page, limit } = this.props;
+    const { params: { resourceName }, page, limit } = this.props;
     const nextPage = page + (direction === FORWARD ? +1 : -1);
     this.fetchItems(resourceName, limit, nextPage);
   };
@@ -51,7 +51,7 @@ class Grid extends React.PureComponent {
   };
 
   handleRemoveItems = async () => {
-    const { invoke, items, limit, page, resourceName } = this.props;
+    const { invoke, items, limit, page, params: { resourceName } } = this.props;
     const itemIds = this.state.selection.map(index => items[index].id);
     await invoke('DELETE', resourceName, '/', { body: itemIds }, (state, error, result) => {
       console.log(result);
@@ -62,11 +62,11 @@ class Grid extends React.PureComponent {
 
   handleRowClick = rowIndex => {
     const id = this.props.items[rowIndex].id;
-    this.props.openDetails(this.props.resourceName, id);
+    this.props.openDetails(this.props.params.resourceName, id);
   };
 
   render() {
-    const { schema, items, page, maxPage, resourceName } = this.props;
+    const { schema, items, page, maxPage, params: { resourceName } } = this.props;
     const { selection } = this.state;
     return (
       <div className="fitted column layout">
@@ -126,7 +126,7 @@ class Grid extends React.PureComponent {
 }
 
 export default connect(
-  (state, { resourceName }) => {
+  (state, { params: { resourceName } }) => {
     const { resources: { [resourceName]: resource }, schemas, settings: { limit } } = state;
     const { items, page } = resource || { items: null, page: 0 };
     const schema = schemas[resourceName] || {};

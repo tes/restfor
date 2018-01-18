@@ -1,9 +1,9 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import { Router, Route, hashHistory } from 'react-router';
 import AppBar from 'material-ui/AppBar';
 import Drawer from 'material-ui/Drawer';
 import MenuItem from 'material-ui/MenuItem';
-import Grid from './Grid';
 import { fetchSchemas, switchResource } from '../actionCreators';
 
 class App extends React.PureComponent {
@@ -25,7 +25,7 @@ class App extends React.PureComponent {
   };
 
   render() {
-    const { schemaList, params: { resourceName } } = this.props;
+    const { schemaList, params: { resourceName }, children } = this.props;
     return (
       <div className="absolute column layout">
         <header className="dynamic">
@@ -42,7 +42,7 @@ class App extends React.PureComponent {
             </MenuItem>
           ))}
         </Drawer>
-        <main className="relative fitted layout">{resourceName && <Grid resourceName={resourceName} />}</main>
+        <main className="relative fitted layout">{children}</main>
       </div>
     );
   }

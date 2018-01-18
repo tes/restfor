@@ -7,8 +7,12 @@ import {
   REJECT_INVOKING
 } from './actionTypes';
 
-export const openDetails = (resourceName, id) => (dispatch, getState, { hashHistory }) => {};
-export const closeDetails = () => (dispatch, getState, { hashHistory }) => {};
+export const openDetails = (resourceName, id) => (dispatch, getState, { hashHistory }) => {
+  hashHistory.push(`/${resourceName}/${id}`);
+};
+export const closeDetails = () => (dispatch, getState, { hashHistory }) => {
+  hashHistory.goBack();
+};
 
 export const startFetchingSchemas = () => ({ type: START_FETCHING_SCHEMAS });
 export const resolveFetchingSchemas = schemas => ({ type: RESOLVE_FETCHING_SCHEMAS, schemas });
