@@ -5,9 +5,9 @@ WORKDIR /restfor
 ADD package.json /restfor/package.json
 ADD package-lock.json /restfor/package-lock.json
 
-RUN npm install --production
+RUN npm install
 
-ADD configs /restfor/configs
+ADD config /restfor/config
 ADD public /restfor/public
 ADD server /restfor/server
 ADD src /restfor/src
