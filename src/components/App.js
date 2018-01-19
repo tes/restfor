@@ -2,17 +2,13 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { Link } from 'react-router';
 import AppBar from 'material-ui/AppBar';
-import Drawer from 'material-ui/Drawer';
 import MenuItem from 'material-ui/MenuItem';
 import { fetchSchemas } from '../actionCreators';
 import { invoke } from '../actionCreators';
 import { getOffsetFromPage } from '../helpers/page';
+import './App.css';
 
 class App extends React.PureComponent {
-  state = {
-    isDrawerOpen: false
-  };
-
   async componentDidMount() {
     await this.props.fetchSchemas();
     await this.fetchItems();
@@ -51,29 +47,23 @@ class App extends React.PureComponent {
     }
   }
 
-  handleToggleDrawer = () => {
-    this.setState({ isDrawerOpen: !this.state.isDrawerOpen });
-  };
-
   render() {
     const { schemaList, params: { resourceName }, children } = this.props;
     return (
-      <div className="absolute column layout">
+      <div className="absolute column layout App">
         <header className="dynamic">
-          <AppBar
-            title="Restfor"
-            iconClassNameRight="muidocs-icon-navigation-expand-more"
-            onLeftIconButtonClick={this.handleToggleDrawer}
-          />
+          <AppBar title="Restfor" showMenuIconButton={false} />
         </header>
-        <Drawer open={this.state.isDrawerOpen} docked={false} onRequestChange={this.handleToggleDrawer}>
-          {schemaList.map(name => (
-            <Link to={`/${name}?page=1`} key={name} onClick={this.handleToggleDrawer}>
-              <MenuItem disabled={name === resourceName}>{name.toUpperCase()}</MenuItem>
-            </Link>
-          ))}
-        </Drawer>
-        <main className="relative fitted layout">{children}</main>
+        <div className="fitted row layout">
+          <nav className="dynamic column high layout">
+            {schemaList.map(name => (
+              <Link to={`/${name}?page=1`} key={name}>
+                <MenuItem disabled={name === resourceName}>{name.toUpperCase()}</MenuItem>
+              </Link>
+            ))}
+          </nav>
+          <main className="relative fitted layout">{children}</main>
+        </div>
       </div>
     );
   }
