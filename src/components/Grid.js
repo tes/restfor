@@ -1,5 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 import { Link } from 'react-router';
 import { Toolbar, ToolbarGroup, ToolbarTitle } from 'material-ui/Toolbar';
 import FlatButton from 'material-ui/FlatButton';
@@ -14,6 +15,10 @@ import { getMaxPage } from '../selectors';
 import { resolvePage, getOffsetFromPage } from '../helpers/page';
 
 class Grid extends React.PureComponent {
+  static contextTypes = {
+    views: PropTypes.object
+  };
+
   state = {
     selection: []
   };
@@ -58,6 +63,7 @@ class Grid extends React.PureComponent {
   };
 
   render() {
+    console.log(this.context.views);
     const { schema, items, maxPage, params: { resourceName }, location: { query: { page: rawPage } } } = this.props;
     const page = resolvePage(rawPage);
     const { selection } = this.state;
