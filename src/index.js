@@ -8,7 +8,7 @@ import ViewProvider, { getViews } from './components/ViewProvider';
 import App from './components/App';
 import Grid from './components/Grid';
 import Details from './components/Details';
-import defaultViewFactory from './views/defaults/index.js';
+import defaultViewFactory from './views/defaults';
 import viewFactory from './views';
 
 import store from './store';
