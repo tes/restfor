@@ -11,7 +11,7 @@ import { Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowCol
 import { invoke, openDetails, switchPage } from '../actionCreators';
 import { getMaxPage } from '../selectors';
 import { resolvePage, getOffsetFromPage } from '../helpers/page';
-import { getComponent } from './ViewProvider';
+import { getComponent, getAdditionalProperties } from './ViewProvider';
 
 class Grid extends React.PureComponent {
   static contextTypes = {
@@ -62,10 +62,10 @@ class Grid extends React.PureComponent {
   };
 
   render() {
-    //console.log(this.context.views);
     const { schema, items, maxPage, params: { resourceName }, location: { query: { page: rawPage } } } = this.props;
     const page = resolvePage(rawPage);
     const { selection } = this.state;
+    const additionalProperties = getAdditionalProperties(this.context.views, 'grid', schema, resourceName);
     return (
       <div className="fitted column layout">
         <header className="dynamic layout">
@@ -99,7 +99,7 @@ class Grid extends React.PureComponent {
           >
             <TableHeader displaySelectAll={false}>
               <TableRow>
-                {Object.keys(schema).map(propertyName => (
+                {[ ...Object.keys(schema), ...additionalProperties ].map(propertyName => (
                   <TableHeaderColumn key={propertyName}>
                     <span className="sorter">{propertyName}</span>
                   </TableHeaderColumn>
@@ -117,6 +117,11 @@ class Grid extends React.PureComponent {
                         record,
                         schema
                       })}
+                    </TableRowColumn>
+                  ))}
+                  {additionalProperties.map(propertyName => (
+                    <TableRowColumn key={propertyName}>
+                      {getComponent('grid')(this.context.views, resourceName, { propertyName, record })}
                     </TableRowColumn>
                   ))}
                 </TableRow>

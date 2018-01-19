@@ -58,10 +58,21 @@ const register = views => ({
 });
 
 export const getComponent = view => (views, resourceName, props) => {
+  if (!props.schema) {
+    const Component = views[view].properties[resourceName] && views[view].properties[resourceName][props.propertyName];
+    return <Component {...props} />;
+  }
   const type = getType(props.schema[props.propertyName].type);
   const Component =
     (views[view].properties[resourceName] && views[view].properties[resourceName][props.propertyName]) ||
     views[view].types[type] ||
     views[view].types.any;
   return <Component {...props} />;
+};
+
+export const getAdditionalProperties = (views, viewName, schema, resourceName) => {
+  const schemaProperties = Object.keys(schema);
+  if (schemaProperties.length === 0) return [];
+  const viewProperties = Object.keys(views[viewName].properties[resourceName]) || [];
+  return viewProperties.filter(viewProperty => !schemaProperties.includes(viewProperty));
 };
