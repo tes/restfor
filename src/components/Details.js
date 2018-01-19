@@ -6,7 +6,7 @@ import { Toolbar, ToolbarGroup, ToolbarTitle } from 'material-ui/Toolbar';
 import RaisedButton from 'material-ui/RaisedButton';
 import { invoke, closeDetails } from '../actionCreators';
 import { getType } from '../helpers/types';
-import { getComponent } from './ViewProvider';
+import { getComponent, getAdditionalProperties } from './ViewProvider';
 import './Details.css';
 
 class Details extends React.PureComponent {
@@ -66,6 +66,7 @@ class Details extends React.PureComponent {
 
   render() {
     const { params: { resourceName, id }, schema } = this.props;
+    const additionalProperties = getAdditionalProperties(this.context.views, 'editor', schema, resourceName);
     return (
       <div className="fitted column layout Details">
         <header className="dynamic layout">
@@ -99,6 +100,22 @@ class Details extends React.PureComponent {
                             record: this.state,
                             schema,
                             onChange: this.handleChange(propertyName)
+                          })}
+                        </td>
+                      </tr>
+                    )
+                )}
+                {additionalProperties.map(
+                  propertyName =>
+                    id !== 'new' && (
+                      <tr key={propertyName}>
+                        <td>
+                          <b>{propertyName}</b>
+                        </td>
+                        <td>
+                          {getComponent('editor')(this.context.views, resourceName, {
+                            propertyName,
+                            record: this.state
                           })}
                         </td>
                       </tr>
