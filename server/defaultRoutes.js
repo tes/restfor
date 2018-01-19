@@ -22,7 +22,7 @@ module.exports.bulkCreate = name => ({ models }) =>
 
 module.exports.updateById = name => ({ models }) =>
   requestHandler(
-    ({ id, record }) => models[name].update(record, { where: { id } }),
+    ({ id, record }) => models[name].update(record, { where: { id } }).then(() => models[name].findById(id)),
     req => ({ id: Number(req.params.id), record: req.body })
   );
 

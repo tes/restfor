@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import { getType } from '../helpers/types';
 
 export default class extends React.PureComponent {
   static propTypes = {
@@ -55,3 +56,12 @@ const register = views => ({
     property: registerProperty(views, 'editor')
   }
 });
+
+export const getComponent = view => (views, resourceName, props) => {
+  const type = getType(props.schema[props.propertyName].type);
+  const Component =
+    (views[view].properties[resourceName] && views[view].properties[resourceName][props.propertyName]) ||
+    views[view].types[type] ||
+    views[view].types.any;
+  return <Component {...props} />;
+};

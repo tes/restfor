@@ -27,9 +27,10 @@ class App extends React.PureComponent {
   }
 
   fetchItems() {
-    const { params: { resourceName, id }, limit, location: { query: { page } } } = this.props;
+    const { items, params: { resourceName, id }, limit, location: { query: { page } } } = this.props;
     if (!resourceName) return;
     if (id && id !== 'new') {
+      if (items && items.find(item => item.id === Number(id))) return;
       this.props.invoke('GET', resourceName, '/:id', { params: { id: Number(id) } }, (state, error, result) => {
         if (error) return state;
         if (result) return { ...state, items: [ result ], count: 1 };
@@ -79,6 +80,10 @@ class App extends React.PureComponent {
 }
 
 export default connect(
-  ({ schemas, settings: { limit } }, { resourceName }) => ({ schemaList: Object.keys(schemas), limit }),
+  ({ schemas, resources, settings: { limit } }, { params: { resourceName } }) => ({
+    schemaList: Object.keys(schemas),
+    limit,
+    items: resources[resourceName] && resources[resourceName].items
+  }),
   { fetchSchemas, invoke }
 )(App);

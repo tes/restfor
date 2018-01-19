@@ -11,7 +11,7 @@ import { Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowCol
 import { invoke, openDetails, switchPage } from '../actionCreators';
 import { getMaxPage } from '../selectors';
 import { resolvePage, getOffsetFromPage } from '../helpers/page';
-import { getType } from '../helpers/types';
+import { getComponent } from './ViewProvider';
 
 class Grid extends React.PureComponent {
   static contextTypes = {
@@ -111,7 +111,7 @@ class Grid extends React.PureComponent {
                 <TableRow key={i} selected={selection.includes(i)}>
                   {Object.keys(record).map(propertyName => (
                     <TableRowColumn key={propertyName}>
-                      {getCellComponent(this.context.views, resourceName, {
+                      {getComponent('grid')(this.context.views, resourceName, {
                         propertyName,
                         value: record[propertyName],
                         record,
@@ -128,12 +128,6 @@ class Grid extends React.PureComponent {
     );
   }
 }
-
-const getCellComponent = (views, resourceName, props) => {
-  const type = getType(props.schema[props.propertyName].type);
-  const Component = views.grid.properties[props.propertyName] || views.grid.types[type] || views.grid.types.any;
-  return <Component {...props} />;
-};
 
 export default connect(
   (state, { params: { resourceName } }) => {
