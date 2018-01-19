@@ -1,6 +1,6 @@
 import { stringify } from 'querystring';
 
-const API_URL = process.env.NODE_ENV === 'development' ? 'http://localhost:3001' : 'http://localhost:3001';
+const API_URL = process.env.NODE_ENV === 'development' ? 'http://localhost:3001/api' : 'http://35.156.223.46:3001/api';
 
 const injectParams = (path, params) =>
   Object.keys(params).reduce((path, key) => path.replace(':' + key, params[key]), path);

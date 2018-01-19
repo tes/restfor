@@ -4,10 +4,11 @@ const { findAll, findById, bulkCreate, updateById, bulkDelete } = require('./def
 
 module.exports = ({ config, models, app, routeOverrides }) => {
   const modelNames = Object.keys(models);
+  const apiRouter = express.Router();
   const resourceRouter = express.Router();
   modelNames.forEach(initRouter({ config, models }, resourceRouter, routeOverrides));
-  app.use('/resources', resourceRouter);
-  app.get('/schemas', (req, res) => {
+  apiRouter.use('/resources', resourceRouter);
+  apiRouter.get('/schemas', (req, res) => {
     res.json(
       modelNames.reduce(
         (schemas, name) => ({ ...schemas, [name.toLowerCase()]: getJsonSchema(models[name].attributes) }),
@@ -15,6 +16,7 @@ module.exports = ({ config, models, app, routeOverrides }) => {
       )
     );
   });
+  app.use('/api', apiRouter);
 };
 
 const initRouter = (dependencies, resourceRouter, routeOverrides) => name => {
