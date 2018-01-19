@@ -8,13 +8,14 @@ import ViewProvider, { getViews } from './components/ViewProvider';
 import App from './components/App';
 import Grid from './components/Grid';
 import Details from './components/Details';
+import defaultViewFactory from './views/defaults/index.js';
 import viewFactory from './views';
 
 import store from './store';
 
 ReactDOM.render(
   <MuiThemeProvider>
-    <ViewProvider views={getViews(viewFactory)}>
+    <ViewProvider views={getViews(defaultViewFactory, viewFactory)}>
       <Provider store={store}>
         <Router history={hashHistory}>
           <Route path="/" component={App}>

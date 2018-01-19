@@ -1,18 +1,17 @@
 import React from 'react';
-import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 import { Link } from 'react-router';
 import { Toolbar, ToolbarGroup, ToolbarTitle } from 'material-ui/Toolbar';
 import FlatButton from 'material-ui/FlatButton';
 import RaisedButton from 'material-ui/RaisedButton';
 import ArrowBack from 'material-ui/svg-icons/navigation/arrow-back';
 import ArrowForward from 'material-ui/svg-icons/navigation/arrow-forward';
-import Check from 'material-ui/svg-icons/navigation/check';
-import Chip from 'material-ui/Chip';
 import { Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn } from 'material-ui/Table';
 import { invoke, openDetails, switchPage } from '../actionCreators';
 import { getMaxPage } from '../selectors';
 import { resolvePage, getOffsetFromPage } from '../helpers/page';
+import { getType } from '../helpers/types';
 
 class Grid extends React.PureComponent {
   static contextTypes = {
@@ -63,7 +62,7 @@ class Grid extends React.PureComponent {
   };
 
   render() {
-    console.log(this.context.views);
+    //console.log(this.context.views);
     const { schema, items, maxPage, params: { resourceName }, location: { query: { page: rawPage } } } = this.props;
     const page = resolvePage(rawPage);
     const { selection } = this.state;
@@ -108,11 +107,16 @@ class Grid extends React.PureComponent {
               </TableRow>
             </TableHeader>
             <TableBody deselectOnClickaway={false} showRowHover>
-              {(items || []).map((item, i) => (
+              {(items || []).map((record, i) => (
                 <TableRow key={i} selected={selection.includes(i)}>
-                  {Object.keys(item).map(propertyName => (
+                  {Object.keys(record).map(propertyName => (
                     <TableRowColumn key={propertyName}>
-                      {getCellComponent(schema[propertyName], item[propertyName])}
+                      {getCellComponent(this.context.views, resourceName, {
+                        propertyName,
+                        value: record[propertyName],
+                        record,
+                        schema
+                      })}
                     </TableRowColumn>
                   ))}
                 </TableRow>
@@ -125,17 +129,10 @@ class Grid extends React.PureComponent {
   }
 }
 
-const getCellComponent = (schema, value) => {
-  switch (schema.type) {
-    case 'BOOLEAN':
-      return value ? <Check /> : '';
-    case 'ENUM':
-      return <Chip>{value}</Chip>;
-    case 'DATE':
-      return new Date(value).toLocaleString();
-    default:
-      return value;
-  }
+const getCellComponent = (views, resourceName, props) => {
+  const type = getType(props.schema[props.propertyName].type);
+  const Component = views.grid.properties[props.propertyName] || views.grid.types[type] || views.grid.types.any;
+  return <Component {...props} />;
 };
 
 export default connect(

@@ -1,19 +1,18 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import isDeepEqual from 'deep-equal';
 import { Toolbar, ToolbarGroup, ToolbarTitle } from 'material-ui/Toolbar';
 import RaisedButton from 'material-ui/RaisedButton';
-import TextField from 'material-ui/TextField';
-import Toggle from 'material-ui/Toggle';
-import SelectField from 'material-ui/SelectField';
-import MenuItem from 'material-ui/MenuItem';
-import DateTimePicker from 'material-ui-datetimepicker';
-import DatePickerDialog from 'material-ui/DatePicker/DatePickerDialog';
-import TimePickerDialog from 'material-ui/TimePicker/TimePickerDialog';
 import { invoke, closeDetails } from '../actionCreators';
+import { getType } from '../helpers/types';
 import './Details.css';
 
 class Details extends React.PureComponent {
+  static contextTypes = {
+    views: PropTypes.object
+  };
+
   state = this.getDefaultState();
 
   getDefaultState() {
@@ -89,12 +88,13 @@ class Details extends React.PureComponent {
                           <b>{propertyName}</b>
                         </td>
                         <td>
-                          {getPropertyComponent(
+                          {getComponent(this.context.views, resourceName, {
                             propertyName,
-                            this.state[propertyName],
-                            this.handleChange(propertyName),
-                            schema[propertyName]
-                          )}
+                            value: this.state[propertyName],
+                            record: this.state,
+                            schema,
+                            onChange: this.handleChange(propertyName)
+                          })}
                         </td>
                       </tr>
                     )
@@ -108,7 +108,13 @@ class Details extends React.PureComponent {
   }
 }
 
-const numberTypes = [ 'TINYINT', 'SMALLINT', 'MEDIUMINT', 'INTEGER', 'BIGINT', 'FLOAT', 'DOUBLE', 'DECIMAL', 'REAL' ];
+const getComponent = (views, resourceName, props) => {
+  const type = getType(props.schema[props.propertyName].type);
+  const Component = views.editor.properties[props.propertyName] || views.editor.types[type] || views.editor.types.any;
+  return <Component {...props} />;
+};
+
+/* const numberTypes = [ 'TINYINT', 'SMALLINT', 'MEDIUMINT', 'INTEGER', 'BIGINT', 'FLOAT', 'DOUBLE', 'DECIMAL', 'REAL' ];
 
 const getPropertyComponent = (propertyName, value, onChange, schema) => {
   switch (schema.type) {
@@ -142,7 +148,7 @@ const getPropertyComponent = (propertyName, value, onChange, schema) => {
         />
       );
   }
-};
+}; */
 
 const getDefaultValue = (propertyName, schema) => {
   switch (schema.type) {
@@ -153,8 +159,7 @@ const getDefaultValue = (propertyName, schema) => {
     case 'ENUM':
       return (schema.values && schema.values[0]) || null;
     default:
-      const isNumber = numberTypes.includes(schema.type);
-      return isNumber ? 0 : '';
+      return getType(schema.type) === 'number' ? 0 : '';
   }
 };
 

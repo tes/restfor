@@ -19,53 +19,39 @@ export default class extends React.PureComponent {
   }
 }
 
-export const getViews = viewFactory => {
-  let views = {};
-  viewFactory(
-    register({
-      get: () => views,
-      set: nextViews => (views = nextViews)
-    })
-  );
+export const getViews = (defaultViewFactory, viewFactory) => {
+  let views = { grid: { properties: {}, types: {} }, editor: { properties: {}, types: {} } };
+  defaultViewFactory(register(views));
+  viewFactory(register(views));
   return views;
 };
 
 const registerType = (views, viewName, typeName) => component => {
-  const view = views.get()[viewName] || {};
-  const types = view.types || {};
-  views.set({
-    ...views.get(),
-    [viewName]: { ...view, types: { ...types, [typeName]: component } }
-  });
+  views[viewName].types[typeName] = component;
 };
 
 const registerProperty = (views, viewName) => (resourceName, propertyName, component) => {
-  const view = views.get()[viewName] || {};
-  const properties = view.properties;
-  views.set({
-    ...views.get(),
-    [viewName]: {
-      ...view,
-      properties: { ...properties, [propertyName]: component }
-    }
-  });
+  views[viewName].properties[resourceName] = views[viewName].properties[resourceName] || {};
+  views[viewName].properties[resourceName][propertyName] = component;
 };
 
 const register = views => ({
   grid: {
-    boolean: registerType(views, 'grid', 'boolean'),
+    bool: registerType(views, 'grid', 'bool'),
     string: registerType(views, 'grid', 'string'),
     number: registerType(views, 'grid', 'number'),
     date: registerType(views, 'grid', 'date'),
     enum: registerType(views, 'grid', 'enum'),
+    any: registerType(views, 'grid', 'any'),
     property: registerProperty(views, 'grid')
   },
   editor: {
-    boolean: registerType(views, 'editor', 'boolean'),
+    bool: registerType(views, 'editor', 'bool'),
     string: registerType(views, 'editor', 'string'),
     number: registerType(views, 'editor', 'number'),
     date: registerType(views, 'editor', 'date'),
     enum: registerType(views, 'editor', 'enum'),
+    any: registerType(views, 'editor', 'any'),
     property: registerProperty(views, 'editor')
   }
 });
