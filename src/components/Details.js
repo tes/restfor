@@ -139,7 +139,7 @@ const getDefaultValue = (propertyName, schema) => {
     case 'ENUM':
       return (schema.values && schema.values[0]) || null;
     default:
-      return getType(schema.type) === 'number' ? 0 : '';
+      return getType(schema.type) === 'number' ? 1 : '';
   }
 };
 
