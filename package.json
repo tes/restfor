@@ -1,7 +1,7 @@
 {
   "name": "restfor",
   "description": "",
-  "version": "0.9.2",
+  "version": "0.9.3",
   "scripts": {
     "build": "rimraf lib && babel src -d lib",
     "build:w": "rimraf lib && babel src -d lib -w"
