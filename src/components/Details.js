@@ -41,7 +41,7 @@ class Details extends React.PureComponent {
 
   handleChange = propertyName => value => this.setState({ [propertyName]: value });
   handleSave = async () => {
-    const { invoke, closeDetails, params: { resourceName, id } } = this.props;
+    const { invoke, closeDetails, match: { params: { resourceName, id } } } = this.props;
     if (id === 'new') {
       await invoke('POST', resourceName, '/', { body: [ this.state ] });
       closeDetails();
@@ -54,7 +54,7 @@ class Details extends React.PureComponent {
     }
   };
   handleRemove = async () => {
-    const { invoke, closeDetails, params: { resourceName, id } } = this.props;
+    const { invoke, closeDetails, match: { params: { resourceName, id } } } = this.props;
     await invoke('DELETE', resourceName, '/', { body: [ id ] });
     closeDetails();
   };
@@ -65,7 +65,7 @@ class Details extends React.PureComponent {
   }
 
   render() {
-    const { params: { resourceName, id }, schema } = this.props;
+    const { match: { params: { resourceName, id } }, schema } = this.props;
     const additionalProperties = getAdditionalProperties(this.context.views, 'editor', schema, resourceName);
     return (
       <div className="fitted column layout Details">
@@ -144,7 +144,7 @@ const getDefaultValue = (propertyName, schema) => {
 };
 
 export default connect(
-  ({ schemas, resources }, { params: { resourceName, id } }) => ({
+  ({ schemas, resources }, { match: { params: { resourceName, id } } }) => ({
     schema: schemas[resourceName],
     record: ((resources[resourceName] && resources[resourceName].items) || []).find(record => record.id === Number(id))
   }),
