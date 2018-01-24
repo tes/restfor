@@ -71,6 +71,7 @@ export const getComponent = view => (views, resourceName, props) => {
 };
 
 export const getAdditionalProperties = (views, viewName, schema, resourceName) => {
+  if (!schema) return [];
   const schemaProperties = Object.keys(schema);
   if (schemaProperties.length === 0) return [];
   const viewProperties =
