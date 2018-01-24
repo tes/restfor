@@ -1,11 +1,33 @@
 {
   "name": "restfor",
-  "version": "0.1.0",
-  "private": true,
+  "description": "",
+  "version": "0.9.0",
   "main": "lib",
   "scripts": {
     "build": "babel src -d lib"
   },
+  "files": [
+    "lib",
+    "styles.css"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jaystack/restfor.git"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jaystack/restfor/issues"
+  },
+  "keywords": [
+    "react",
+    "CRUD",
+    "admin",
+    "scaffolding",
+    "data driven"
+  ],
+  "authors": [
+    "JayStack (https://github.com/jaystack)"
+  ],
   "dependencies": {
     "body-parser": "^1.18.2",
     "config": "^1.29.2",
