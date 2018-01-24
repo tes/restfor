@@ -63,3 +63,9 @@ a {
 .high {
   z-index: 1;
 }
+
+.Details main table td {
+  padding: 20px;
+  text-align: center;
+  vertical-align: middle;
+}
