@@ -1,9 +1,0 @@
-{
-  "port": 3001,
-  "db": {
-    "database": "restfor",
-    "host": "localhost",
-    "username": "root",
-    "password": "root"
-  }
-}
