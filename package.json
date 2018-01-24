@@ -2,9 +2,9 @@
   "name": "restfor",
   "description": "",
   "version": "0.9.0",
-  "main": "lib",
   "scripts": {
-    "build": "babel src -d lib"
+    "build": "rimraf lib && babel src -d lib",
+    "build:w": "rimraf lib && babel src -d lib -w"
   },
   "files": [
     "lib",
@@ -29,6 +29,7 @@
     "JayStack (https://github.com/jaystack)"
   ],
   "dependencies": {
+    "babel-polyfill": "^6.26.0",
     "body-parser": "^1.18.2",
     "config": "^1.29.2",
     "cookie-parser": "^1.4.3",
@@ -56,6 +57,7 @@
     "babel-preset-env": "^1.6.1",
     "babel-preset-react": "^6.24.1",
     "babel-preset-stage-2": "^6.24.1",
-    "babel-preset-stage-3": "^6.24.1"
+    "babel-preset-stage-3": "^6.24.1",
+    "rimraf": "^2.6.2"
   }
 }

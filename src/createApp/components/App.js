@@ -7,7 +7,6 @@ import MenuItem from 'material-ui/MenuItem';
 import { fetchSchemas } from '../actionCreators';
 import { invoke } from '../actionCreators';
 import { getOffsetFromPage } from '../helpers/page';
-import './App.css';
 import Grid from './Grid';
 import Details from './Details';
 
