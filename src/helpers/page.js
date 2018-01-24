@@ -4,8 +4,3 @@ export const resolvePage = rawPage => {
 };
 
 export const getOffsetFromPage = (rawPage, limit) => resolvePage(rawPage) * limit;
-
-export const changePage = (rawPage, value) => {
-  const nextPage = resolvePage(rawPage) + value;
-  return nextPage < 0 ? 0 : nextPage;
-};
