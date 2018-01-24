@@ -10,7 +10,8 @@
     "lib",
     "styles.css",
     "createApp.js",
-    "createRouter.js"
+    "createRouter.js",
+    "LICENSE.md"
   ],
   "repository": {
     "type": "git",
