@@ -1,12 +1,10 @@
 import { stringify } from 'querystring';
 
-const API_URL = process.env.NODE_ENV === 'development' ? 'http://localhost:3001/api' : 'http://35.156.223.46/api';
-
 const injectParams = (path, params) =>
   Object.keys(params).reduce((path, key) => path.replace(':' + key, params[key]), path);
 
-const call = method => (path, { params = {}, query = {}, headers = {}, body } = {}) =>
-  fetch(`${API_URL}${injectParams(path, params)}?${stringify(query)}`, {
+const call = (baseUrl, method) => (path, { params = {}, query = {}, headers = {}, body } = {}) =>
+  fetch(`${baseUrl}${injectParams(path, params)}?${stringify(query)}`, {
     method: method.toUpperCase(),
     body: body ? JSON.stringify(body) : undefined,
     headers: { ...headers, 'Content-Type': 'application/json' }
@@ -17,9 +15,9 @@ const call = method => (path, { params = {}, query = {}, headers = {}, body } = 
       throw error;
     });
 
-export default {
-  get: call('GET'),
-  post: call('POST'),
-  put: call('PUT'),
-  delete: call('DELETE')
-};
+export default baseUrl => ({
+  get: call(baseUrl, 'GET'),
+  post: call(baseUrl, 'POST'),
+  put: call(baseUrl, 'PUT'),
+  delete: call(baseUrl, 'DELETE')
+});

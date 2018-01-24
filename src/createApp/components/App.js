@@ -7,8 +7,6 @@ import MenuItem from 'material-ui/MenuItem';
 import { fetchSchemas } from '../actionCreators';
 import { invoke } from '../actionCreators';
 import { getOffsetFromPage } from '../helpers/page';
-import './App.css';
-import hashHistory from '../hashHistory';
 import Grid from './Grid';
 import Details from './Details';
 
@@ -52,7 +50,7 @@ class App extends React.PureComponent {
   }
 
   render() {
-    const { schemaList, match: { params: { resourceName } } } = this.props;
+    const { schemaList, match: { params: { resourceName } }, history } = this.props;
     return (
       <div className="absolute column layout App">
         <header className="dynamic">
@@ -67,7 +65,7 @@ class App extends React.PureComponent {
             ))}
           </nav>
           <main className="relative fitted layout">
-            <Router history={hashHistory}>
+            <Router history={history}>
               <div className="fitted column layout">
                 <Route exact path="/:resourceName" component={Grid} />
                 <Route exact path="/:resourceName/:id" component={Details} />

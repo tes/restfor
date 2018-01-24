@@ -7,7 +7,6 @@ import RaisedButton from 'material-ui/RaisedButton';
 import { invoke, closeDetails } from '../actionCreators';
 import { getType } from '../helpers/types';
 import { getComponent, getAdditionalProperties } from './ViewProvider';
-import './Details.css';
 
 class Details extends React.PureComponent {
   static contextTypes = {

@@ -1,8 +1,37 @@
 {
   "name": "restfor",
-  "version": "0.1.0",
-  "private": true,
+  "description": "",
+  "version": "0.9.1",
+  "scripts": {
+    "build": "rimraf lib && babel src -d lib",
+    "build:w": "rimraf lib && babel src -d lib -w"
+  },
+  "files": [
+    "lib",
+    "styles.css",
+    "createApp.js",
+    "createRouter.js"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jaystack/restfor.git"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/jaystack/restfor/issues"
+  },
+  "keywords": [
+    "react",
+    "CRUD",
+    "admin",
+    "scaffolding",
+    "data driven"
+  ],
+  "authors": [
+    "JayStack (https://github.com/jaystack)"
+  ],
   "dependencies": {
+    "babel-polyfill": "^6.26.0",
     "body-parser": "^1.18.2",
     "config": "^1.29.2",
     "cookie-parser": "^1.4.3",
@@ -17,7 +46,6 @@
     "mysql2": "^1.5.1",
     "prop-types": "^15.6.0",
     "react": "^16.2.0",
-    "react-dom": "^16.2.0",
     "react-redux": "^5.0.6",
     "react-router": "^4.2.0",
     "react-router-dom": "^4.2.2",
@@ -26,16 +54,12 @@
     "redux-thunk": "^2.2.0",
     "sequelize": "^4.31.2"
   },
-  "scripts": {
-    "start": "react-scripts start",
-    "server": "node server",
-    "server:dev": "nodemon server",
-    "build": "react-scripts build",
-    "test": "react-scripts test --env=jsdom",
-    "eject": "react-scripts eject"
-  },
   "devDependencies": {
-    "nodemon": "^1.14.11",
-    "react-scripts": "^1.1.0"
+    "babel-cli": "^6.26.0",
+    "babel-preset-env": "^1.6.1",
+    "babel-preset-react": "^6.24.1",
+    "babel-preset-stage-2": "^6.24.1",
+    "babel-preset-stage-3": "^6.24.1",
+    "rimraf": "^2.6.2"
   }
 }
