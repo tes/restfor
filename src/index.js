@@ -1,25 +1,12 @@
-import React from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
-import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
-import { Provider } from 'react-redux';
-import { Router, Route } from 'react-router-dom';
-import ViewProvider, { getViews } from './components/ViewProvider';
-import App from './components/App';
-import defaultViewFactory from './views/defaults';
+import createApp from './createApp';
 import viewFactory from './views';
-import hashHistory from './hashHistory';
-import store from './store';
+import './styles.css';
 
 ReactDOM.render(
-  <MuiThemeProvider>
-    <ViewProvider views={getViews(defaultViewFactory, viewFactory)}>
-      <Provider store={store}>
-        <Router history={hashHistory}>
-          <Route path="/:resourceName?/:id?" component={App} />
-        </Router>
-      </Provider>
-    </ViewProvider>
-  </MuiThemeProvider>,
+  createApp(
+    { apiUrl: process.env.NODE_ENV === 'development' ? 'http://localhost:3001/api' : 'http://35.156.223.46/api' },
+    viewFactory
+  ),
   document.getElementById('root')
 );
