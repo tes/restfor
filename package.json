@@ -8,7 +8,9 @@
   },
   "files": [
     "lib",
-    "styles.css"
+    "styles.css",
+    "createApp.js",
+    "createRouter.js"
   ],
   "repository": {
     "type": "git",
