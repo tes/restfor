@@ -1,7 +1,6 @@
 import ReactDOM from 'react-dom';
 import createApp from './createApp';
 import viewFactory from './views';
-import './styles.css';
 
 ReactDOM.render(
   createApp(
