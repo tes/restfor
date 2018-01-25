@@ -150,48 +150,6 @@ class Grid extends React.PureComponent {
             </TableBody>
           </Table>
         </main>
-
-        {/* 
-          <Table
-            height={'calc(100% - 59px)'}
-            wrapperStyle={{ height: '100%' }}
-            multiSelectable
-            fixedHeader
-            onRowSelection={this.handleRowSelection}
-            onCellClick={this.handleRowClick}
-          >
-            <TableHeader displaySelectAll={false}>
-              <TableRow>
-                {[ ...Object.keys(schema), ...additionalProperties ].map(propertyName => (
-                  <TableHeaderColumn key={propertyName}>
-                    <span className="sorter">{propertyName}</span>
-                  </TableHeaderColumn>
-                ))}
-              </TableRow>
-            </TableHeader>
-            <TableBody deselectOnClickaway={false} showRowHover>
-              {(items || []).map((record, i) => (
-                <TableRow key={i} selected={selection.includes(i)}>
-                  {Object.keys(record).map(propertyName => (
-                    <TableRowColumn key={propertyName}>
-                      {getComponent('grid')(this.context.views, resourceName, {
-                        propertyName,
-                        value: record[propertyName],
-                        record,
-                        schema
-                      })}
-                    </TableRowColumn>
-                  ))}
-                  {additionalProperties.map(propertyName => (
-                    <TableRowColumn key={propertyName}>
-                      {getComponent('grid')(this.context.views, resourceName, { propertyName, record })}
-                    </TableRowColumn>
-                  ))}
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-         */}
       </div>
     );
   }
