@@ -2,7 +2,10 @@ import { parse } from 'qs';
 import React from 'react';
 import { connect } from 'react-redux';
 import { Router, Route, Link } from 'react-router-dom';
+import Toolbar from 'material-ui/Toolbar';
 import AppBar from 'material-ui/AppBar';
+import Typography from 'material-ui/Typography';
+import List, { ListItem, ListItemText } from 'material-ui/List';
 import MenuItem from 'material-ui/MenuItem';
 import { fetchSchemas } from '../actionCreators';
 import { invoke } from '../actionCreators';
@@ -53,25 +56,38 @@ class App extends React.PureComponent {
     const { schemaList, match: { params: { resourceName } }, history } = this.props;
     return (
       <div className="absolute column layout App">
-        <header className="dynamic">
-          <AppBar title="Restfor" showMenuIconButton={false} />
+        <header className="dynamic high">
+          <AppBar position="static">
+            <Toolbar>
+              <Typography type="title" color="inherit">
+                Restfor
+              </Typography>
+            </Toolbar>
+          </AppBar>
         </header>
-        <div className="fitted row layout">
+        <div className="fitted row low layout">
+          {/* <nav className="dynamic column high layout">
+            
+          </nav> */}
           <nav className="dynamic column high layout">
-            {schemaList.map(name => (
-              <Link to={`/${name}?page=1`} key={name}>
-                <MenuItem disabled={name === resourceName}>{name.toUpperCase()}</MenuItem>
-              </Link>
-            ))}
+            <List>
+              {schemaList.map(name => (
+                <Link to={`/${name}?page=1`} key={name}>
+                  <ListItem button disabled={name === resourceName}>
+                    <ListItemText primary={name.toUpperCase()} />
+                  </ListItem>
+                </Link>
+              ))}
+            </List>
           </nav>
-          <main className="relative fitted layout">
+          {/* <main className="relative fitted layout">
             <Router history={history}>
               <div className="fitted column layout">
                 <Route exact path="/:resourceName" component={Grid} />
                 <Route exact path="/:resourceName/:id" component={Details} />
               </div>
             </Router>
-          </main>
+          </main> */}
         </div>
       </div>
     );

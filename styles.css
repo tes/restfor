@@ -64,6 +64,10 @@ a {
   z-index: 1;
 }
 
+.low {
+  z-index: 0;
+}
+
 .Details main table td {
   padding: 20px;
   text-align: center;
@@ -72,5 +76,6 @@ a {
 
 .App > div > nav {
   width: 200px;
-  box-shadow: 0px 0px 10px 1px rgba(0, 0, 0, 0.2);
+  box-shadow: 0px 0px 10px 1px rgba(0, 0, 0, 0.1);
+  background-color: white;
 }
