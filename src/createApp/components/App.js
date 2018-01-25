@@ -77,14 +77,14 @@ class App extends React.PureComponent {
               ))}
             </List>
           </nav>
-          {/* <main className="relative fitted layout">
+          <main className="relative fitted low layout">
             <Router history={history}>
               <div className="fitted column layout">
                 <Route exact path="/:resourceName" component={Grid} />
                 <Route exact path="/:resourceName/:id" component={Details} />
               </div>
             </Router>
-          </main> */}
+          </main>
         </div>
       </div>
     );

@@ -3,11 +3,12 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { Toolbar, ToolbarGroup, ToolbarTitle } from 'material-ui/Toolbar';
-import FlatButton from 'material-ui/FlatButton';
-import RaisedButton from 'material-ui/RaisedButton';
-import ArrowBack from 'material-ui/svg-icons/navigation/arrow-back';
-import ArrowForward from 'material-ui/svg-icons/navigation/arrow-forward';
+import AppBar from 'material-ui/AppBar';
+import Toolbar from 'material-ui/Toolbar';
+import Typography from 'material-ui/Typography';
+import Button from 'material-ui/Button';
+import NavigateBefore from 'material-ui-icons/NavigateBefore';
+import NavigateNext from 'material-ui-icons/NavigateNext';
 import { Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn } from 'material-ui/Table';
 import { invoke, openDetails } from '../actionCreators';
 import { getMaxPage } from '../selectors';
@@ -74,27 +75,33 @@ class Grid extends React.PureComponent {
     const additionalProperties = getAdditionalProperties(this.context.views, 'grid', schema, resourceName);
     return (
       <div className="fitted column layout">
-        <header className="dynamic layout">
-          <Toolbar style={{ width: '100%' }}>
-            <ToolbarGroup>
-              <ToolbarTitle text={resourceName.toUpperCase()} />
+        <header className="dynamic column layout">
+          <AppBar position="static" color="default">
+            <Toolbar>
+              <Typography type="title" className="right margin">
+                {resourceName.toUpperCase()}
+              </Typography>
               <Link to={`/${resourceName}/new`}>
-                <RaisedButton label="Add" primary />
+                <Button raised color="primary">
+                  Add
+                </Button>
               </Link>
-              {selection.length > 0 && (
-                <RaisedButton label="Remove selected items" secondary onClick={this.handleRemoveItems} />
-              )}
-            </ToolbarGroup>
-            <ToolbarGroup>
-              <PageSwitch direction={-1} disabled={page === 0} to={`${pathname}?page=${page}`} />
-              <FlatButton disabled>
-                {page + 1} / {maxPage}
-              </FlatButton>
-              <PageSwitch direction={+1} disabled={page >= maxPage - 1} to={`${pathname}?page=${page + 2}`} />
-            </ToolbarGroup>
-          </Toolbar>
+              <div style={{ marginLeft: 'auto' }}>
+                {selection.length > 0 && (
+                  <Button raised color="secondary" onClick={this.handleRemoveItems}>
+                    Remove selected items
+                  </Button>
+                )}
+                <PageSwitch direction={-1} disabled={page === 0} to={`${pathname}?page=${page}`} />
+                <Button disabled>
+                  {page + 1} / {maxPage}
+                </Button>
+                <PageSwitch direction={+1} disabled={page >= maxPage - 1} to={`${pathname}?page=${page + 2}`} />
+              </div>
+            </Toolbar>
+          </AppBar>
         </header>
-        <main className="fitted layout">
+        {/* <main className="fitted layout">
           <Table
             height={'calc(100% - 59px)'}
             wrapperStyle={{ height: '100%' }}
@@ -134,7 +141,7 @@ class Grid extends React.PureComponent {
               ))}
             </TableBody>
           </Table>
-        </main>
+        </main> */}
       </div>
     );
   }
@@ -160,12 +167,12 @@ class PageSwitch extends React.PureComponent {
 
   render() {
     const { direction, disabled, to } = this.props;
-    const icon = direction === -1 ? <ArrowBack /> : <ArrowForward />;
+    const icon = direction === -1 ? <NavigateBefore /> : <NavigateNext />;
     return disabled ? (
-      <FlatButton icon={icon} disabled />
+      <Button disabled>{icon}</Button>
     ) : (
       <Link to={to}>
-        <FlatButton icon={icon} />
+        <Button icon={icon}>{icon}</Button>
       </Link>
     );
   }
