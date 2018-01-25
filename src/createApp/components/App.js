@@ -6,7 +6,7 @@ import Toolbar from 'material-ui/Toolbar';
 import AppBar from 'material-ui/AppBar';
 import Typography from 'material-ui/Typography';
 import List, { ListItem, ListItemText } from 'material-ui/List';
-import MenuItem from 'material-ui/MenuItem';
+import { MenuItem } from 'material-ui/Menu';
 import { fetchSchemas } from '../actionCreators';
 import { invoke } from '../actionCreators';
 import { getOffsetFromPage } from '../helpers/page';
