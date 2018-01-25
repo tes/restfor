@@ -8,12 +8,11 @@ import { ConnectedRouter } from 'react-router-redux'
 import ViewProvider from './components/ViewProvider';
 import App from './components/App';
 import createApi from './createApi';
-import history from './history' 
+import {history} from './history' 
 import createStore from './createStore';
 import createViews from './createViews';
 
 export default (config, viewFactory = () => {}) => {
-  const hashHistory = createHashHistory();
   const api = createApi(config.apiUrl);
   const store = createStore({ api, history });
   const views = createViews(viewFactory);

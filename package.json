@@ -42,11 +42,9 @@
     "express": "^4.16.2",
     "fs-extra": "^5.0.0",
     "history": "^4.7.2",
-    "material-ui": "^0.20.0",
     "morgan": "^1.9.0",
     "mysql2": "^1.5.1",
     "prop-types": "^15.6.0",
-    "react": "^16.2.0",
     "react-redux": "^5.0.6",
     "react-router": "^4.2.0",
     "react-router-dom": "^4.2.2",
@@ -55,6 +53,10 @@
     "redux-devtools-extension": "^2.13.2",
     "redux-thunk": "^2.2.0",
     "sequelize": "^4.31.2"
+  },
+  "peerDependencies": {
+    "react": "^16.2.0",
+    "material-ui": "^0.20.0"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",

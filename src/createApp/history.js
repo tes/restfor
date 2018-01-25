@@ -1,3 +1,3 @@
 import createHashHistory from 'history/createHashHistory';
 
-export default history = createHashHistory();
+export const history = createHashHistory();
