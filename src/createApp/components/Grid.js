@@ -3,12 +3,14 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { Toolbar, ToolbarGroup, ToolbarTitle } from 'material-ui/Toolbar';
-import FlatButton from 'material-ui/FlatButton';
-import RaisedButton from 'material-ui/RaisedButton';
-import ArrowBack from 'material-ui/svg-icons/navigation/arrow-back';
-import ArrowForward from 'material-ui/svg-icons/navigation/arrow-forward';
-import { Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn } from 'material-ui/Table';
+import AppBar from 'material-ui/AppBar';
+import Toolbar from 'material-ui/Toolbar';
+import Typography from 'material-ui/Typography';
+import Button from 'material-ui/Button';
+import NavigateBefore from 'material-ui-icons/NavigateBefore';
+import NavigateNext from 'material-ui-icons/NavigateNext';
+import Table, { TableHead, TableBody, TableRow, TableCell } from 'material-ui/Table';
+import Checkbox from 'material-ui/Checkbox';
 import { invoke, openDetails } from '../actionCreators';
 import { getMaxPage } from '../selectors';
 import { resolvePage, getOffsetFromPage } from '../helpers/page';
@@ -39,10 +41,16 @@ class Grid extends React.PureComponent {
     );
   }
 
-  handleRowSelection = selections => {
-    const selection =
-      typeof selections === 'string' ? (selections === 'none' ? [] : this.props.items.map((_, i) => i)) : selections;
-    this.setState({ selection });
+  handleAllSelection = evt => {
+    this.setState({
+      selection: evt.target.checked && this.state.selection.length === 0 ? this.props.items.map((_, i) => i) : []
+    });
+  };
+
+  handleRowSelection = i => evt => {
+    const set = new Set(this.state.selection);
+    evt.target.checked ? set.add(i) : set.delete(i);
+    this.setState({ selection: [ ...set ] });
   };
 
   handleRemoveItems = async () => {
@@ -53,8 +61,7 @@ class Grid extends React.PureComponent {
     await this.fetchItems();
   };
 
-  handleRowClick = (rowIndex, cellIndex) => {
-    if (cellIndex === -1) return;
+  handleRowClick = rowIndex => evt => {
     const id = this.props.items[rowIndex].id;
     this.props.openDetails(id);
   };
@@ -74,61 +81,68 @@ class Grid extends React.PureComponent {
     const additionalProperties = getAdditionalProperties(this.context.views, 'grid', schema, resourceName);
     return (
       <div className="fitted column layout">
-        <header className="dynamic layout">
-          <Toolbar style={{ width: '100%' }}>
-            <ToolbarGroup>
-              <ToolbarTitle text={resourceName.toUpperCase()} />
+        <header className="dynamic column layout">
+          <AppBar position="static" color="default">
+            <Toolbar>
+              <Typography type="title">{resourceName.toUpperCase()}</Typography>
               <Link to={`/${resourceName}/new`}>
-                <RaisedButton label="Add" primary />
+                <Button raised color="primary" className="left margin">
+                  Add
+                </Button>
               </Link>
               {selection.length > 0 && (
-                <RaisedButton label="Remove selected items" secondary onClick={this.handleRemoveItems} />
+                <Button raised color="secondary" onClick={this.handleRemoveItems} className="left margin">
+                  Remove selected items
+                </Button>
               )}
-            </ToolbarGroup>
-            <ToolbarGroup>
-              <PageSwitch direction={-1} disabled={page === 0} to={`${pathname}?page=${page}`} />
-              <FlatButton disabled>
-                {page + 1} / {maxPage}
-              </FlatButton>
-              <PageSwitch direction={+1} disabled={page >= maxPage - 1} to={`${pathname}?page=${page + 2}`} />
-            </ToolbarGroup>
-          </Toolbar>
+              <div style={{ marginLeft: 'auto' }}>
+                <PageSwitch direction={-1} disabled={page === 0} to={`${pathname}?page=${page}`} />
+                <Button disabled>
+                  {page + 1} / {maxPage}
+                </Button>
+                <PageSwitch direction={+1} disabled={page >= maxPage - 1} to={`${pathname}?page=${page + 2}`} />
+              </div>
+            </Toolbar>
+          </AppBar>
         </header>
-        <main className="fitted layout">
-          <Table
-            height={'calc(100% - 59px)'}
-            wrapperStyle={{ height: '100%' }}
-            multiSelectable
-            fixedHeader
-            onRowSelection={this.handleRowSelection}
-            onCellClick={this.handleRowClick}
-          >
-            <TableHeader displaySelectAll={false}>
+        <main className="fitted layout overflow">
+          <Table>
+            <TableHead>
               <TableRow>
+                <TableCell padding="checkbox">
+                  <Checkbox
+                    checked={selection.length === items.length}
+                    onChange={this.handleAllSelection}
+                    indeterminate={selection.length > 0 && selection.length < items.length}
+                  />
+                </TableCell>
                 {[ ...Object.keys(schema), ...additionalProperties ].map(propertyName => (
-                  <TableHeaderColumn key={propertyName}>
+                  <TableCell key={propertyName}>
                     <span className="sorter">{propertyName}</span>
-                  </TableHeaderColumn>
+                  </TableCell>
                 ))}
               </TableRow>
-            </TableHeader>
-            <TableBody deselectOnClickaway={false} showRowHover>
+            </TableHead>
+            <TableBody>
               {(items || []).map((record, i) => (
-                <TableRow key={i} selected={selection.includes(i)}>
+                <TableRow key={i} role="checkbox" aria-checked={selection.includes(i)} hover selected tabIndex={-1}>
+                  <TableCell padding="checkbox">
+                    <Checkbox checked={selection.includes(i)} onChange={this.handleRowSelection(i)} />
+                  </TableCell>
                   {Object.keys(record).map(propertyName => (
-                    <TableRowColumn key={propertyName}>
+                    <TableCell key={propertyName} onClick={this.handleRowClick(i)}>
                       {getComponent('grid')(this.context.views, resourceName, {
                         propertyName,
                         value: record[propertyName],
                         record,
                         schema
                       })}
-                    </TableRowColumn>
+                    </TableCell>
                   ))}
                   {additionalProperties.map(propertyName => (
-                    <TableRowColumn key={propertyName}>
+                    <TableCell key={propertyName}>
                       {getComponent('grid')(this.context.views, resourceName, { propertyName, record })}
-                    </TableRowColumn>
+                    </TableCell>
                   ))}
                 </TableRow>
               ))}
@@ -160,12 +174,12 @@ class PageSwitch extends React.PureComponent {
 
   render() {
     const { direction, disabled, to } = this.props;
-    const icon = direction === -1 ? <ArrowBack /> : <ArrowForward />;
+    const icon = direction === -1 ? <NavigateBefore /> : <NavigateNext />;
     return disabled ? (
-      <FlatButton icon={icon} disabled />
+      <Button disabled>{icon}</Button>
     ) : (
       <Link to={to}>
-        <FlatButton icon={icon} />
+        <Button icon={icon}>{icon}</Button>
       </Link>
     );
   }
