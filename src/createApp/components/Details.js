@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import isDeepEqual from 'deep-equal';
 import Typography from 'material-ui/Typography';
+import AppBar from 'material-ui/AppBar';
 import Toolbar from 'material-ui/Toolbar';
 import Button from 'material-ui/Button';
 import { invoke, closeDetails } from '../actionCreators';
@@ -70,28 +71,30 @@ class Details extends React.PureComponent {
     return (
       <div className="fitted column layout Details">
         <header className="dynamic layout">
-          <Toolbar style={{ width: '100%' }}>
-            <Typography type="title">{`${resourceName.toUpperCase()} / ${id.toString().toUpperCase()}`}</Typography>
-            <div style={{ marginLeft: 'auto' }}>
-              <Button
-                raised
-                color="primary"
-                onClick={this.handleSave}
-                disabled={this.isSaveButtonDisabled()}
-                className="left margin"
-              >
-                Save
-              </Button>
-              {id !== 'new' && (
-                <Button raised color="secondary" onClick={this.handleRemove} className="left margin">
-                  Remove
+          <AppBar position="static" color="default">
+            <Toolbar style={{ width: '100%' }}>
+              <Typography type="title">{`${resourceName.toUpperCase()} / ${id.toString().toUpperCase()}`}</Typography>
+              <div style={{ marginLeft: 'auto' }}>
+                <Button
+                  raised
+                  color="primary"
+                  onClick={this.handleSave}
+                  disabled={this.isSaveButtonDisabled()}
+                  className="left margin"
+                >
+                  Save
                 </Button>
-              )}
-              <Button raised onClick={this.handleCancel} className="left margin">
-                Close
-              </Button>
-            </div>
-          </Toolbar>
+                {id !== 'new' && (
+                  <Button raised color="secondary" onClick={this.handleRemove} className="left margin">
+                    Remove
+                  </Button>
+                )}
+                <Button raised onClick={this.handleCancel} className="left margin">
+                  Close
+                </Button>
+              </div>
+            </Toolbar>
+          </AppBar>
         </header>
         <main className="fitted column layout overflow-y">
           {schema &&
