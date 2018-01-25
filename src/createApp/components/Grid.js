@@ -61,8 +61,7 @@ class Grid extends React.PureComponent {
     await this.fetchItems();
   };
 
-  handleRowClick = (rowIndex, cellIndex) => {
-    if (cellIndex === -1) return;
+  handleRowClick = rowIndex => evt => {
     const id = this.props.items[rowIndex].id;
     this.props.openDetails(id);
   };
@@ -131,7 +130,7 @@ class Grid extends React.PureComponent {
                     <Checkbox checked={selection.includes(i)} onChange={this.handleRowSelection(i)} />
                   </TableCell>
                   {Object.keys(record).map(propertyName => (
-                    <TableCell key={propertyName}>
+                    <TableCell key={propertyName} onClick={this.handleRowClick(i)}>
                       {getComponent('grid')(this.context.views, resourceName, {
                         propertyName,
                         value: record[propertyName],
