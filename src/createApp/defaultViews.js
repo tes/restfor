@@ -9,6 +9,7 @@ import ArrowLeft from 'material-ui-icons/KeyboardArrowLeft';
 import ArrowRight from 'material-ui-icons/KeyboardArrowRight';
 import Check from 'material-ui-icons/Check';
 
+
 export default register => {
   register.grid.bool(({ value }) => (value ? <Check /> : ''));
   register.grid.enum(({ value }) => <Chip label={value} />);
@@ -23,7 +24,7 @@ export default register => {
     />
   ));
 
-  register.editor.date(({ value, schema, propertyName, onChange }) => (
+/*   register.editor.date(({ value, schema, propertyName, onChange }) => (
     <DateTimePicker
       value={value ? new Date(value) : null}
       onChange={value => onChange(value.toISOString())}
@@ -31,7 +32,7 @@ export default register => {
       leftArrowIcon={<ArrowLeft />}
       rightArrowIcon={<ArrowRight />}
     />
-  ));
+  )); */
 
   register.editor.enum(({ value, onChange, schema, propertyName }) => (
     <Select value={value} onChange={evt => onChange(evt.target.value)}>
