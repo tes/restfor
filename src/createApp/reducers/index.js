@@ -4,7 +4,7 @@ import resources from './resources';
 import isFetching from './isFetching';
 import error from './error';
 import settings from './settings';
-import { routerReducer } from 'react-router-redux';
+import router from './router'
 
 export default combineReducers({
 	schemas,
@@ -12,5 +12,5 @@ export default combineReducers({
 	isFetching,
 	error,
 	settings,
-	router: routerReducer
+	router
 });

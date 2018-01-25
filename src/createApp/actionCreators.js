@@ -11,7 +11,7 @@ export const openDetails = id => (dispatch, getState, { hashHistory }) => {
   const { pathname } = hashHistory.location;
   hashHistory.push(`${pathname}/${id}`);
 };
-export const closeDetails = () => (dispatch, getState, { hashHistory }) => {
+export const closeDetails = () => (dispatch, getState, { history }) => {
   hashHistory.goBack();
 };
 
