@@ -66,7 +66,7 @@ class App extends React.PureComponent {
           </AppBar>
         </header>
         <div className="fitted row low layout">
-          <nav className="dynamic column high layout">
+          <nav className="dynamic column high shadowed layout">
             <List>
               {schemaList.map(name => (
                 <Link to={`/${name}?page=1`} key={name}>
