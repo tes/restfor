@@ -7,24 +7,24 @@ import {
   REJECT_INVOKING
 } from './actionTypes';
 
-export const openDetails = id => (dispatch, getState, { hashHistory }) => {
-  const { pathname } = hashHistory.location;
-  hashHistory.push(`${pathname}/${id}`);
+export const openDetails = id => (dispatch, getState, { history }) => {
+  const { pathname } = history.location;
+  history.push(`${pathname}/${id}`);
 };
 export const closeDetails = () => (dispatch, getState, { history }) => {
-  hashHistory.goBack();
+  history.goBack();
 };
 
 export const startFetchingSchemas = () => ({ type: START_FETCHING_SCHEMAS });
 export const resolveFetchingSchemas = schemas => ({ type: RESOLVE_FETCHING_SCHEMAS, schemas });
 export const rejectFetchingSchemas = error => ({ type: REJECT_FETCHING_SCHEMAS, error });
 
-export const fetchSchemas = () => async (dispatch, getState, { api, hashHistory }) => {
+export const fetchSchemas = () => async (dispatch, getState, { api, history }) => {
   try {
     dispatch(startFetchingSchemas());
     const schemas = await api.get('/schemas');
     dispatch(resolveFetchingSchemas(schemas));
-    if (schemas.length > 0) hashHistory.push('/' + schemas[0].toLowerCase());
+    if (schemas.length > 0) history.push('/' + schemas[0].toLowerCase());
   } catch (error) {
     dispatch(rejectFetchingSchemas(error.message));
   }

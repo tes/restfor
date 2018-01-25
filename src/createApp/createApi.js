@@ -9,7 +9,11 @@ const call = (baseUrl, method) => (path, { params = {}, query = {}, headers = {}
     body: body ? JSON.stringify(body) : undefined,
     headers: { ...headers, 'Content-Type': 'application/json' }
   })
-    .then(res => res.json())
+    .then(async res => {
+      const json = await res.json();
+      if (!res.ok) throw new Error('Something went wrong');
+      return json;
+    })
     .catch(error => {
       console.error(error);
       throw error;
