@@ -1,5 +1,5 @@
 import React from 'react';
-import Check from 'material-ui/svg-icons/navigation/check';
+import Check from 'material-ui-icons/Check';
 import Chip from 'material-ui/Chip';
 import TextField from 'material-ui/TextField';
 import SelectField from 'material-ui/SelectField';
@@ -8,9 +8,9 @@ import Toggle from 'material-ui/Toggle';
 import { DateTimePicker } from 'material-ui-pickers';
 
 export default register => {
-  /* register.grid.bool(({ value }) => (value ? <Check /> : ''));
+  register.grid.bool(({ value }) => (value ? <Check /> : ''));
   register.grid.enum(({ value }) => <Chip label={value} />);
-  register.grid.date(({ value }) => new Date(value).toLocaleString()); */
+  register.grid.date(({ value }) => new Date(value).toLocaleString());
   register.grid.any(({ value }) => value);
 
   /* register.editor.bool(({ value, schema, propertyName, onChange }) => (
