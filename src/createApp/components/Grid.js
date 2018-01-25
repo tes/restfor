@@ -9,7 +9,8 @@ import Typography from 'material-ui/Typography';
 import Button from 'material-ui/Button';
 import NavigateBefore from 'material-ui-icons/NavigateBefore';
 import NavigateNext from 'material-ui-icons/NavigateNext';
-import { Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn } from 'material-ui/Table';
+import Table, { TableHead, TableBody, TableRow, TableCell } from 'material-ui/Table';
+import Checkbox from 'material-ui/Checkbox';
 import { invoke, openDetails } from '../actionCreators';
 import { getMaxPage } from '../selectors';
 import { resolvePage, getOffsetFromPage } from '../helpers/page';
@@ -40,10 +41,16 @@ class Grid extends React.PureComponent {
     );
   }
 
-  handleRowSelection = selections => {
-    const selection =
-      typeof selections === 'string' ? (selections === 'none' ? [] : this.props.items.map((_, i) => i)) : selections;
-    this.setState({ selection });
+  handleAllSelection = evt => {
+    this.setState({
+      selection: evt.target.checked && this.state.selection.length === 0 ? this.props.items.map((_, i) => i) : []
+    });
+  };
+
+  handleRowSelection = i => evt => {
+    const set = new Set(this.state.selection);
+    evt.target.checked ? set.add(i) : set.delete(i);
+    this.setState({ selection: [ ...set ] });
   };
 
   handleRemoveItems = async () => {
@@ -78,20 +85,18 @@ class Grid extends React.PureComponent {
         <header className="dynamic column layout">
           <AppBar position="static" color="default">
             <Toolbar>
-              <Typography type="title" className="right margin">
-                {resourceName.toUpperCase()}
-              </Typography>
+              <Typography type="title">{resourceName.toUpperCase()}</Typography>
               <Link to={`/${resourceName}/new`}>
-                <Button raised color="primary">
+                <Button raised color="primary" className="left margin">
                   Add
                 </Button>
               </Link>
+              {selection.length > 0 && (
+                <Button raised color="secondary" onClick={this.handleRemoveItems} className="left margin">
+                  Remove selected items
+                </Button>
+              )}
               <div style={{ marginLeft: 'auto' }}>
-                {selection.length > 0 && (
-                  <Button raised color="secondary" onClick={this.handleRemoveItems}>
-                    Remove selected items
-                  </Button>
-                )}
                 <PageSwitch direction={-1} disabled={page === 0} to={`${pathname}?page=${page}`} />
                 <Button disabled>
                   {page + 1} / {maxPage}
@@ -101,7 +106,52 @@ class Grid extends React.PureComponent {
             </Toolbar>
           </AppBar>
         </header>
-        {/* <main className="fitted layout">
+        <main className="fitted layout overflow">
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell padding="checkbox">
+                  <Checkbox
+                    checked={selection.length === items.length}
+                    onChange={this.handleAllSelection}
+                    indeterminate={selection.length > 0 && selection.length < items.length}
+                  />
+                </TableCell>
+                {[ ...Object.keys(schema), ...additionalProperties ].map(propertyName => (
+                  <TableCell key={propertyName}>
+                    <span className="sorter">{propertyName}</span>
+                  </TableCell>
+                ))}
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {(items || []).map((record, i) => (
+                <TableRow key={i} role="checkbox" aria-checked={selection.includes(i)} hover selected tabIndex={-1}>
+                  <TableCell padding="checkbox">
+                    <Checkbox checked={selection.includes(i)} onChange={this.handleRowSelection(i)} />
+                  </TableCell>
+                  {Object.keys(record).map(propertyName => (
+                    <TableCell key={propertyName}>
+                      {getComponent('grid')(this.context.views, resourceName, {
+                        propertyName,
+                        value: record[propertyName],
+                        record,
+                        schema
+                      })}
+                    </TableCell>
+                  ))}
+                  {additionalProperties.map(propertyName => (
+                    <TableCell key={propertyName}>
+                      {getComponent('grid')(this.context.views, resourceName, { propertyName, record })}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </main>
+
+        {/* 
           <Table
             height={'calc(100% - 59px)'}
             wrapperStyle={{ height: '100%' }}
@@ -141,7 +191,7 @@ class Grid extends React.PureComponent {
               ))}
             </TableBody>
           </Table>
-        </main> */}
+         */}
       </div>
     );
   }
