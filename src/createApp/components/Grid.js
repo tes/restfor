@@ -14,13 +14,7 @@ import Checkbox from 'material-ui/Checkbox';
 import { invoke, openDetails } from '../actionCreators';
 import { getSchema, getItems, getPage, getMaxPage, getLimit, getResourceName, getPathname } from '../selectors';
 import { getComponent, getAdditionalProperties } from './ViewProvider';
-import Dialog, {
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-  withMobileDialog
-} from 'material-ui/Dialog';
+import DeleteDialog from './DeleteDialog';
 
 class Grid extends React.PureComponent {
   static contextTypes = {
@@ -149,33 +143,7 @@ class Grid extends React.PureComponent {
             </TableBody>
           </Table>
 
-          <Dialog fullScreen={false} open={this.state.deleteDialogWindow} aria-labelledby="responsive-dialog-title">
-            <DialogTitle id="responsive-dialog-title">{'Are you sure?'}</DialogTitle>
-            <DialogContent>
-              <DialogContentText>
-                Would you like to delete this item?
-              </DialogContentText>
-            </DialogContent>
-            <DialogActions>
-              <Button
-                onClick={() => {
-                  this.handleConfirmClose(false);
-                }}
-                color="primary"
-              >
-                No
-              </Button>
-              <Button
-                onClick={() => {
-                  this.handleConfirmClose(true);
-                }}
-                color="primary"
-                autoFocus
-              >
-                Yes, delete it!
-              </Button>
-            </DialogActions>
-          </Dialog>
+          <DeleteDialog isOpened={this.state.deleteDialogWindow} handleClose={this.handleConfirmClose} />
 
         </main>
       </div>

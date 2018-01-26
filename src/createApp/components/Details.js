@@ -10,13 +10,14 @@ import { invoke, closeDetails } from '../actionCreators';
 import { getType } from '../helpers/types';
 import { getComponent, getAdditionalProperties } from './ViewProvider';
 import { getRecord, getSchema, getId, getResourceName } from '../selectors';
+import DeleteDialog from './DeleteDialog';
 
 class Details extends React.PureComponent {
   static contextTypes = {
     views: PropTypes.object
   };
 
-  state = this.getDefaultState();
+  state = {...this.getDefaultState(), deleteDialogWindow: false};
 
   getDefaultState() {
     const { record, schema } = this.props;
@@ -62,6 +63,17 @@ class Details extends React.PureComponent {
     await invoke('DELETE', resourceName, '/', { body: [id] });
     closeDetails();
   };
+
+  handleConfirmWindow = () => {
+    this.setState({ deleteDialogWindow: true });
+  };
+
+  handleConfirmClose = answer => {
+    this.setState({ deleteDialogWindow: false });
+    if (!answer) return false;
+    this.handleRemove();
+  };
+
   handleCancel = () => this.props.closeDetails();
 
   isSaveButtonDisabled() {
@@ -88,7 +100,7 @@ class Details extends React.PureComponent {
                   Save
                 </Button>
                 {id !== 'new' &&
-                  <Button raised color="secondary" onClick={this.handleRemove} className="left margin">
+                  <Button raised color="secondary" onClick={this.handleConfirmWindow} className="left margin">
                     Remove
                   </Button>}
                 <Button raised onClick={this.handleCancel} className="left margin">
@@ -138,6 +150,7 @@ class Details extends React.PureComponent {
                 )}
               </tbody>
             </table>}
+            <DeleteDialog isOpened={this.state.deleteDialogWindow} handleClose={this.handleConfirmClose} />
         </main>
       </div>
     );
