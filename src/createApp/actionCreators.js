@@ -4,7 +4,8 @@ import {
   REJECT_FETCHING_SCHEMAS,
   START_INVOKING,
   RESOLVE_INVOKING,
-  REJECT_INVOKING
+  REJECT_INVOKING,
+  REJECT_ERROR
 } from './actionTypes';
 
 export const openDetails = id => (dispatch, getState, { history }) => {
@@ -33,6 +34,7 @@ export const fetchSchemas = () => async (dispatch, getState, { api, history }) =
 export const startInvoking = () => ({ type: START_INVOKING });
 export const resolveInvoking = (result, request, reducer) => ({ type: RESOLVE_INVOKING, result, request, reducer });
 export const rejectInvoking = (error, request, reducer) => ({ type: REJECT_INVOKING, error, request, reducer });
+export const dismissError = () => ({type : REJECT_ERROR}) 
 
 export const invoke = (method, resourceName, path, ...args) => async (dispatch, getState, { api }) => {
   const options = args.find(arg => typeof arg === 'object') || { params: {}, query: {} };

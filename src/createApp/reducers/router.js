@@ -1,7 +1,6 @@
 import { LOCATION_CHANGE } from 'react-router-redux';
 import queryString from 'query-string';
 import { matchPath } from 'react-router';
-
 const matchOptions = { path: '/:resourceName?/:id?', exact: false };
 
 export default (state = {}, action) => {

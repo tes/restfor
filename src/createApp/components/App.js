@@ -6,18 +6,19 @@ import Toolbar from 'material-ui/Toolbar';
 import AppBar from 'material-ui/AppBar';
 import Typography from 'material-ui/Typography';
 import List, { ListItem, ListItemText } from 'material-ui/List';
+import Snackbar from 'material-ui/Snackbar';
 import { MenuItem } from 'material-ui/Menu';
-import { fetchSchemas } from '../actionCreators';
+import { fetchSchemas, dismissError } from '../actionCreators';
 import { invoke } from '../actionCreators';
 import { getPage, getResourceName, getId, getItems, getLimit, getSchemaList } from '../selectors';
 import Grid from './Grid';
 import Details from './Details';
 
 class App extends React.PureComponent {
-  async componentDidMount() {
-    await this.props.fetchSchemas();
-    await this.fetchItems();
-  }
+	async componentDidMount() {
+		await this.props.fetchSchemas();
+		await this.fetchItems();
+	}
 
   componentDidUpdate(prevProps) {
     if (prevProps.location.pathname !== this.props.location.pathname || prevProps.page !== this.props.page)
@@ -49,8 +50,12 @@ class App extends React.PureComponent {
     }
   }
 
+	closeSnackBar = () => {
+		this.props.dismissError();
+	};
+
   render() {
-    const { schemaList, resourceName, history } = this.props;
+    const { schemaList, resourceName, history, error } = this.props;
     return (
       <div className="absolute column layout App">
         <header className="dynamic high">
@@ -83,6 +88,16 @@ class App extends React.PureComponent {
             </Router>
           </main>
         </div>
+        <Snackbar
+					anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+					open={error ? true : false}
+					onClose={this.closeSnackBar}
+					autoHideDuration={7000}
+					SnackbarContentProps={{
+						'aria-describedby': 'message-id'
+					}}
+					message={<span id="message-id">{error ? error : 'Something wrong'}</span>}
+				/>
       </div>
     );
   }
@@ -95,7 +110,8 @@ export default connect(
     items: getItems(state),
     page: getPage(state),
     resourceName: getResourceName(state),
-    id: getId(state)
+    id: getId(state),
+    error: state.error
   }),
-  { fetchSchemas, invoke }
+  { fetchSchemas, invoke, dismissError }
 )(App);
