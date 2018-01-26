@@ -31,7 +31,7 @@ class Details extends React.PureComponent {
                       ...record,
                       [propertyName]: getDefaultValue(propertyName, schema[propertyName])
                     }),
-              {}
+              null
             )
           : null;
   }
