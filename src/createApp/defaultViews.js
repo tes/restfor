@@ -20,6 +20,11 @@ export default register => {
   register.details.date(({ value }) => new Date(value).toLocaleString());
   register.details.any(({ value }) => value);
 
+  register.actions.bool(({ value }) => (value ? <Check /> : ''));
+  register.actions.enum(({ value }) => <Chip label={value} />);
+  register.actions.date(({ value }) => new Date(value).toLocaleString());
+  register.actions.any(({ value }) => value);
+
   register.editor.bool(({ value, schema, propertyName, onChange }) => (
     <Switch
       checked={value}

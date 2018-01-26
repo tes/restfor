@@ -24,7 +24,8 @@ export const getViews = (defaultViewFactory, viewFactory) => {
   let views = {
     grid: { properties: {}, types: {}, actions: {} },
     details: { properties: {}, types: {}, actions: {} },
-    editor: { properties: {}, types: {}, actions: {} }
+    editor: { properties: {}, types: {}, actions: {} },
+    actions: { properties: {}, types: {}, actions: {} }
   };
   defaultViewFactory(register(views));
   viewFactory(register(views));
@@ -75,6 +76,14 @@ const register = views => ({
     any: registerType(views, 'editor', 'any'),
     property: registerProperty(views, 'editor'),
     action: registerAction(views, 'editor')
+  },
+  actions: {
+    bool: registerType(views, 'actions', 'bool'),
+    string: registerType(views, 'actions', 'string'),
+    number: registerType(views, 'actions', 'number'),
+    date: registerType(views, 'actions', 'date'),
+    enum: registerType(views, 'actions', 'enum'),
+    any: registerType(views, 'actions', 'any')
   }
 });
 

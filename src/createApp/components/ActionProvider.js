@@ -7,6 +7,7 @@ import Dialog, { DialogTitle, DialogActions } from 'material-ui/Dialog';
 import { invoke } from '../actionCreators';
 import { getResourceName } from '../selectors';
 import { getActions } from './ViewProvider';
+import { getField } from './ViewProvider';
 
 class ActionProvider extends React.PureComponent {
   static contextTypes = {
@@ -94,10 +95,22 @@ class ActionProvider extends React.PureComponent {
     return (
       <Component
         {...action.actionProps}
+        paramName={paramName}
         value={action.state[paramName]}
         onChange={this.handleActionParamChange(paramName)}
+        invoke={this.props.invoke}
       />
     );
+  }
+
+  renderDefaultParamComponent(action, paramName, paramType) {
+    const { resourceName } = this.props;
+    return getField('actions')(this.context.views, resourceName, {
+      paramName,
+      value: action.state[paramName],
+      onChange: this.handleActionParamChange(paramName),
+      invoke
+    });
   }
 
   renderMenu(actions) {
