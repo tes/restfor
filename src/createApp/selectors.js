@@ -34,7 +34,7 @@ export const getRecord = state => {
 
 export const getSchema = state => {
   const resourceName = getResourceName(state);
-  return resourceName && state.schemas ? state.schemas[resourceName] || o : o;
+  return resourceName && state.schemas && state.schemas[resourceName] || null;
 };
 
 export const getSchemaList = ({ schemas }) => (schemas ? Object.keys(schemas) : a);

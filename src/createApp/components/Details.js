@@ -17,7 +17,7 @@ class Details extends React.PureComponent {
     views: PropTypes.object
   };
 
-  state = {...this.getDefaultState(), deleteDialogWindow: false};
+  state = { record: this.getDefaultState(), deleteDialogWindow: false };
 
   getDefaultState() {
     const { record, schema } = this.props;
@@ -39,18 +39,19 @@ class Details extends React.PureComponent {
 
   componentDidUpdate(prevProps) {
     if (prevProps.record !== this.props.record || prevProps.schema !== this.props.schema)
-      this.setState(this.getDefaultState());
+      this.setState({ record: this.getDefaultState() });
   }
 
   handleChange = propertyName => value => this.setState({ [propertyName]: value });
 
   handleSave = async () => {
     const { invoke, closeDetails, resourceName, id } = this.props;
+    const { record } = this.state;
     if (id === 'new') {
-      await invoke('POST', resourceName, '/', { body: [this.state] });
+      await invoke('POST', resourceName, '/', { body: [record] });
       closeDetails();
     } else {
-      await invoke('PUT', resourceName, '/:id', { params: { id }, body: this.state }, (state, error, result) => {
+      await invoke('PUT', resourceName, '/:id', { params: { id }, body: record }, (state, error, result) => {
         if (error) return state;
         if (result) return { ...state, items: state.items.map(item => (item.id === id ? result : item)) };
         return state;
@@ -77,11 +78,13 @@ class Details extends React.PureComponent {
   handleCancel = () => this.props.closeDetails();
 
   isSaveButtonDisabled() {
-    return isDeepEqual(this.state, this.props.record);
+    const { record } = this.state;
+    return !!record && isDeepEqual(record, this.props.record);
   }
 
   render() {
     const { resourceName, id, schema } = this.props;
+    const { record } = this.state;
     const additionalProperties = getAdditionalProperties(this.context.views, 'editor', schema, resourceName);
     return (
       <div className="fitted column layout Details">
@@ -112,7 +115,7 @@ class Details extends React.PureComponent {
         </header>
         <main className="fitted column layout overflow-y">
           {schema &&
-            this.state &&
+            record &&
             <table>
               <tbody>
                 {Object.keys(schema).map(
@@ -125,8 +128,8 @@ class Details extends React.PureComponent {
                       <td>
                         {getComponent('editor')(this.context.views, resourceName, {
                           propertyName,
-                          value: this.state[propertyName],
-                          record: this.state,
+                          value: record[propertyName],
+                          record,
                           schema,
                           onChange: this.handleChange(propertyName)
                         })}
@@ -143,14 +146,14 @@ class Details extends React.PureComponent {
                       <td>
                         {getComponent('editor')(this.context.views, resourceName, {
                           propertyName,
-                          record: this.state
+                          record
                         })}
                       </td>
                     </tr>
                 )}
               </tbody>
             </table>}
-            <DeleteDialog isOpened={this.state.deleteDialogWindow} handleClose={this.handleConfirmClose} />
+          <DeleteDialog isOpened={this.state.deleteDialogWindow} handleClose={this.handleConfirmClose} />
         </main>
       </div>
     );
