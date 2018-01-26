@@ -1,6 +1,5 @@
 import { LOCATION_CHANGE } from 'react-router-redux';
-import queryString from 'query-string'
-
+import queryString from 'query-string';
 
 export default (state = {}, action) => {
 	switch (action.type) {
