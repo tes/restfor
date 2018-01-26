@@ -12,8 +12,7 @@ import NavigateNext from 'material-ui-icons/NavigateNext';
 import Table, { TableHead, TableBody, TableRow, TableCell } from 'material-ui/Table';
 import Checkbox from 'material-ui/Checkbox';
 import { invoke, openDetails } from '../actionCreators';
-import { getMaxPage } from '../selectors';
-import { resolvePage, getOffsetFromPage } from '../helpers/page';
+import { getSchema, getItems, getPage, getMaxPage, getLimit, getResourceName, getPathname } from '../selectors';
 import { getComponent, getAdditionalProperties } from './ViewProvider';
 import Dialog, {DialogActions,DialogContent,DialogContentText,DialogTitle,withMobileDialog} from 'material-ui/Dialog';
 
@@ -28,19 +27,12 @@ class Grid extends React.PureComponent {
   };
 
   fetchItems() {
-    const { limit, match: { params: { resourceName } }, location: { search } } = this.props;
-    const { page } = parse(search.substr(1));
-    this.props.invoke(
-      'GET',
-      resourceName,
-      '/',
-      { query: { offset: getOffsetFromPage(page, limit), limit } },
-      (state, error, result) => {
-        if (error) return state;
-        if (result) return { ...state, items: result.rows, count: result.count };
-        return state;
-      }
-    );
+    const { limit, resourceName, page } = this.props;
+    this.props.invoke('GET', resourceName, '/', { query: { offset: page * limit, limit } }, (state, error, result) => {
+      if (error) return state;
+      if (result) return { ...state, items: result.rows, count: result.count };
+      return state;
+    });
   }
 
   handleAllSelection = evt => {
@@ -52,7 +44,7 @@ class Grid extends React.PureComponent {
   handleRowSelection = i => evt => {
     const set = new Set(this.state.selection);
     evt.target.checked ? set.add(i) : set.delete(i);
-    this.setState({ selection: [ ...set ] });
+    this.setState({ selection: [...set] });
   };
 
   handleRemoveItems = async () => {
@@ -80,16 +72,7 @@ class Grid extends React.PureComponent {
   };
 
   render() {
-    const {
-      schema,
-      items,
-      maxPage,
-      location: { pathname },
-      match: { params: { resourceName } },
-      location: { search }
-    } = this.props;
-    const { page: rawPage } = parse(search.substr(1));
-    const page = resolvePage(rawPage);
+    const { schema, items, maxPage, pathname, resourceName, page } = this.props;
     const { selection } = this.state;
     const additionalProperties = getAdditionalProperties(this.context.views, 'grid', schema, resourceName);
     return (
@@ -106,8 +89,7 @@ class Grid extends React.PureComponent {
               {selection.length > 0 && (
                 <Button raised color="secondary" onClick={this.handleConfirmWindow} className="left margin">
                   Remove selected items
-                </Button>
-              )}
+                </Button>}
               <div style={{ marginLeft: 'auto' }}>
                 <PageSwitch direction={-1} disabled={page === 0} to={`${pathname}?page=${page}`} />
                 <Button disabled>
@@ -129,7 +111,7 @@ class Grid extends React.PureComponent {
                     indeterminate={selection.length > 0 && selection.length < items.length}
                   />
                 </TableCell>
-                {[ ...Object.keys(schema), ...additionalProperties ].map(propertyName => (
+                {[...Object.keys(schema), ...additionalProperties].map(propertyName => (
                   <TableCell key={propertyName}>
                     <span className="sorter">{propertyName}</span>
                   </TableCell>
@@ -190,13 +172,15 @@ class Grid extends React.PureComponent {
 }
 
 export default connect(
-  (state, { match: { params: { resourceName } } }) => {
-    const { resources: { [resourceName]: resource }, schemas, settings: { limit } } = state;
-    const { items, page } = resource || { items: [], page: 0 };
-    const schema = schemas[resourceName] || {};
-    const maxPage = getMaxPage(resourceName)(state);
-    return { schema, items, page, maxPage, limit };
-  },
+  state => ({
+    pathname: getPathname(state),
+    resourceName: getResourceName(state),
+    schema: getSchema(state),
+    page: getPage(state),
+    maxPage: getMaxPage(state),
+    limit: getLimit(state),
+    items: getItems(state)
+  }),
   { invoke, openDetails }
 )(Grid);
 
@@ -210,12 +194,10 @@ class PageSwitch extends React.PureComponent {
   render() {
     const { direction, disabled, to } = this.props;
     const icon = direction === -1 ? <NavigateBefore /> : <NavigateNext />;
-    return disabled ? (
-      <Button disabled>{icon}</Button>
-    ) : (
-      <Link to={to}>
-        <Button icon={icon}>{icon}</Button>
-      </Link>
-    );
+    return disabled
+      ? <Button disabled>{icon}</Button>
+      : <Link to={to}>
+          <Button icon={icon}>{icon}</Button>
+        </Link>;
   }
 }

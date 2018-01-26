@@ -9,7 +9,7 @@ import List, { ListItem, ListItemText } from 'material-ui/List';
 import { MenuItem } from 'material-ui/Menu';
 import { fetchSchemas } from '../actionCreators';
 import { invoke } from '../actionCreators';
-import { getOffsetFromPage } from '../helpers/page';
+import { getPage, getResourceName, getId, getItems, getLimit, getSchemaList } from '../selectors';
 import Grid from './Grid';
 import Details from './Details';
 
@@ -20,21 +20,18 @@ class App extends React.PureComponent {
   }
 
   componentDidUpdate(prevProps) {
-    const prevQuery = parse(prevProps.location.search.substr(1));
-    const query = parse(this.props.location.search.substr(1));
-    if (prevProps.location.pathname !== this.props.location.pathname || prevQuery.page !== query.page)
+    if (prevProps.location.pathname !== this.props.location.pathname || prevProps.page !== this.props.page)
       this.fetchItems();
   }
 
   fetchItems() {
-    const { items, match: { params: { resourceName, id } }, limit, location: { search } } = this.props;
-    const { page } = parse(search.substr(1));
+    const { items, resourceName, id, limit, page } = this.props;
     if (!resourceName) return;
     if (id && id !== 'new') {
       if (items && items.find(item => item.id === Number(id))) return;
       this.props.invoke('GET', resourceName, '/:id', { params: { id: Number(id) } }, (state, error, result) => {
         if (error) return state;
-        if (result) return { ...state, items: [ result ], count: 1 };
+        if (result) return { ...state, items: [result], count: 1 };
         return state;
       });
     } else {
@@ -42,7 +39,7 @@ class App extends React.PureComponent {
         'GET',
         resourceName,
         '/',
-        { query: { offset: getOffsetFromPage(page, limit), limit } },
+        { query: { offset: page * limit, limit } },
         (state, error, result) => {
           if (error) return state;
           if (result) return { ...state, items: result.rows, count: result.count };
@@ -53,7 +50,7 @@ class App extends React.PureComponent {
   }
 
   render() {
-    const { schemaList, match: { params: { resourceName } }, history } = this.props;
+    const { schemaList, resourceName, history } = this.props;
     return (
       <div className="absolute column layout App">
         <header className="dynamic high">
@@ -92,10 +89,13 @@ class App extends React.PureComponent {
 }
 
 export default connect(
-  ({ schemas, resources, settings: { limit } }, { match: { params: { resourceName } } }) => ({
-    schemaList: Object.keys(schemas),
-    limit,
-    items: resources[resourceName] && resources[resourceName].items
+  state => ({
+    schemaList: getSchemaList(state),
+    limit: getLimit(state),
+    items: getItems(state),
+    page: getPage(state),
+    resourceName: getResourceName(state),
+    id: getId(state)
   }),
   { fetchSchemas, invoke }
 )(App);
