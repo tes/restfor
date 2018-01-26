@@ -46,6 +46,7 @@ a {
 
 .fitted {
   flex: 1 1 0;
+  overflow: hidden;
 }
 
 .center {

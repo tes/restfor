@@ -15,10 +15,10 @@ import Grid from './Grid';
 import Details from './Details';
 
 class App extends React.PureComponent {
-	async componentDidMount() {
-		await this.props.fetchSchemas();
-		await this.fetchItems();
-	}
+  async componentDidMount() {
+    await this.props.fetchSchemas();
+    await this.fetchItems();
+  }
 
   componentDidUpdate(prevProps) {
     if (prevProps.location.pathname !== this.props.location.pathname || prevProps.page !== this.props.page)
@@ -50,9 +50,9 @@ class App extends React.PureComponent {
     }
   }
 
-	closeSnackBar = () => {
-		this.props.dismissError();
-	};
+  closeSnackBar = () => {
+    this.props.dismissError();
+  };
 
   render() {
     const { schemaList, resourceName, history, error } = this.props;
@@ -79,25 +79,23 @@ class App extends React.PureComponent {
               ))}
             </List>
           </nav>
-          <main className="relative fitted low layout">
-            <Router history={history}>
-              <div className="fitted column layout">
-                <Route exact path="/:resourceName" component={Grid} />
-                <Route exact path="/:resourceName/:id" component={Details} />
-              </div>
-            </Router>
-          </main>
+          <Router history={history}>
+            <main className="relative fitted column low layout">
+              <Route exact path="/:resourceName" component={Grid} />
+              <Route exact path="/:resourceName/:id" component={Details} />
+            </main>
+          </Router>
         </div>
         <Snackbar
-					anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-					open={error ? true : false}
-					onClose={this.closeSnackBar}
-					autoHideDuration={7000}
-					SnackbarContentProps={{
-						'aria-describedby': 'message-id'
-					}}
-					message={<span id="message-id">{error ? error : 'Something wrong'}</span>}
-				/>
+          anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+          open={error ? true : false}
+          onClose={this.closeSnackBar}
+          autoHideDuration={7000}
+          SnackbarContentProps={{
+            'aria-describedby': 'message-id'
+          }}
+          message={<span id="message-id">{error ? error : 'Something wrong'}</span>}
+        />
       </div>
     );
   }

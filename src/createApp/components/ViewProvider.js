@@ -16,7 +16,7 @@ export default class extends React.PureComponent {
   }
 
   render() {
-    return <div>{this.props.children}</div>;
+    return <div className="absolute">{this.props.children}</div>;
   }
 }
 
@@ -74,7 +74,7 @@ export const getAdditionalProperties = (views, viewName, schema, resourceName) =
   if (!schema) return [];
   const schemaProperties = Object.keys(schema);
   if (schemaProperties.length === 0) return [];
-  const viewProperties =
-    (views[viewName].properties[resourceName] && Object.keys(views[viewName].properties[resourceName])) || [];
+  const viewProperties = (views[viewName].properties[resourceName] &&
+    Object.keys(views[viewName].properties[resourceName])) || [];
   return viewProperties.filter(viewProperty => !schemaProperties.includes(viewProperty));
 };
