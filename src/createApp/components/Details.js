@@ -9,7 +9,7 @@ import { Link } from 'react-router-dom';
 import Card, { CardActions, CardContent } from 'material-ui/Card';
 import { invoke, closeDetails } from '../actionCreators';
 import { getRecord, getSchema, getId, getResourceName } from '../selectors';
-import { getComponent, getAdditionalProperties } from './ViewProvider';
+import { getField, getAdditionalProperties } from './ViewProvider';
 import DeleteDialog from './DeleteDialog';
 
 class Details extends React.PureComponent {
@@ -64,7 +64,7 @@ class Details extends React.PureComponent {
             </Toolbar>
           </AppBar>
         </header>
-        <main className="fitted column layout">
+        <main className="fitted column layout overflow">
           <Card style={{ maxWidth: '800px' }}>
             <CardContent>
               {schema &&
@@ -79,7 +79,7 @@ class Details extends React.PureComponent {
                             <b>{propertyName}</b>
                           </td>
                           <td>
-                            {getComponent('details')(this.context.views, resourceName, {
+                            {getField('details')(this.context.views, resourceName, {
                               propertyName,
                               value: record[propertyName],
                               record,
@@ -96,7 +96,7 @@ class Details extends React.PureComponent {
                             <b>{propertyName}</b>
                           </td>
                           <td>
-                            {getComponent('details')(this.context.views, resourceName, {
+                            {getField('details')(this.context.views, resourceName, {
                               propertyName,
                               record
                             })}
