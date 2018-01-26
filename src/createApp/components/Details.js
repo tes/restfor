@@ -42,7 +42,7 @@ class Details extends React.PureComponent {
       this.setState({ record: this.getDefaultState() });
   }
 
-  handleChange = propertyName => value => this.setState({ [propertyName]: value });
+  handleChange = propertyName => value => this.setState({ record: { ...this.state.record, [propertyName]: value } });
 
   handleSave = async () => {
     const { invoke, closeDetails, resourceName, id } = this.props;
