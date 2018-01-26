@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Button from 'material-ui/Button';
 import Menu, { MenuItem } from 'material-ui/Menu';
-import Dialog, { DialogTitle } from 'material-ui/Dialog';
+import Dialog, { DialogTitle, DialogActions } from 'material-ui/Dialog';
 import { invoke } from '../actionCreators';
 import { getResourceName } from '../selectors';
 import { getActions } from './ViewProvider';
@@ -20,7 +20,7 @@ class ActionProvider extends React.PureComponent {
 
   state = {
     menuAnchor: null,
-    dialogForAction: null
+    actionOfDialog: null
   };
 
   handleMenuOpen = event => {
@@ -32,24 +32,71 @@ class ActionProvider extends React.PureComponent {
   };
 
   handleDialogClose = () => {
-    this.setState({ dialogForAction: null });
+    this.setState({ actionOfDialog: null });
   };
+
+  handleDialogSubmit = () => {};
 
   handleActionClick = (action, actionProps) => () => {
     this.handleMenuClose();
     if (!action.params) callback(action.actionProps);
-    else this.setState({ dialogForAction: action });
+    else this.setState({ actionOfDialog: { ...action, state: {} } });
+  };
+
+  handleActionParamChange = paramName => value => {
+    const { actionOfDialog } = this.state;
+    this.setState({
+      ...this.state,
+      actionOfDialog: { ...actionOfDialog, state: { ...actionOfDialog.state, [paramName]: value } }
+    });
   };
 
   renderDialog() {
-    const { dialogForAction } = this.state;
+    const { actionOfDialog } = this.state;
     return (
-      <Dialog onClose={this.handleDialogClose} open={!!dialogForAction}>
-        {dialogForAction && <DialogTitle>{dialogForAction && dialogForAction.name}</DialogTitle>}
+      <Dialog onClose={this.handleDialogClose} open={!!actionOfDialog}>
+        {actionOfDialog && <DialogTitle>{actionOfDialog && actionOfDialog.name}</DialogTitle>}
         <div className="param-container">
-          yee
+          <table>
+            <tbody>
+              {actionOfDialog &&
+                actionOfDialog.params &&
+                Object.keys(actionOfDialog.params).map(paramName =>
+                  this.renderActionParam(actionOfDialog, paramName, actionOfDialog.params[paramName])
+                )}
+            </tbody>
+          </table>
         </div>
+        <DialogActions>
+          <Button onClick={this.handleDialogClose}>
+            Cancel
+          </Button>
+          <Button onClick={this.handleDialogSubmit} color="primary">
+            Ok
+          </Button>
+        </DialogActions>
       </Dialog>
+    );
+  }
+
+  renderActionParam(action, paramName, paramType) {
+    return (
+      <tr key={paramName}>
+        <td>{paramName}</td>
+        <td>
+          {typeof paramType === 'function' ? this.renderCustomParamComponent(action, paramName, paramType) : null}
+        </td>
+      </tr>
+    );
+  }
+
+  renderCustomParamComponent(action, paramName, Component) {
+    return (
+      <Component
+        {...action.actionProps}
+        value={action.state[paramName]}
+        onChange={this.handleActionParamChange(paramName)}
+      />
     );
   }
 
@@ -74,7 +121,7 @@ class ActionProvider extends React.PureComponent {
 
   render() {
     const { resourceName, view: viewName, actionProps } = this.props;
-    const { menuAnchor, dialogForAction } = this.state;
+    const { menuAnchor, actionOfDialog } = this.state;
     const actions = getActions(viewName)(this.context.views, resourceName);
     return (
       <div style={{ display: 'inline' }}>
