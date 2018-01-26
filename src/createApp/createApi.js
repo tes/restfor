@@ -11,7 +11,7 @@ const call = (baseUrl, method) => (path, { params = {}, query = {}, headers = {}
   })
     .then(async res => {
       const json = await res.json();
-      if (!res.ok) throw new Error(json.message);
+      if (!res.ok) throw new Error(res.status === 500 ? 'Something went wrong' : json.message);
       return json;
     })
     .catch(error => {
