@@ -21,7 +21,11 @@ export default class extends React.PureComponent {
 }
 
 export const getViews = (defaultViewFactory, viewFactory) => {
-  let views = { grid: { properties: {}, types: {} }, editor: { properties: {}, types: {} } };
+  let views = {
+    grid: { properties: {}, types: {} },
+    details: { properties: {}, types: {} },
+    editor: { properties: {}, types: {} }
+  };
   defaultViewFactory(register(views));
   viewFactory(register(views));
   return views;
@@ -46,6 +50,15 @@ const register = views => ({
     any: registerType(views, 'grid', 'any'),
     property: registerProperty(views, 'grid')
   },
+  details: {
+    bool: registerType(views, 'details', 'bool'),
+    string: registerType(views, 'details', 'string'),
+    number: registerType(views, 'details', 'number'),
+    date: registerType(views, 'details', 'date'),
+    enum: registerType(views, 'details', 'enum'),
+    any: registerType(views, 'details', 'any'),
+    property: registerProperty(views, 'details')
+  },
   editor: {
     bool: registerType(views, 'editor', 'bool'),
     string: registerType(views, 'editor', 'string'),
@@ -67,7 +80,7 @@ export const getComponent = view => (views, resourceName, props) => {
     (views[view].properties[resourceName] && views[view].properties[resourceName][props.propertyName]) ||
     views[view].types[type] ||
     views[view].types.any;
-  return <Component {...props} />;
+  return Component ? <Component {...props} /> : null;
 };
 
 export const getAdditionalProperties = (views, viewName, schema, resourceName) => {

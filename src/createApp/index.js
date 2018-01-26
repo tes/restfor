@@ -2,14 +2,14 @@ import 'babel-polyfill';
 import React from 'react';
 import { Provider as StoreProvider } from 'react-redux';
 import { Router, Route } from 'react-router-dom';
-import { ConnectedRouter } from 'react-router-redux'
+import { ConnectedRouter } from 'react-router-redux';
 
 import ViewProvider from './components/ViewProvider';
 import { MuiThemeProvider, createMuiTheme } from 'material-ui/styles';
 import blue from 'material-ui/colors/blue';
 import App from './components/App';
 import createApi from './createApi';
-import {history} from './history' 
+import { history } from './history';
 import createStore from './createStore';
 import createViews from './createViews';
 

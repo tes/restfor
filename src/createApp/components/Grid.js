@@ -80,7 +80,7 @@ class Grid extends React.PureComponent {
           <AppBar position="static" color="default">
             <Toolbar>
               <Typography type="title">{resourceName.toUpperCase()}</Typography>
-              <Link to={`/${resourceName}/new`}>
+              <Link to={`/${resourceName}/new/edit`}>
                 <Button raised color="primary" className="left margin">
                   Add
                 </Button>

@@ -13,6 +13,7 @@ import { invoke } from '../actionCreators';
 import { getPage, getResourceName, getId, getItems, getLimit, getSchemaList } from '../selectors';
 import Grid from './Grid';
 import Details from './Details';
+import Editor from './Editor';
 
 class App extends React.PureComponent {
   async componentDidMount() {
@@ -83,6 +84,7 @@ class App extends React.PureComponent {
             <main className="relative fitted column low layout">
               <Route exact path="/:resourceName" component={Grid} />
               <Route exact path="/:resourceName/:id" component={Details} />
+              <Route exact path="/:resourceName/:id/edit" component={Editor} />
             </main>
           </Router>
         </div>

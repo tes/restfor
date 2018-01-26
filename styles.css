@@ -87,7 +87,17 @@ a {
     0px 1px 10px 0px rgba(0, 0, 0, 0.12);
 }
 
+.Details > main {
+  align-items: center;
+  padding: 20px 0px;
+}
+
 .Details main table td {
+  padding: 20px;
+  vertical-align: middle;
+}
+
+.Editor main table td {
   padding: 20px;
   vertical-align: middle;
 }

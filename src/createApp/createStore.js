@@ -7,5 +7,5 @@ import { routerMiddleware } from 'react-router-redux';
 
 const middleware = routerMiddleware(history);
 
-export default (extraArguments) =>
-	createStore(rootReducer, composeWithDevTools(applyMiddleware(middleware, thunk.withExtraArgument(extraArguments))));
+export default extraArguments =>
+  createStore(rootReducer, composeWithDevTools(applyMiddleware(middleware, thunk.withExtraArgument(extraArguments))));
