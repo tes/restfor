@@ -1,7 +1,6 @@
 import { resolvePage } from './helpers/page';
 
 const a = [];
-const o = {};
 
 export const getPathname = ({ router: { pathname } }) => pathname;
 
@@ -11,7 +10,10 @@ export const getId = ({ router: { params: { id } } }) => (id && id !== 'new' ? N
 
 export const getPage = ({ router: { query: { page } } }) => resolvePage(page);
 
-export const getMaxPage = resourceName => ({ settings: { limit }, resources }) => {
+export const getMaxPage = state => {
+  const { settings: { limit }, resources } = state;
+  const resourceName = getResourceName(state);
+  if (!resourceName) return null;
   const resource = resources[resourceName];
   if (!resource) return null;
   return Math.ceil(resource.count / limit);
@@ -34,7 +36,7 @@ export const getRecord = state => {
 
 export const getSchema = state => {
   const resourceName = getResourceName(state);
-  return resourceName && state.schemas && state.schemas[resourceName] || null;
+  return (resourceName && state.schemas && state.schemas[resourceName]) || null;
 };
 
 export const getSchemaList = ({ schemas }) => (schemas ? Object.keys(schemas) : a);

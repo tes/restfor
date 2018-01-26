@@ -94,58 +94,64 @@ class Grid extends React.PureComponent {
                 <Button disabled>
                   {page + 1} / {maxPage}
                 </Button>
-                <PageSwitch direction={+1} disabled={page >= maxPage - 1} to={`${pathname}?page=${page + 2}`} />
+                <PageSwitch
+                  direction={+1}
+                  disabled={!Number.isFinite(maxPage) || page >= maxPage - 1}
+                  to={`${pathname}?page=${page + 2}`}
+                />
               </div>
             </Toolbar>
           </AppBar>
         </header>
-        <main className="fitted layout overflow">
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell padding="checkbox">
-                  <Checkbox
-                    checked={selection.length === items.length}
-                    onChange={this.handleAllSelection}
-                    indeterminate={selection.length > 0 && selection.length < items.length}
-                  />
-                </TableCell>
-                {[...Object.keys(schema), ...additionalProperties].map(propertyName => (
-                  <TableCell key={propertyName}>
-                    <span className="sorter">{propertyName}</span>
-                  </TableCell>
-                ))}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {(items || []).map((record, i) => (
-                <TableRow key={i} role="checkbox" aria-checked={selection.includes(i)} hover selected tabIndex={-1}>
+        {schema &&
+          items &&
+          <main className="fitted layout overflow">
+            <Table>
+              <TableHead>
+                <TableRow>
                   <TableCell padding="checkbox">
-                    <Checkbox checked={selection.includes(i)} onChange={this.handleRowSelection(i)} />
+                    <Checkbox
+                      checked={selection.length === items.length}
+                      onChange={this.handleAllSelection}
+                      indeterminate={selection.length > 0 && selection.length < items.length}
+                    />
                   </TableCell>
-                  {Object.keys(record).map(propertyName => (
-                    <TableCell key={propertyName} onClick={this.handleRowClick(i)}>
-                      {getComponent('grid')(this.context.views, resourceName, {
-                        propertyName,
-                        value: record[propertyName],
-                        record,
-                        schema
-                      })}
-                    </TableCell>
-                  ))}
-                  {additionalProperties.map(propertyName => (
+                  {[...Object.keys(schema), ...additionalProperties].map(propertyName => (
                     <TableCell key={propertyName}>
-                      {getComponent('grid')(this.context.views, resourceName, { propertyName, record })}
+                      <span className="sorter">{propertyName}</span>
                     </TableCell>
                   ))}
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHead>
+              <TableBody>
+                {(items || []).map((record, i) => (
+                  <TableRow key={i} role="checkbox" aria-checked={selection.includes(i)} hover selected tabIndex={-1}>
+                    <TableCell padding="checkbox">
+                      <Checkbox checked={selection.includes(i)} onChange={this.handleRowSelection(i)} />
+                    </TableCell>
+                    {Object.keys(record).map(propertyName => (
+                      <TableCell key={propertyName} onClick={this.handleRowClick(i)}>
+                        {getComponent('grid')(this.context.views, resourceName, {
+                          propertyName,
+                          value: record[propertyName],
+                          record,
+                          schema
+                        })}
+                      </TableCell>
+                    ))}
+                    {additionalProperties.map(propertyName => (
+                      <TableCell key={propertyName}>
+                        {getComponent('grid')(this.context.views, resourceName, { propertyName, record })}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
 
-          <DeleteDialog isOpened={this.state.deleteDialogWindow} handleClose={this.handleConfirmClose} />
+            <DeleteDialog isOpened={this.state.deleteDialogWindow} handleClose={this.handleConfirmClose} />
 
-        </main>
+          </main>}
       </div>
     );
   }
