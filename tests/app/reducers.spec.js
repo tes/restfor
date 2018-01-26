@@ -51,6 +51,26 @@ describe('Reducers test', () => {
 
     });
 
+    //Default action in the reducer
+    it('RANDOM_ACTION', () => {
+
+      const state = {
+        param1: 1,
+        param2: 'this is a string',
+        param3: true
+      };
+      const action = {
+        type: 'RANDOM_ACTION'
+      };
+
+      expect(errorReducer(state, action)).toEqual({
+        param1: 1,
+        param2: 'this is a string',
+        param3: true
+      });
+
+    });
+
   })
 
 })
