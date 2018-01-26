@@ -67,7 +67,7 @@ class Editor extends React.PureComponent {
   }
 
   render() {
-    const { resourceName, id, schema } = this.props;
+    const { resourceName, id, schema, invoke } = this.props;
     const { record } = this.state;
     const additionalProperties = getAdditionalProperties(this.context.views, 'editor', schema, resourceName);
     return (
@@ -111,7 +111,8 @@ class Editor extends React.PureComponent {
                           value: record[propertyName],
                           record,
                           schema,
-                          onChange: this.handleChange(propertyName)
+                          onChange: this.handleChange(propertyName),
+                          invoke
                         })}
                       </td>
                     </tr>
@@ -126,7 +127,8 @@ class Editor extends React.PureComponent {
                       <td>
                         {getComponent('editor')(this.context.views, resourceName, {
                           propertyName,
-                          record
+                          record,
+                          invoke
                         })}
                       </td>
                     </tr>

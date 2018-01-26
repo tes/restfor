@@ -38,7 +38,7 @@ class Details extends React.PureComponent {
   handleCancel = () => this.props.closeDetails();
 
   render() {
-    const { resourceName, id, schema, record } = this.props;
+    const { resourceName, id, schema, record, invoke } = this.props;
     const title = `${resourceName.toUpperCase()} / ${id.toString().toUpperCase()}`;
     const additionalProperties = getAdditionalProperties(this.context.views, 'details', schema, resourceName);
     return (
@@ -83,7 +83,8 @@ class Details extends React.PureComponent {
                               propertyName,
                               value: record[propertyName],
                               record,
-                              schema
+                              schema,
+                              invoke
                             })}
                           </td>
                         </tr>
@@ -98,7 +99,8 @@ class Details extends React.PureComponent {
                           <td>
                             {getComponent('details')(this.context.views, resourceName, {
                               propertyName,
-                              record
+                              record,
+                              invoke
                             })}
                           </td>
                         </tr>

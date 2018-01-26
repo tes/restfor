@@ -71,7 +71,7 @@ class Grid extends React.PureComponent {
   };
 
   render() {
-    const { schema, items, maxPage, pathname, resourceName, page } = this.props;
+    const { schema, items, maxPage, pathname, resourceName, page, invoke } = this.props;
     const { selection } = this.state;
     const additionalProperties = getAdditionalProperties(this.context.views, 'grid', schema, resourceName);
     return (
@@ -135,13 +135,14 @@ class Grid extends React.PureComponent {
                           propertyName,
                           value: record[propertyName],
                           record,
-                          schema
+                          schema,
+                          invoke
                         })}
                       </TableCell>
                     ))}
                     {additionalProperties.map(propertyName => (
                       <TableCell key={propertyName}>
-                        {getComponent('grid')(this.context.views, resourceName, { propertyName, record })}
+                        {getComponent('grid')(this.context.views, resourceName, { propertyName, record, invoke })}
                       </TableCell>
                     ))}
                   </TableRow>
