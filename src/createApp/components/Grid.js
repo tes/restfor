@@ -15,6 +15,7 @@ import { invoke, openDetails } from '../actionCreators';
 import { getMaxPage } from '../selectors';
 import { resolvePage, getOffsetFromPage } from '../helpers/page';
 import { getComponent, getAdditionalProperties } from './ViewProvider';
+import Dialog, {DialogActions,DialogContent,DialogContentText,DialogTitle,withMobileDialog} from 'material-ui/Dialog';
 
 class Grid extends React.PureComponent {
   static contextTypes = {
@@ -22,7 +23,8 @@ class Grid extends React.PureComponent {
   };
 
   state = {
-    selection: []
+    selection: [],
+    deleteDialogWindow: false
   };
 
   fetchItems() {
@@ -59,11 +61,22 @@ class Grid extends React.PureComponent {
     await invoke('DELETE', resourceName, '/', { body: itemIds });
     this.setState({ selection: [] });
     await this.fetchItems();
+
   };
 
   handleRowClick = rowIndex => evt => {
     const id = this.props.items[rowIndex].id;
     this.props.openDetails(id);
+  };
+
+  handleConfirmWindow = () => {
+    this.setState({ deleteDialogWindow: true });
+  };
+
+  handleConfirmClose = (answer) => {
+    this.setState({ deleteDialogWindow: false }); 
+    if (!answer) return false;
+    this.handleRemoveItems();  
   };
 
   render() {
@@ -91,7 +104,7 @@ class Grid extends React.PureComponent {
                 </Button>
               </Link>
               {selection.length > 0 && (
-                <Button raised color="secondary" onClick={this.handleRemoveItems} className="left margin">
+                <Button raised color="secondary" onClick={this.handleConfirmWindow} className="left margin">
                   Remove selected items
                 </Button>
               )}
@@ -148,6 +161,28 @@ class Grid extends React.PureComponent {
               ))}
             </TableBody>
           </Table>
+
+          <Dialog
+            fullScreen={false}
+            open={this.state.deleteDialogWindow}
+            aria-labelledby="responsive-dialog-title"
+          >
+          <DialogTitle id="responsive-dialog-title">{"Are you sure?"}</DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              Would you like to delete this item?
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={ () => { this.handleConfirmClose(false) }} color="primary">
+              No
+            </Button>
+            <Button onClick={ () => { this.handleConfirmClose(true) }} color="primary" autoFocus>
+              Yes, delete it!
+            </Button>
+          </DialogActions>
+        </Dialog>
+
         </main>
       </div>
     );
