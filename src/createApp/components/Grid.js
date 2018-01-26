@@ -7,15 +7,15 @@ import AppBar from 'material-ui/AppBar';
 import Toolbar from 'material-ui/Toolbar';
 import Typography from 'material-ui/Typography';
 import Button from 'material-ui/Button';
-import Menu, { MenuItem } from 'material-ui/Menu';
 import NavigateBefore from 'material-ui-icons/NavigateBefore';
 import NavigateNext from 'material-ui-icons/NavigateNext';
 import Table, { TableHead, TableBody, TableRow, TableCell } from 'material-ui/Table';
 import Checkbox from 'material-ui/Checkbox';
 import { invoke, openDetails } from '../actionCreators';
 import { getSchema, getItems, getPage, getMaxPage, getLimit, getResourceName, getPathname } from '../selectors';
-import { getField, getActions, getAdditionalProperties } from './ViewProvider';
+import { getField, getAdditionalProperties } from './ViewProvider';
 import DeleteDialog from './DeleteDialog';
+import ActionProvider from './ActionProvider';
 
 class Grid extends React.PureComponent {
   static contextTypes = {
@@ -24,7 +24,6 @@ class Grid extends React.PureComponent {
 
   state = {
     selection: [],
-    actionMenuAnchor: null,
     deleteDialogWindow: false
   };
 
@@ -46,7 +45,7 @@ class Grid extends React.PureComponent {
   handleRowSelection = i => evt => {
     const set = new Set(this.state.selection);
     evt.target.checked ? set.add(i) : set.delete(i);
-    this.setState({ selection: [...set] });
+    this.setState({ selection: [...set].sort((a, b) => a - b) });
   };
 
   handleRemoveItems = async () => {
@@ -72,23 +71,13 @@ class Grid extends React.PureComponent {
     this.handleRemoveItems();
   };
 
-  handleActionMenuOpen = event => {
-    this.setState({ actionMenuAnchor: event.currentTarget });
-  };
-
-  handleActionMenuClose = () => {
-    this.setState({ actionMenuAnchor: null });
-  };
-
-  handleActionClick = callback => () => {
-    this.handleActionMenuClose();
-    callback({ invoke: this.props.invoke });
-  };
+  getSelectedIds() {
+    return this.state.selection.map(i => this.props.items[i].id);
+  }
 
   render() {
     const { schema, items, maxPage, pathname, resourceName, page, invoke } = this.props;
-    const { selection, actionMenuAnchor } = this.state;
-    const actions = getActions('grid')(this.context.views, resourceName);
+    const { selection } = this.state;
     const additionalProperties = getAdditionalProperties(this.context.views, 'grid', schema, resourceName);
     return (
       <div className="fitted column layout">
@@ -106,17 +95,7 @@ class Grid extends React.PureComponent {
                   Remove selected items
                 </Button>}
               <div style={{ marginLeft: 'auto' }}>
-                <Button ref="actionMenu" disabled={actions.length === 0} onClick={this.handleActionMenuOpen}>
-                  Actions
-                </Button>
-                {actions.length > 0 &&
-                  <Menu anchorEl={actionMenuAnchor} open={!!actionMenuAnchor} onClose={this.handleActionMenuClose}>
-                    {actions.map(action => (
-                      <MenuItem key={action.name} onClick={this.handleActionClick(action.callback)}>
-                        {action.name}
-                      </MenuItem>
-                    ))}
-                  </Menu>}
+                <ActionProvider view="grid" actionProps={{ selection: this.getSelectedIds() }} />
                 <PageSwitch direction={-1} disabled={page === 0} to={`${pathname}?page=${page}`} />
                 <Button disabled>
                   {page + 1} / {maxPage}
