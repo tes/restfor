@@ -40,9 +40,9 @@ const registerProperty = (views, viewName) => (resourceName, propertyName, compo
   views[viewName].properties[resourceName][propertyName] = component;
 };
 
-const registerAction = (views, viewName) => (resourceName, name, callback, params) => {
+const registerAction = (views, viewName) => (resourceName, name, callback, options) => {
   views[viewName].actions[resourceName] = views[viewName].actions[resourceName] || [];
-  views[viewName].actions[resourceName].push({ name, callback, params });
+  views[viewName].actions[resourceName].push({ name, callback, ...options });
 };
 
 const register = views => ({

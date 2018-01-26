@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Button from 'material-ui/Button';
 import Menu, { MenuItem } from 'material-ui/Menu';
+import Dialog, { DialogTitle } from 'material-ui/Dialog';
 import { invoke } from '../actionCreators';
 import { getResourceName } from '../selectors';
 import { getActions } from './ViewProvider';
@@ -18,7 +19,8 @@ class ActionProvider extends React.PureComponent {
   };
 
   state = {
-    menuAnchor: null
+    menuAnchor: null,
+    dialogForAction: null
   };
 
   handleMenuOpen = event => {
@@ -29,29 +31,58 @@ class ActionProvider extends React.PureComponent {
     this.setState({ menuAnchor: null });
   };
 
-  handleActionClick = ({ name, callback }, actionProps) => () => {
-    /* this.handleMenuClose();
-    callback({ invoke: this.props.invoke }); */
-    console.log(name, callback, actionProps);
+  handleDialogClose = () => {
+    this.setState({ dialogForAction: null });
   };
+
+  handleActionClick = (action, actionProps) => () => {
+    this.handleMenuClose();
+    if (!action.params) callback(action.actionProps);
+    else this.setState({ dialogForAction: action });
+  };
+
+  renderDialog() {
+    const { dialogForAction } = this.state;
+    return (
+      <Dialog onClose={this.handleDialogClose} open={!!dialogForAction}>
+        {dialogForAction && <DialogTitle>{dialogForAction && dialogForAction.name}</DialogTitle>}
+        <div className="param-container">
+          yee
+        </div>
+      </Dialog>
+    );
+  }
+
+  renderMenu(actions) {
+    const { actionProps } = this.props;
+    const { menuAnchor } = this.state;
+    return (
+      actions.length > 0 &&
+      <Menu anchorEl={menuAnchor} open={!!menuAnchor} onClose={this.handleMenuClose}>
+        {actions.map(action => (
+          <MenuItem
+            key={action.name}
+            onClick={this.handleActionClick(action, actionProps)}
+            disabled={action.condition && !action.condition(actionProps || {})}
+          >
+            {action.name}
+          </MenuItem>
+        ))}
+      </Menu>
+    );
+  }
 
   render() {
     const { resourceName, view: viewName, actionProps } = this.props;
-    const { menuAnchor } = this.state;
+    const { menuAnchor, dialogForAction } = this.state;
     const actions = getActions(viewName)(this.context.views, resourceName);
     return (
       <div style={{ display: 'inline' }}>
         <Button ref="actionMenu" disabled={actions.length === 0} onClick={this.handleMenuOpen}>
           Actions
         </Button>
-        {actions.length > 0 &&
-          <Menu anchorEl={menuAnchor} open={!!menuAnchor} onClose={this.handleMenuClose}>
-            {actions.map(action => (
-              <MenuItem key={action.name} onClick={this.handleActionClick(action, actionProps)}>
-                {action.name}
-              </MenuItem>
-            ))}
-          </Menu>}
+        {this.renderMenu(actions)}
+        {this.renderDialog()}
       </div>
     );
   }
