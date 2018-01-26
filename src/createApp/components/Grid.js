@@ -24,7 +24,7 @@ class Grid extends React.PureComponent {
 
   state = {
     selection: [],
-    open: false
+    deleteDialogWindow: false
   };
 
   fetchItems() {
@@ -69,12 +69,12 @@ class Grid extends React.PureComponent {
     this.props.openDetails(id);
   };
 
-  handleClickOpen = () => {
-    this.setState({ open: true });
+  handleConfirmWindow = () => {
+    this.setState({ deleteDialogWindow: true });
   };
 
-  handleClose = (answer) => {
-    this.setState({ open: false }); 
+  handleConfirmClose = (answer) => {
+    this.setState({ deleteDialogWindow: false }); 
     if (!answer) return false;
     this.handleRemoveItems();  
   };
@@ -104,7 +104,7 @@ class Grid extends React.PureComponent {
                 </Button>
               </Link>
               {selection.length > 0 && (
-                <Button raised color="secondary" onClick={this.handleClickOpen} className="left margin">
+                <Button raised color="secondary" onClick={this.handleConfirmWindow} className="left margin">
                   Remove selected items
                 </Button>
               )}
@@ -164,7 +164,7 @@ class Grid extends React.PureComponent {
 
           <Dialog
             fullScreen={false}
-            open={this.state.open}
+            open={this.state.deleteDialogWindow}
             aria-labelledby="responsive-dialog-title"
           >
           <DialogTitle id="responsive-dialog-title">{"Are you sure?"}</DialogTitle>
@@ -174,10 +174,10 @@ class Grid extends React.PureComponent {
             </DialogContentText>
           </DialogContent>
           <DialogActions>
-            <Button onClick={ () => { this.handleClose(false) }} color="primary">
+            <Button onClick={ () => { this.handleConfirmClose(false) }} color="primary">
               No
             </Button>
-            <Button onClick={ () => { this.handleClose(true) }} color="primary" autoFocus>
+            <Button onClick={ () => { this.handleConfirmClose(true) }} color="primary" autoFocus>
               Yes, delete it!
             </Button>
           </DialogActions>
