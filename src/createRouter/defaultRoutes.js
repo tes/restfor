@@ -4,7 +4,10 @@ const requestHandler = require('./requestHandler');
 module.exports.findAll = name => ({ models }) =>
   requestHandler(
     ({ offset, limit }) => models[name].findAndCount({ offset, limit }),
-    req => ({ offset: Number(req.query.offset), limit: Number(req.query.limit) })
+    req => ({
+      offset: req.query.offset ? Number(req.query.offset) : null,
+      limit: req.query.limit ? Number(req.query.limit) : null
+    })
   );
 
 module.exports.findById = name => ({ models }) =>
