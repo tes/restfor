@@ -59,7 +59,7 @@ class App extends React.PureComponent {
     const { schemaList, resourceName, history, error } = this.props;
     return (
       <div className="absolute column layout App">
-        <header className="dynamic high">
+        {/* <header className="dynamic high">
           <AppBar position="static">
             <Toolbar>
               <Typography type="title" color="inherit">
@@ -67,7 +67,7 @@ class App extends React.PureComponent {
               </Typography>
             </Toolbar>
           </AppBar>
-        </header>
+        </header> */}
         <div className="fitted row low layout">
           <nav className="dynamic column high shadowed layout overflow">
             <List>
