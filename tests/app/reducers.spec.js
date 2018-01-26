@@ -1,5 +1,14 @@
-import { REJECT_FETCHING_SCHEMAS, REJECT_INVOKING, REJECT_ERROR } from '../../src/createApp/actionTypes';
+import { 
+  REJECT_FETCHING_SCHEMAS, 
+  REJECT_INVOKING, 
+  REJECT_ERROR,
+  START_FETCHING_SCHEMAS,
+  START_INVOKING,
+  RESOLVE_FETCHING_SCHEMAS,
+  RESOLVE_INVOKING
+} from '../../src/createApp/actionTypes';
 import errorReducer from '../../src/createApp/reducers/error';
+import isFetchingReducer from '../../src/createApp/reducers/isFetching';
 
 describe('Reducers test', () => {
 
@@ -71,6 +80,100 @@ describe('Reducers test', () => {
 
     });
 
-  })
+  });
+
+  describe('isFetching reducer', () => {
+
+    it('START_FETCHING_SCHEMAS', () => {
+
+      const state = false;
+      const action = {
+        type: START_FETCHING_SCHEMAS
+      }
+
+      expect(isFetchingReducer(state, action)).toEqual(true);
+
+    });
+
+    it('START_INVOKING', () => {
+
+      const state = false;
+      const action = {
+        type: START_INVOKING
+      }
+
+      expect(isFetchingReducer(state, action)).toEqual(true);
+
+    });
+
+    it('RESOLVE_FETCHING_SCHEMAS', () => {
+
+      const state = false;
+      const action = {
+        type: RESOLVE_FETCHING_SCHEMAS
+      }
+
+      expect(isFetchingReducer(state, action)).toEqual(false);
+
+    });
+
+    it('RESOLVE_INVOKING', () => {
+
+      const state = false;
+      const action = {
+        type: RESOLVE_INVOKING
+      }
+
+      expect(isFetchingReducer(state, action)).toEqual(false);
+
+    });
+
+    it('REJECT_FETCHING_SCHEMAS', () => {
+
+      const state = false;
+      const action = {
+        type: REJECT_FETCHING_SCHEMAS
+      }
+
+      expect(isFetchingReducer(state, action)).toEqual(false);
+
+    });
+
+    it('REJECT_INVOKING', () => {
+
+      const state = false;
+      const action = {
+        type: REJECT_INVOKING
+      }
+
+      expect(isFetchingReducer(state, action)).toEqual(false);
+
+    });
+
+    it('RANDOM_ACTION', () => {
+
+      const state = false;
+      const action = {
+        type: 'RANDOM_ACTION'
+      }
+
+      expect(isFetchingReducer(state, action)).toEqual(false);
+
+    });
+
+    it('RANDOM_ACTION', () => {
+
+      const state = true;
+      const action = {
+        type: 'RANDOM_ACTION'
+      }
+
+      expect(isFetchingReducer(state, action)).toEqual(true);
+
+    });
+
+    
+
+  });
 
 })
