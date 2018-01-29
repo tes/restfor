@@ -9,7 +9,7 @@ import { MuiThemeProvider, createMuiTheme } from 'material-ui/styles';
 import blue from 'material-ui/colors/blue';
 import App from './components/App';
 import createApi from './createApi';
-import { history } from './history';
+import { history } from './createHashHistory';
 import createStore from './createStore';
 import createViews from './createViews';
 
