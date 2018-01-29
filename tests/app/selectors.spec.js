@@ -359,4 +359,85 @@ describe("selector's testing suit", () => {
 			expect(result).toEqual(null);
 		});
 	});
+
+	describe('test getSchema selector', () => {
+		it('return with the selected schema correctly', () => {
+			const state = {
+				router: {
+					params: {
+						resourceName: 'users',
+						id: 'asd'
+					}
+				},
+				schemas: {
+					users: {
+						id: 2
+					}
+				},
+				resources: {
+					users: {
+						items: [
+							{
+								id: 2,
+								a: 1
+							}
+						]
+					}
+				}
+			};
+
+			const result = selectors.getSchema(state);
+			expect(result).toEqual({ id: 2 });
+		});
+
+		it('return with empty array', () => {
+			const state = {
+				router: {
+					params: {
+						resourceName: 'users',
+						id: 'asd'
+					}
+				},
+				schemas: [],
+				resources: {
+					users: {
+						items: [
+							{
+								id: 2,
+								a: 1
+							}
+						]
+					}
+				}
+			};
+
+			const result = selectors.getSchema(state);
+			expect(result).toEqual(null);
+		});
+	});
+
+	describe('test getSchemaList selector', () => {
+		it('return with list of schemas', () => {
+			const state = {
+				schemas: {
+					users: {
+						id: 1
+					},
+					tasks: {
+						id: 2
+					}
+				}
+			};
+
+			const result = selectors.getSchemaList(state);
+			expect(result).toEqual([ 'users', 'tasks' ]);
+		});
+
+		it('return with empty array when schemas is not presented in state', () => {
+			const state = {};
+
+			const result = selectors.getSchemaList(state);
+			expect(result).toEqual([]);
+		});
+	});
 });
