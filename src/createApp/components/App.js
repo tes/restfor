@@ -13,6 +13,7 @@ import { invoke } from '../actionCreators';
 import { getPage, getResourceName, getId, getItems, getLimit, getSchemaList } from '../selectors';
 import Grid from './Grid';
 import Details from './Details';
+import Editor from './Editor';
 
 class App extends React.PureComponent {
   async componentDidMount() {
@@ -58,7 +59,7 @@ class App extends React.PureComponent {
     const { schemaList, resourceName, history, error } = this.props;
     return (
       <div className="absolute column layout App">
-        <header className="dynamic high">
+        {/* <header className="dynamic high">
           <AppBar position="static">
             <Toolbar>
               <Typography type="title" color="inherit">
@@ -66,7 +67,7 @@ class App extends React.PureComponent {
               </Typography>
             </Toolbar>
           </AppBar>
-        </header>
+        </header> */}
         <div className="fitted row low layout">
           <nav className="dynamic column high shadowed layout overflow">
             <List>
@@ -83,6 +84,7 @@ class App extends React.PureComponent {
             <main className="relative fitted column low layout">
               <Route exact path="/:resourceName" component={Grid} />
               <Route exact path="/:resourceName/:id" component={Details} />
+              <Route exact path="/:resourceName/:id/edit" component={Editor} />
             </main>
           </Router>
         </div>

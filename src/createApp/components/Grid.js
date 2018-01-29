@@ -13,8 +13,9 @@ import Table, { TableHead, TableBody, TableRow, TableCell } from 'material-ui/Ta
 import Checkbox from 'material-ui/Checkbox';
 import { invoke, openDetails } from '../actionCreators';
 import { getSchema, getItems, getPage, getMaxPage, getLimit, getResourceName, getPathname } from '../selectors';
-import { getComponent, getAdditionalProperties } from './ViewProvider';
+import { getField, getAdditionalProperties } from './ViewProvider';
 import DeleteDialog from './DeleteDialog';
+import ActionProvider from './ActionProvider';
 
 class Grid extends React.PureComponent {
   static contextTypes = {
@@ -44,7 +45,7 @@ class Grid extends React.PureComponent {
   handleRowSelection = i => evt => {
     const set = new Set(this.state.selection);
     evt.target.checked ? set.add(i) : set.delete(i);
-    this.setState({ selection: [...set] });
+    this.setState({ selection: [...set].sort((a, b) => a - b) });
   };
 
   handleRemoveItems = async () => {
@@ -70,8 +71,18 @@ class Grid extends React.PureComponent {
     this.handleRemoveItems();
   };
 
+  componentWillReceiveProps(nextProps) {
+    if (this.props.items !== nextProps.items) {
+      this.setState({ selection: [] });
+    }
+  }
+
+  getSelectedIds() {
+    return this.state.selection.map(i => this.props.items[i].id);
+  }
+
   render() {
-    const { schema, items, maxPage, pathname, resourceName, page } = this.props;
+    const { schema, items, maxPage, pathname, resourceName, page, invoke } = this.props;
     const { selection } = this.state;
     const additionalProperties = getAdditionalProperties(this.context.views, 'grid', schema, resourceName);
     return (
@@ -80,7 +91,7 @@ class Grid extends React.PureComponent {
           <AppBar position="static" color="default">
             <Toolbar>
               <Typography type="title">{resourceName.toUpperCase()}</Typography>
-              <Link to={`/${resourceName}/new`}>
+              <Link to={`/${resourceName}/new/edit`}>
                 <Button raised color="primary" className="left margin">
                   Add
                 </Button>
@@ -90,6 +101,7 @@ class Grid extends React.PureComponent {
                   Remove selected items
                 </Button>}
               <div style={{ marginLeft: 'auto' }}>
+                <ActionProvider view="grid" actionProps={{ selection: this.getSelectedIds() }} />
                 <PageSwitch direction={-1} disabled={page === 0} to={`${pathname}?page=${page}`} />
                 <Button disabled>
                   {page + 1} / {maxPage}
@@ -131,17 +143,18 @@ class Grid extends React.PureComponent {
                     </TableCell>
                     {Object.keys(record).map(propertyName => (
                       <TableCell key={propertyName} onClick={this.handleRowClick(i)}>
-                        {getComponent('grid')(this.context.views, resourceName, {
+                        {getField('grid')(this.context.views, resourceName, {
                           propertyName,
                           value: record[propertyName],
                           record,
-                          schema
+                          schema,
+                          invoke
                         })}
                       </TableCell>
                     ))}
                     {additionalProperties.map(propertyName => (
                       <TableCell key={propertyName}>
-                        {getComponent('grid')(this.context.views, resourceName, { propertyName, record })}
+                        {getField('grid')(this.context.views, resourceName, { propertyName, record, invoke })}
                       </TableCell>
                     ))}
                   </TableRow>
