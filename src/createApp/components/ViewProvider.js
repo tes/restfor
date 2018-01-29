@@ -104,6 +104,15 @@ export const getActions = view => (views, resourceName) => {
   return (views[view].actions && views[view].actions[resourceName]) || [];
 };
 
+export const getActionParamComponent = (views, resourceName, paramName, paramType, props) => {
+  const view = 'actions';
+  const Component =
+    (views[view].properties[resourceName] && views[view].properties[resourceName][paramName]) ||
+    views[view].types[paramType.type] ||
+    views[view].types.any;
+  return Component ? <Component {...props} /> : null;
+};
+
 export const getAdditionalProperties = (views, viewName, schema, resourceName) => {
   if (!schema) return [];
   const schemaProperties = Object.keys(schema);

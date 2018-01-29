@@ -8,6 +8,6 @@ export const typeConstructors = {
   bool: () => ({ type: BOOL }),
   number: () => ({ type: NUMBER }),
   string: () => ({ type: STRING }),
-  enum: values => ({ type: ENUM, values }),
+  enum: (...values) => ({ type: ENUM, values }),
   date: () => ({ type: DATE })
 };

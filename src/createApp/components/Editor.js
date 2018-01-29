@@ -30,7 +30,7 @@ class Editor extends React.PureComponent {
                   ? record
                   : {
                       ...record,
-                      [propertyName]: getDefaultValue(propertyName, schema[propertyName])
+                      [propertyName]: getDefaultValue(schema[propertyName])
                     }),
               null
             )
@@ -141,7 +141,7 @@ class Editor extends React.PureComponent {
   }
 }
 
-const getDefaultValue = (propertyName, schema) => {
+const getDefaultValue = (schema) => {
   switch (schema.type) {
     case 'BOOLEAN':
       return false;

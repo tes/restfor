@@ -3,11 +3,11 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import Button from 'material-ui/Button';
 import Menu, { MenuItem } from 'material-ui/Menu';
-import Dialog, { DialogTitle, DialogActions } from 'material-ui/Dialog';
+import Dialog, { DialogTitle, DialogActions, DialogContent } from 'material-ui/Dialog';
 import { invoke } from '../actionCreators';
 import { getResourceName } from '../selectors';
 import { getActions } from './ViewProvider';
-import { getField } from './ViewProvider';
+import { getActionParamComponent } from './ViewProvider';
 
 class ActionProvider extends React.PureComponent {
   static contextTypes = {
@@ -41,7 +41,7 @@ class ActionProvider extends React.PureComponent {
   handleActionClick = (action, actionProps) => () => {
     this.handleMenuClose();
     if (!action.params) callback(action.actionProps);
-    else this.setState({ actionOfDialog: { ...action, state: {} } });
+    else this.setState({ actionOfDialog: { ...action, state: getDefaultParamsState(action.params) } });
   };
 
   handleActionParamChange = paramName => value => {
@@ -57,7 +57,7 @@ class ActionProvider extends React.PureComponent {
     return (
       <Dialog onClose={this.handleDialogClose} open={!!actionOfDialog}>
         {actionOfDialog && <DialogTitle>{actionOfDialog && actionOfDialog.name}</DialogTitle>}
-        <div className="param-container">
+        <DialogContent className="param-container">
           <table>
             <tbody>
               {actionOfDialog &&
@@ -67,7 +67,7 @@ class ActionProvider extends React.PureComponent {
                 )}
             </tbody>
           </table>
-        </div>
+        </DialogContent>
         <DialogActions>
           <Button onClick={this.handleDialogClose}>
             Cancel
@@ -85,7 +85,9 @@ class ActionProvider extends React.PureComponent {
       <tr key={paramName}>
         <td>{paramName}</td>
         <td>
-          {typeof paramType === 'function' ? this.renderCustomParamComponent(action, paramName, paramType) : null}
+          {typeof paramType === 'function'
+            ? this.renderCustomParamComponent(action, paramName, paramType)
+            : this.renderDefaultParamComponent(action, paramName, paramType)}
         </td>
       </tr>
     );
@@ -105,8 +107,9 @@ class ActionProvider extends React.PureComponent {
 
   renderDefaultParamComponent(action, paramName, paramType) {
     const { resourceName } = this.props;
-    return getField('actions')(this.context.views, resourceName, {
+    return getActionParamComponent(this.context.views, resourceName, paramName, paramType, {
       paramName,
+      paramType,
       value: action.state[paramName],
       onChange: this.handleActionParamChange(paramName),
       invoke
@@ -147,6 +150,28 @@ class ActionProvider extends React.PureComponent {
     );
   }
 }
+
+const getDefaultParamsState = params => {
+  return Object.keys(params).reduce(
+    (state, paramName) => ({ ...state, [paramName]: getDefaultValue(params[paramName]) }),
+    {}
+  );
+};
+
+const getDefaultValue = ({ type, values }) => {
+  switch (type) {
+    case 'bool':
+      return false;
+    case 'date':
+      return new Date().toISOString();
+    case 'enum':
+      return (values && values[0]) || null;
+    case 'number':
+      return 0;
+    default:
+      return '';
+  }
+};
 
 export default connect(
   state => ({
