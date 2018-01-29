@@ -7,8 +7,10 @@ import {
   RESOLVE_FETCHING_SCHEMAS,
   RESOLVE_INVOKING
 } from '../../src/createApp/actionTypes';
+
 import errorReducer from '../../src/createApp/reducers/error';
 import isFetchingReducer from '../../src/createApp/reducers/isFetching';
+import resourcesReducer from '../../src/createApp/reducers/resources';
 
 describe('Reducers test', () => {
 
@@ -173,6 +175,43 @@ describe('Reducers test', () => {
     });
 
     
+
+  });
+
+  describe('resources reducer', () => {
+
+    it('RESOLVE_FETCHING_SCHEMAS', () => {
+
+      const schemas = [
+        {
+          id: 1,
+          text: "schema1"
+        },
+        {
+          id: 2,
+          text: "schema2"
+        }
+      ];
+
+      const state = {};
+      const action = {
+        type: RESOLVE_FETCHING_SCHEMAS,
+        schemas
+      };
+      
+
+      expect(resourcesReducer(state, action)).toEqual({        
+        0: {
+          items: [],
+          count: 0
+        },
+        1: {
+          items: [],
+          count: 0
+        }
+      });
+
+    });
 
   });
 
