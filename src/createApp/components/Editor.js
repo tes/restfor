@@ -9,7 +9,7 @@ import Button from 'material-ui/Button';
 import { Link } from 'react-router-dom';
 import { invoke, closeDetails } from '../actionCreators';
 import { getType } from '../helpers/types';
-import { getComponent, getAdditionalProperties } from './ViewProvider';
+import { getField, getAdditionalProperties } from './ViewProvider';
 import { getRecord, getSchema, getId, getResourceName } from '../selectors';
 
 class Editor extends React.PureComponent {
@@ -30,7 +30,7 @@ class Editor extends React.PureComponent {
                   ? record
                   : {
                       ...record,
-                      [propertyName]: getDefaultValue(propertyName, schema[propertyName])
+                      [propertyName]: getDefaultValue(schema[propertyName])
                     }),
               null
             )
@@ -106,7 +106,7 @@ class Editor extends React.PureComponent {
                         <b>{propertyName}</b>
                       </td>
                       <td>
-                        {getComponent('editor')(this.context.views, resourceName, {
+                        {getField('editor')(this.context.views, resourceName, {
                           propertyName,
                           value: record[propertyName],
                           record,
@@ -125,7 +125,7 @@ class Editor extends React.PureComponent {
                         <b>{propertyName}</b>
                       </td>
                       <td>
-                        {getComponent('editor')(this.context.views, resourceName, {
+                        {getField('editor')(this.context.views, resourceName, {
                           propertyName,
                           record,
                           invoke
@@ -141,7 +141,7 @@ class Editor extends React.PureComponent {
   }
 }
 
-const getDefaultValue = (propertyName, schema) => {
+const getDefaultValue = (schema) => {
   switch (schema.type) {
     case 'BOOLEAN':
       return false;

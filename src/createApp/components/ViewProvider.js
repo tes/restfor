@@ -22,9 +22,10 @@ export default class extends React.PureComponent {
 
 export const getViews = (defaultViewFactory, viewFactory) => {
   let views = {
-    grid: { properties: {}, types: {} },
-    details: { properties: {}, types: {} },
-    editor: { properties: {}, types: {} }
+    grid: { properties: {}, types: {}, actions: {} },
+    details: { properties: {}, types: {}, actions: {} },
+    editor: { properties: {}, types: {}, actions: {} },
+    actions: { properties: {}, types: {}, actions: {} }
   };
   defaultViewFactory(register(views));
   viewFactory(register(views));
@@ -40,6 +41,11 @@ const registerProperty = (views, viewName) => (resourceName, propertyName, compo
   views[viewName].properties[resourceName][propertyName] = component;
 };
 
+const registerAction = (views, viewName) => (resourceName, name, callback, options) => {
+  views[viewName].actions[resourceName] = views[viewName].actions[resourceName] || [];
+  views[viewName].actions[resourceName].push({ name, callback, ...options });
+};
+
 const register = views => ({
   grid: {
     bool: registerType(views, 'grid', 'bool'),
@@ -48,7 +54,8 @@ const register = views => ({
     date: registerType(views, 'grid', 'date'),
     enum: registerType(views, 'grid', 'enum'),
     any: registerType(views, 'grid', 'any'),
-    property: registerProperty(views, 'grid')
+    property: registerProperty(views, 'grid'),
+    action: registerAction(views, 'grid')
   },
   details: {
     bool: registerType(views, 'details', 'bool'),
@@ -57,7 +64,8 @@ const register = views => ({
     date: registerType(views, 'details', 'date'),
     enum: registerType(views, 'details', 'enum'),
     any: registerType(views, 'details', 'any'),
-    property: registerProperty(views, 'details')
+    property: registerProperty(views, 'details'),
+    action: registerAction(views, 'details')
   },
   editor: {
     bool: registerType(views, 'editor', 'bool'),
@@ -66,11 +74,20 @@ const register = views => ({
     date: registerType(views, 'editor', 'date'),
     enum: registerType(views, 'editor', 'enum'),
     any: registerType(views, 'editor', 'any'),
-    property: registerProperty(views, 'editor')
+    property: registerProperty(views, 'editor'),
+    action: registerAction(views, 'editor')
+  },
+  actions: {
+    bool: registerType(views, 'actions', 'bool'),
+    string: registerType(views, 'actions', 'string'),
+    number: registerType(views, 'actions', 'number'),
+    date: registerType(views, 'actions', 'date'),
+    enum: registerType(views, 'actions', 'enum'),
+    any: registerType(views, 'actions', 'any')
   }
 });
 
-export const getComponent = view => (views, resourceName, props) => {
+export const getField = view => (views, resourceName, props) => {
   if (!props.schema) {
     const Component = views[view].properties[resourceName] && views[view].properties[resourceName][props.propertyName];
     return <Component {...props} />;
@@ -79,6 +96,19 @@ export const getComponent = view => (views, resourceName, props) => {
   const Component =
     (views[view].properties[resourceName] && views[view].properties[resourceName][props.propertyName]) ||
     views[view].types[type] ||
+    views[view].types.any;
+  return Component ? <Component {...props} /> : null;
+};
+
+export const getActions = view => (views, resourceName) => {
+  return (views[view].actions && views[view].actions[resourceName]) || [];
+};
+
+export const getActionParamComponent = (views, resourceName, paramName, paramType, props) => {
+  const view = 'actions';
+  const Component =
+    (views[view].properties[resourceName] && views[view].properties[resourceName][paramName]) ||
+    views[view].types[paramType.type] ||
     views[view].types.any;
   return Component ? <Component {...props} /> : null;
 };

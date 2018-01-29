@@ -12,6 +12,7 @@
     "styles.css",
     "createApp.js",
     "createRouter.js",
+    "types.js",
     "LICENSE.md",
     "README.md"
   ],
