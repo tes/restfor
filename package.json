@@ -5,7 +5,7 @@
   "scripts": {
     "build": "rimraf lib && babel src -d lib",
     "build:w": "rimraf lib && babel src -d lib -w",
-    "test": "jest"
+    "test": "jest --watchAll"
   },
   "files": [
     "lib",
