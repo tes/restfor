@@ -40,8 +40,8 @@ class ActionProvider extends React.PureComponent {
 
   handleActionClick = (action, actionProps) => () => {
     this.handleMenuClose();
-    if (!action.params) callback(action.actionProps);
-    else this.setState({ actionOfDialog: { ...action, state: getDefaultParamsState(action.params) } });
+    if (!action.params) callback(actionProps);
+    else this.setState({ actionOfDialog: { ...action, actionProps, state: getDefaultParamsState(action.params) } });
   };
 
   handleActionParamChange = paramName => value => {
@@ -112,7 +112,8 @@ class ActionProvider extends React.PureComponent {
       paramType,
       value: action.state[paramName],
       onChange: this.handleActionParamChange(paramName),
-      invoke
+      invoke,
+      ...action.actionProps
     });
   }
 
