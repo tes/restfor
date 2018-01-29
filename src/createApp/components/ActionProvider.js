@@ -49,7 +49,8 @@ class ActionProvider extends React.PureComponent {
 
   handleActionClick = (action, actionProps) => () => {
     this.handleMenuClose();
-    if (!action.params) action.callback(actionProps);
+    if (!action.params || Object.keys(action.params).length === 0)
+      action.callback({ ...actionProps, invoke: this.props.invoke });
     else this.setState({ actionOfDialog: { ...action, actionProps, state: getDefaultParamsState(action.params) } });
   };
 
