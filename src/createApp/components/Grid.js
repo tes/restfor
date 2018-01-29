@@ -71,6 +71,12 @@ class Grid extends React.PureComponent {
     this.handleRemoveItems();
   };
 
+  componentWillReceiveProps(nextProps) {
+    if (this.props.items !== nextProps.items) {
+      this.setState({ selection: [] });
+    }
+  }
+
   getSelectedIds() {
     return this.state.selection.map(i => this.props.items[i].id);
   }

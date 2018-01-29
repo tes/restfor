@@ -36,11 +36,20 @@ class ActionProvider extends React.PureComponent {
     this.setState({ actionOfDialog: null });
   };
 
-  handleDialogSubmit = () => {};
+  handleDialogSubmit = async () => {
+    const { actionOfDialog } = this.state;
+    if (!actionOfDialog) return;
+    await actionOfDialog.callback({
+      params: actionOfDialog.state,
+      invoke: this.props.invoke,
+      ...actionOfDialog.actionProps
+    });
+    this.setState({ actionOfDialog: null });
+  };
 
   handleActionClick = (action, actionProps) => () => {
     this.handleMenuClose();
-    if (!action.params) callback(actionProps);
+    if (!action.params) action.callback(actionProps);
     else this.setState({ actionOfDialog: { ...action, actionProps, state: getDefaultParamsState(action.params) } });
   };
 
@@ -73,7 +82,7 @@ class ActionProvider extends React.PureComponent {
             Cancel
           </Button>
           <Button onClick={this.handleDialogSubmit} color="primary">
-            Ok
+            Execute
           </Button>
         </DialogActions>
       </Dialog>
