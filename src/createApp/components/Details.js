@@ -11,6 +11,7 @@ import { invoke, closeDetails } from '../actionCreators';
 import { getRecord, getSchema, getId, getResourceName } from '../selectors';
 import { getField, getAdditionalProperties } from './ViewProvider';
 import DeleteDialog from './DeleteDialog';
+import ActionProvider from './ActionProvider';
 
 class Details extends React.PureComponent {
   static contextTypes = {
@@ -48,6 +49,7 @@ class Details extends React.PureComponent {
             <Toolbar style={{ width: '100%' }}>
               <Typography type="title">{title}</Typography>
               <div style={{ marginLeft: 'auto' }}>
+                <ActionProvider view="details" actionProps={{ record: this.props.record }} />
                 <Link to={`/${resourceName}/${id}/edit`}>
                   <Button raised color="primary" className="left margin">
                     Edit
