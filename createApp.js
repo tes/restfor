@@ -1,1 +1,1 @@
-module.exports = require('./lib/createApp').default;
+module.exports = require('./lib/app').default;

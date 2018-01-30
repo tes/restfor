@@ -1,1 +1,1 @@
-module.exports = require('./lib/createRouter');
+module.exports = require('./lib/api');
