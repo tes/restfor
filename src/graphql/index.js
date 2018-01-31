@@ -6,33 +6,18 @@ const { graphql, buildASTSchema } = require('graphql');
 const { parse } = require('graphql/language');
 const { introspectionQuery } = require('graphql/utilities');
 const { readFileSync, writeFileSync } = require('fs');
+const createRestforSchema = require('./createRestforSchema');
 
-module.exports = ({ db: dbConfig, schemas, resolvers }) => {
-  console.log(JSON.stringify(parse(`
-  type User {
-    id: Int @primaryKey @auto
-    name: String
-  }
-  
-  type Task {
-    id: Int @primaryKey @auto
-    title: String @required
-    taskType: TaskType
-    checked: Boolean @default(value: false)
-    userId: Int @required
-  }
-  
-  enum TaskType {
-    PRIMARY
-    SECONDARY
-  }
-  
-  `), null, 2))
-  const schemaFile = readFileSync(schemas);
-  const schemaDocument = parse(schemaFile);
+module.exports = ({ db: dbConfig, collections, schemas, resolvers }) => {
+  const schemaFile = readFileSync(schemas).toString();
+  const schemaDocument = parse(schemaFile, { noLocation: true });
+  const restforSchema = createRestforSchema(collections, schemaDocument);
+  //console.log(JSON.stringify(schemaDocument, null, 2));
+  console.log(JSON.stringify(restforSchema, null, 2));
   //const schema = mergeSchemas({ schemas, resolvers });
   //const schema = makeExecutableSchema({ typeDefs: schemas, resolvers });
   const router = express.Router();
+  router.get('/schemas', (req, res) => res.json(restforSchema));
   //router.use('/graphql', bodyParser.json(), graphqlExpress({ schema }));
   //router.use('/graphiql', graphiqlExpress({ endpointURL: '/graphql' }));
   return router;
