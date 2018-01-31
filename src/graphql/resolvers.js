@@ -3,7 +3,7 @@ const { Op } = require('sequelize');
 const createWhereFactory = schema => {
   const fieldNames = Object.keys(schema);
   return predicates => {
-    const where = {
+    return {
       [Op.and]: predicates.map(({ field, operator, value }) => {
         if (!fieldNames.includes(field)) {
           throw new Error(`Predicate > unknown field > ${field}`);
