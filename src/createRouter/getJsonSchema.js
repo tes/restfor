@@ -1,5 +1,4 @@
 module.exports = attributes => {
-  console.log(attributes);
   return Object.keys(attributes).reduce((properties, name) => {
     const attribute = attributes[name];
     return {
