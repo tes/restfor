@@ -45,8 +45,11 @@ class Editor extends React.PureComponent {
   handleChange = propertyName => value => this.setState({ record: { ...this.state.record, [propertyName]: value } });
 
   handleSave = async () => {
-    const { invoke, closeDetails, resourceName, id } = this.props;
-    const { record } = this.state;
+    const { invoke, closeDetails, resourceName, id, schema } = this.props;
+    const record = Object.keys(this.state.record).reduce(
+      (record, name) => (schema[name].readOnly ? record : { ...record, [name]: this.state.record[name] }),
+      {}
+    );
     if (id === 'new') {
       await invoke('POST', resourceName, '/', { body: [record] });
       closeDetails();
@@ -141,7 +144,7 @@ class Editor extends React.PureComponent {
   }
 }
 
-const getDefaultValue = (schema) => {
+const getDefaultValue = schema => {
   switch (schema.type) {
     case 'BOOLEAN':
       return false;
