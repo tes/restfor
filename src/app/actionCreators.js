@@ -52,7 +52,9 @@ export const invoke = (method, resourceName, path, ...args) => async (dispatch, 
       body
     });
     dispatch(resolveInvoking(result, request, reducer));
+    return result;
   } catch (error) {
     dispatch(rejectInvoking(error.message, request, reducer));
+    throw error;
   }
 };
