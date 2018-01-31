@@ -16,11 +16,10 @@ const {
 const { op, directive, DEFAULT_PRIMARY_KEY_NAME, DEFAULT_PRIMARY_KEY_TYPE, DEFAULT_LIMIT } = require('./consts');
 const getDefaultValue = require('./getDefaultValue');
 
-module.exports = ({ ast, restforSchema, schema }) => {
+const { itemsFactory, itemFactory, createFactory, updateFactory, deleteFactory } = require('./resolvers');
+
+module.exports = ({ models, ast, restforSchema, schema }) => {
   const typeNames = Object.keys(restforSchema);
-  const Operator = createOperator();
-  const Predicate = createPredicate(Operator);
-  const ItemsQuery = createItemsQuery(Predicate);
   const deltas = typeNames.reduce(
     (deltas, typeName) => ({
       ...deltas,
@@ -28,9 +27,7 @@ module.exports = ({ ast, restforSchema, schema }) => {
     }),
     {}
   );
-  const commonTypes = { Operator, Predicate, ItemsQuery };
-  const context = { ast, commonTypes, deltas, typeNames, restforSchema, schema };
-  const entrySchema = createSchema(context);
+  const entrySchema = createSchema({ models, ast, deltas, typeNames, restforSchema, schema });
   return entrySchema;
 };
 
@@ -90,114 +87,6 @@ const createDelta = (schema, ast, typeName) => {
   });
 };
 
-const createOperator = () =>
-  new GraphQLEnumType({
-    name: 'Operator',
-    values: {
-      [op.EQ]: { value: op.EQ },
-      [op.GT]: { value: op.GT },
-      [op.LT]: { value: op.LT },
-      [op.GTE]: { value: op.GTE },
-      [op.LTE]: { value: op.LTE },
-      [op.IN]: { value: op.IN },
-      [op.CONTAINS]: { value: op.CONTAINS }
-    }
-  });
-
-const createItemsQuery = Predicate => new GraphQLList(Predicate);
-
-const createPredicate = Operator =>
-  new GraphQLInputObjectType({
-    name: 'Predicate',
-    fields: {
-      field: { type: GraphQLString },
-      value: { type: GraphQLInt },
-      operator: { type: Operator, defaultValue: op.EQ }
-    }
-    /* types: [
-      new GraphQLInputObjectType({
-        name: 'IntPredicate',
-        fields: {
-          field: { type: GraphQLString },
-          value: { type: GraphQLInt },
-          operator: { type: Operator, defaultValue: op.EQ }
-        }
-      }),
-      new GraphQLInputObjectType({
-        name: 'IntListPredicate',
-        fields: {
-          field: { type: GraphQLString },
-          value: { type: new GraphQLList(GraphQLInt) },
-          operator: { type: Operator, defaultValue: op.EQ }
-        }
-      }),
-      new GraphQLInputObjectType({
-        name: 'FloatPredicate',
-        fields: {
-          field: { type: GraphQLString },
-          value: { type: GraphQLFloat },
-          operator: { type: Operator, defaultValue: op.EQ }
-        }
-      }),
-      new GraphQLInputObjectType({
-        name: 'FloatListPredicate',
-        fields: {
-          field: { type: GraphQLString },
-          value: { type: new GraphQLList(GraphQLFloat) },
-          operator: { type: Operator, defaultValue: op.EQ }
-        }
-      }),
-      new GraphQLInputObjectType({
-        name: 'IDPredicate',
-        fields: {
-          field: { type: GraphQLString },
-          value: { type: GraphQLID },
-          operator: { type: Operator, defaultValue: op.EQ }
-        }
-      }),
-      new GraphQLInputObjectType({
-        name: 'IDListPredicate',
-        fields: {
-          field: { type: GraphQLString },
-          value: { type: new GraphQLList(GraphQLID) },
-          operator: { type: Operator, defaultValue: op.EQ }
-        }
-      }),
-      new GraphQLInputObjectType({
-        name: 'BoolPredicate',
-        fields: {
-          field: { type: GraphQLString },
-          value: { type: GraphQLBoolean },
-          operator: { type: Operator, defaultValue: op.EQ }
-        }
-      }),
-      new GraphQLInputObjectType({
-        name: 'BoolListPredicate',
-        fields: {
-          field: { type: GraphQLString },
-          value: { type: new GraphQLList(GraphQLBoolean) },
-          operator: { type: Operator, defaultValue: op.EQ }
-        }
-      }),
-      new GraphQLInputObjectType({
-        name: 'StringPredicate',
-        fields: {
-          field: { type: GraphQLString },
-          value: { type: GraphQLString },
-          operator: { type: Operator, defaultValue: op.EQ }
-        }
-      }),
-      new GraphQLInputObjectType({
-        name: 'StringListPredicate',
-        fields: {
-          field: { type: GraphQLString },
-          value: { type: new GraphQLList(GraphQLString) },
-          operator: { type: Operator, defaultValue: op.EQ }
-        }
-      })
-    ] */
-  });
-
 const createSchema = context =>
   new GraphQLSchema({
     query: createQuery(context),
@@ -242,14 +131,14 @@ const createEntityQuery = (context, typeName) => {
           offset: { type: GraphQLInt, defaultValue: 0 },
           limit: { type: GraphQLInt, defaultValue: DEFAULT_LIMIT }
         },
-        resolve: () => 'items'
+        resolve: itemsFactory({ models: context.models }, typeName, context.restforSchema[typeName])
       },
       item: {
         type: context.schema._typeMap[typeName],
         args: {
           [primaryKeyName]: { type: primaryKeyType }
         },
-        resolve: () => ({ title: 'hello' })
+        resolve: itemFactory({ models: context.models }, typeName, context.restforSchema[typeName])
       }
     }
   });
@@ -264,17 +153,17 @@ const createMutationQuery = (context, typeName) => {
       create: {
         type: context.schema._typeMap[typeName],
         args: { new: { type: context.deltas[typeName] } },
-        resolve: () => 'create'
+        resolve: createFactory({ models: context.models }, typeName, context.restforSchema[typeName])
       },
       update: {
         type: context.schema._typeMap[typeName],
         args: { [primaryKeyName]: { type: primaryKeyType }, delta: { type: context.deltas[typeName] } },
-        resolve: () => 'update'
+        resolve: updateFactory({ models: context.models }, typeName, context.restforSchema[typeName])
       },
       delete: {
         type: new GraphQLList(primaryKeyType),
         args: { ids: { type: new GraphQLList(primaryKeyType) } },
-        resolve: () => 'delete'
+        resolve: deleteFactory({ models: context.models }, typeName, context.restforSchema[typeName])
       }
     }
   });
