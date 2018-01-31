@@ -1,3 +1,5 @@
+const getDefaultValue = require('./getDefaultValue');
+
 module.exports = (collectionNames, ast) => {
   const enumTypes = getEnumTypes(ast);
   const collectionTypes = getCollectionTypes(collectionNames, ast);
@@ -50,13 +52,6 @@ const getType = (field, enumTypes) => {
     default:
       return 'string';
   }
-};
-
-const getDefaultValue = directives => {
-  const defaultDirective = directives.find(directive => directive.name.value === 'default');
-  return defaultDirective
-    ? defaultDirective.arguments.find(argument => argument.name.value === 'value').value.value
-    : null;
 };
 
 const getRelatedEnumType = (field, enumTypes) =>

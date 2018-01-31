@@ -13,32 +13,28 @@ const {
   GraphQLInputObjectType
 } = require('graphql/type');
 
+const { op, directive, DEFAULT_PRIMARY_KEY_NAME, DEFAULT_PRIMARY_KEY_TYPE, DEFAULT_LIMIT } = require('./consts');
+const getDefaultValue = require('./getDefaultValue');
+
 module.exports = ({ ast, restforSchema, schema }) => {
   const typeNames = Object.keys(restforSchema);
-  const Date = createDateScalar();
   const Operator = createOperator();
-  const Predicate = createPredicate(Date, Operator);
-  const commonTypes = { Date, Operator, Predicate };
-  const context = { commonTypes, typeNames, restforSchema, schema };
-  return [Date, Operator, Predicate];
+  const Predicate = createPredicate(Operator);
+  const ItemsQuery = createItemsQuery(Predicate);
+  const deltas = typeNames.reduce(
+    (deltas, typeName) => ({
+      ...deltas,
+      [typeName]: createDelta(schema, ast, typeName)
+    }),
+    {}
+  );
+  const commonTypes = { Operator, Predicate, ItemsQuery };
+  const context = { ast, commonTypes, deltas, typeNames, restforSchema, schema };
+  const entrySchema = createSchema(context);
+  return entrySchema;
 };
 
-const DEFAULT_PRIMARY_KEY_NAME = 'id';
-const DEFAULT_PRIMARY_KEY_TYPE = GraphQLInt;
-const DEFAULT_LIMIT = 10;
-
-const EQ = 'eq';
-const GT = 'gt';
-const GTE = 'gte';
-const LT = 'lt';
-const LTE = 'lte';
-const IN = 'in';
-const CONTAINS = 'contains';
-
-const PRIMARY_KEY_DIRECTIVE = 'primaryKey';
-const AUTO_GENERATE_DIRECTIVE = 'auto';
-
-const nonEditableDecoratorNames = [PRIMARY_KEY_DIRECTIVE, AUTO_GENERATE_DIRECTIVE];
+const nonEditableDecoratorNames = [directive.PRIMARY_KEY, directive.AUTO_GENERATE];
 
 const getTypeDefinition = (ast, typeName) => ast.definitions.find(definition => definition.name.value === typeName);
 
@@ -59,7 +55,7 @@ const getPrimaryKeyName = (ast, typeName) => {
   const objectDefinition = getTypeDefinition(ast, typeName);
   if (!objectDefinition) return DEFAULT_PRIMARY_KEY_NAME;
   const primaryKeyField = objectDefinition.fields.find(field =>
-    field.directives.some(directive => directive.name.value === PRIMARY_KEY_DIRECTIVE)
+    field.directives.some(directive => directive.name.value === directive.PRIMARY_KEY)
   );
   return primaryKeyField ? primaryKeyField.name.value : DEFAULT_PRIMARY_KEY_NAME;
 };
@@ -67,20 +63,30 @@ const getPrimaryKeyName = (ast, typeName) => {
 const getPrimaryKeyType = (schema, ast, typeName) => {
   try {
     return getFieldType(schema, ast, typeName, field =>
-      field.directives.some(directive => directive.name.value === PRIMARY_KEY_DIRECTIVE)
+      field.directives.some(directive => directive.name.value === directive.PRIMARY_KEY)
     );
   } catch (error) {
     return DEFAULT_PRIMARY_KEY_TYPE;
   }
 };
 
-const getDelta = (schema, ast, typeName) => {
+const createDelta = (schema, ast, typeName) => {
   const objectDefinition = getTypeDefinition(ast, typeName);
   const freeFields = objectDefinition.fields
     .filter(field => field.directives.every(directive => !nonEditableDecoratorNames.includes(directive.name.value)))
-    .map(field => field.name.value);
+    .map(field => field);
   return new GraphQLInputObjectType({
-    name: `${typeName}Delta`
+    name: `${typeName}Delta`,
+    fields: freeFields.reduce(
+      (fields, field) => ({
+        ...fields,
+        [field.name.value]: {
+          type: getFieldType(schema, ast, typeName, field.name.value),
+          defaultValue: getDefaultValue(field.directives)
+        }
+      }),
+      {}
+    )
   });
 };
 
@@ -88,49 +94,108 @@ const createOperator = () =>
   new GraphQLEnumType({
     name: 'Operator',
     values: {
-      eq: { value: EQ },
-      gt: { value: GT },
-      lt: { value: LT },
-      gte: { value: GTE },
-      lte: { value: LTE },
-      in: { value: IN },
-      contains: { value: CONTAINS }
+      [op.EQ]: { value: op.EQ },
+      [op.GT]: { value: op.GT },
+      [op.LT]: { value: op.LT },
+      [op.GTE]: { value: op.GTE },
+      [op.LTE]: { value: op.LTE },
+      [op.IN]: { value: op.IN },
+      [op.CONTAINS]: { value: op.CONTAINS }
     }
   });
 
-const createPredicate = (Date, Operator) =>
-  new GraphQLObjectType({
+const createItemsQuery = Predicate => new GraphQLList(Predicate);
+
+const createPredicate = Operator =>
+  new GraphQLInputObjectType({
     name: 'Predicate',
     fields: {
       field: { type: GraphQLString },
-      value: {
-        type: new GraphQLUnionType({
-          name: 'PredicateValue',
-          types: [
-            GraphQLID,
-            new GraphQLList(GraphQLID),
-            GraphQLInt,
-            new GraphQLList(GraphQLInt),
-            GraphQLFloat,
-            new GraphQLList(GraphQLFloat),
-            GraphQLString,
-            new GraphQLList(GraphQLString),
-            GraphQLBoolean,
-            new GraphQLList(GraphQLBoolean),
-            Date,
-            new GraphQLList(Date)
-          ]
-        })
-      },
-      operator: { type: Operator, defaultValue: 'eq' }
+      value: { type: GraphQLInt },
+      operator: { type: Operator, defaultValue: op.EQ }
     }
-  });
-
-const createDateScalar = () =>
-  new GraphQLScalarType({
-    name: 'Date',
-    description: 'DateTime scalar',
-    serialize: value => value
+    /* types: [
+      new GraphQLInputObjectType({
+        name: 'IntPredicate',
+        fields: {
+          field: { type: GraphQLString },
+          value: { type: GraphQLInt },
+          operator: { type: Operator, defaultValue: op.EQ }
+        }
+      }),
+      new GraphQLInputObjectType({
+        name: 'IntListPredicate',
+        fields: {
+          field: { type: GraphQLString },
+          value: { type: new GraphQLList(GraphQLInt) },
+          operator: { type: Operator, defaultValue: op.EQ }
+        }
+      }),
+      new GraphQLInputObjectType({
+        name: 'FloatPredicate',
+        fields: {
+          field: { type: GraphQLString },
+          value: { type: GraphQLFloat },
+          operator: { type: Operator, defaultValue: op.EQ }
+        }
+      }),
+      new GraphQLInputObjectType({
+        name: 'FloatListPredicate',
+        fields: {
+          field: { type: GraphQLString },
+          value: { type: new GraphQLList(GraphQLFloat) },
+          operator: { type: Operator, defaultValue: op.EQ }
+        }
+      }),
+      new GraphQLInputObjectType({
+        name: 'IDPredicate',
+        fields: {
+          field: { type: GraphQLString },
+          value: { type: GraphQLID },
+          operator: { type: Operator, defaultValue: op.EQ }
+        }
+      }),
+      new GraphQLInputObjectType({
+        name: 'IDListPredicate',
+        fields: {
+          field: { type: GraphQLString },
+          value: { type: new GraphQLList(GraphQLID) },
+          operator: { type: Operator, defaultValue: op.EQ }
+        }
+      }),
+      new GraphQLInputObjectType({
+        name: 'BoolPredicate',
+        fields: {
+          field: { type: GraphQLString },
+          value: { type: GraphQLBoolean },
+          operator: { type: Operator, defaultValue: op.EQ }
+        }
+      }),
+      new GraphQLInputObjectType({
+        name: 'BoolListPredicate',
+        fields: {
+          field: { type: GraphQLString },
+          value: { type: new GraphQLList(GraphQLBoolean) },
+          operator: { type: Operator, defaultValue: op.EQ }
+        }
+      }),
+      new GraphQLInputObjectType({
+        name: 'StringPredicate',
+        fields: {
+          field: { type: GraphQLString },
+          value: { type: GraphQLString },
+          operator: { type: Operator, defaultValue: op.EQ }
+        }
+      }),
+      new GraphQLInputObjectType({
+        name: 'StringListPredicate',
+        fields: {
+          field: { type: GraphQLString },
+          value: { type: new GraphQLList(GraphQLString) },
+          operator: { type: Operator, defaultValue: op.EQ }
+        }
+      })
+    ] */
   });
 
 const createSchema = context =>
@@ -145,7 +210,7 @@ const createQuery = context =>
     fields: context.typeNames.reduce(
       (query, typeName) => ({
         ...query,
-        [typeName]: { type: createEntityQuery(context, typeName), resolve: () => ({}) }
+        [typeName.toLowerCase()]: { type: createEntityQuery(context, typeName), resolve: () => ({}) }
       }),
       {}
     )
@@ -157,7 +222,7 @@ const createMutation = context =>
     fields: context.typeNames.reduce(
       (query, typeName) => ({
         ...query,
-        [typeName]: { type: createMutationQuery(context, typeName), resolve: () => ({}) }
+        [typeName.toLowerCase()]: { type: createMutationQuery(context, typeName), resolve: () => ({}) }
       }),
       {}
     )
@@ -172,19 +237,19 @@ const createEntityQuery = (context, typeName) => {
       items: {
         type: new GraphQLList(context.schema._typeMap[typeName]),
         args: {
-          query: { type: new GraphQLList(context.commonTypes.Predicate) },
+          query: { type: GraphQLString, defaultValue: '' },
           sort: { type: GraphQLString, defaultValue: primaryKeyName },
           offset: { type: GraphQLInt, defaultValue: 0 },
           limit: { type: GraphQLInt, defaultValue: DEFAULT_LIMIT }
         },
-        resolver: () => 'items'
+        resolve: () => 'items'
       },
       item: {
         type: context.schema._typeMap[typeName],
         args: {
           [primaryKeyName]: { type: primaryKeyType }
         },
-        resolver: () => 'item'
+        resolve: () => ({ title: 'hello' })
       }
     }
   });
@@ -198,15 +263,19 @@ const createMutationQuery = (context, typeName) => {
     fields: {
       create: {
         type: context.schema._typeMap[typeName],
-        args: {},
-        resolver: () => 'create'
+        args: { new: { type: context.deltas[typeName] } },
+        resolve: () => 'create'
       },
       update: {
         type: context.schema._typeMap[typeName],
-        args: { [primaryKeyName]: { type: primaryKeyType } },
-        resolver: () => 'update'
+        args: { [primaryKeyName]: { type: primaryKeyType }, delta: { type: context.deltas[typeName] } },
+        resolve: () => 'update'
       },
-      delete: { args: { ids: { type: new GraphQLList(primaryKeyType) } }, resolver: () => 'delete' }
+      delete: {
+        type: new GraphQLList(primaryKeyType),
+        args: { ids: { type: new GraphQLList(primaryKeyType) } },
+        resolve: () => 'delete'
+      }
     }
   });
 };

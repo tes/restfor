@@ -10,18 +10,22 @@ const createRestforSchema = require('./createRestforSchema');
 const createDefaultSchemas = require('./createDefaultSchemas');
 
 module.exports = ({ db: dbConfig, collections, schemas: schmemasPath, resolvers }) => {
-  const schemaFile = readFileSync(schmemasPath).toString() + '\n\nscalar Date';
+  const schemaFile = readFileSync(schmemasPath).toString();
   const ast = parse(schemaFile, { noLocation: true });
-  const schema = buildASTSchema(ast);
+  const thirdPartySchema = buildASTSchema(ast);
   const restforSchema = createRestforSchema(collections, ast);
-  const defaultSchemas = createDefaultSchemas({ ast, restforSchema, schema });
+  const schemas = createDefaultSchemas({ ast, restforSchema, schema: thirdPartySchema });
+  //console.log(schemas)
   //console.log(JSON.stringify(schemaDocument, null, 2));
   //console.log(JSON.stringify(restforSchema, null, 2));
-  //const schema = mergeSchemas({ schemas, resolvers });
-  //const schema = makeExecutableSchema({ typeDefs: schemas, resolvers });
+
   const router = express.Router();
   router.get('/schemas', (req, res) => res.json(restforSchema));
-  //router.use('/graphql', bodyParser.json(), graphqlExpress({ schema }));
-  //router.use('/graphiql', graphiqlExpress({ endpointURL: '/graphql' }));
+  router.use(
+    '/graphql',
+    bodyParser.json(),
+    graphqlExpress({ schema: mergeSchemas({ schemas: [schemas, schemaFile], resolvers }) })
+  );
+  router.use('/graphiql', graphiqlExpress({ endpointURL: '/graphql' }));
   return router;
 };
