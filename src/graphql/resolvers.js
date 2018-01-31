@@ -50,21 +50,18 @@ const itemsFactory = ({ config: { pageLimitDefault, pageLimitMax = 100 } = {}, m
 
 const itemFactory = ({ models }, typeName) => (_, { id }) => models[typeName].findById(id)
 
-const createFactory = ({ config, models }, typeName, schema) => {
-  const Model = models[typeName];
-
-  return async (_, { new: record }) => {
-    // console.log(record)
-    return await Model.create(record);
-  };
-};
+const createFactory = ({ models }, typeName) => (_, { new: record }) => models[typeName].create(record);
 
 const updateFactory = ({ config, models }, typeName, schema) => {
   const Model = models[typeName];
 
-  return async (_, { query, record }) => {
-    // Model.findAll
-    return null;
+  return async (_, { id, delta }) => {
+    const record = await Model.findById(id)
+    if (!record) {
+      return null;
+    }
+    record.set(delta)
+    return await record.save()
   };
 };
 
@@ -80,12 +77,10 @@ const deleteFactory = ({ config, models }, typeName, schema) => {
     //TODO affectedRows <> foundIds.length ?
     const affectedRows = await Model.destroy({
       where: {
-        id: {
-          [Op.in]: foundIds
-        }
+        id: { [Op.in]: foundIds }
       }
     });
-    return foundIds
+    return foundIds;
   };
 };
 
