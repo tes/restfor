@@ -7,13 +7,16 @@ const { parse } = require('graphql/language');
 const { introspectionQuery } = require('graphql/utilities');
 const { readFileSync, writeFileSync } = require('fs');
 const createRestforSchema = require('./createRestforSchema');
+const createDefaultSchemas = require('./createDefaultSchemas');
 
-module.exports = ({ db: dbConfig, collections, schemas, resolvers }) => {
-  const schemaFile = readFileSync(schemas).toString();
-  const schemaDocument = parse(schemaFile, { noLocation: true });
-  const restforSchema = createRestforSchema(collections, schemaDocument);
+module.exports = ({ db: dbConfig, collections, schemas: schmemasPath, resolvers }) => {
+  const schemaFile = readFileSync(schmemasPath).toString() + '\n\nscalar Date';
+  const ast = parse(schemaFile, { noLocation: true });
+  const schema = buildASTSchema(ast);
+  const restforSchema = createRestforSchema(collections, ast);
+  const defaultSchemas = createDefaultSchemas({ ast, restforSchema, schema });
   //console.log(JSON.stringify(schemaDocument, null, 2));
-  console.log(JSON.stringify(restforSchema, null, 2));
+  //console.log(JSON.stringify(restforSchema, null, 2));
   //const schema = mergeSchemas({ schemas, resolvers });
   //const schema = makeExecutableSchema({ typeDefs: schemas, resolvers });
   const router = express.Router();
