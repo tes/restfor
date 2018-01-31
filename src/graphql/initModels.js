@@ -10,7 +10,7 @@ module.exports = async (dbConfig, modelsPath) => {
 
   const models = initDb(sequelize, modelsPath);
   associate(models);
-  await sequelize.sync();
+  await sequelize.sync({ alter: dbConfig.alterOnSync });
 
   return { models, sequelize };
 };
