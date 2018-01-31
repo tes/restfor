@@ -1,15 +1,18 @@
 const { Op } = require('sequelize');
 
-const createWhereFactory = schema => {
+const createWhereFactory = (schema, typeName) => {
   const fieldNames = Object.keys(schema);
-  return predicates => {
+
+  return filterStr => {
+    const filter = filterStr ? JSON.parse(filterStr) : [];
     return {
-      [Op.and]: predicates.map(({ field, operator, value }) => {
+      [Op.and]: filter.map(({ field, operator, value }) => {
+        console.log(fieldNames)
         if (!fieldNames.includes(field)) {
-          throw new Error(`Predicate > unknown field > ${field}`);
+          throw new Error(`Predicate > unknown field "${field}" on type "${typeName}"`);
         }
         if (!Op.hasOwnProperty(operator)) {
-          throw new Error(`Predicate > unsupported operator > ${operator}`);
+          throw new Error(`Predicate > unsupported operator "${operator}"`);
         }
         //TODO check type similarity
         //TODO type conversion ?
@@ -21,10 +24,9 @@ const createWhereFactory = schema => {
 
 const itemsFactory = ({ models }, typeName, schema) => {
   const Model = models[typeName];
-  const createWhere = createWhereFactory(schema);
+  const createWhere = createWhereFactory(schema, typeName);
 
-  return async (_, { filter: filterStr, sort, offset, limit }) => {
-    const filter = filterStr ? JSON.parse(filterStr) : [];
+  return async (_, { filter, sort, offset, limit }) => {
     const result = await Model.findAll({
       where: createWhere(filter),
       limit,
