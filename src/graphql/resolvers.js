@@ -1,5 +1,7 @@
 const { Op } = require('sequelize');
 
+//TODO exception handling ?
+
 const createWhereFactory = (schema, typeName) => {
   const fieldNames = Object.keys(schema);
 
@@ -22,11 +24,19 @@ const createWhereFactory = (schema, typeName) => {
   };
 };
 
-const itemsFactory = ({ models }, typeName, schema) => {
+
+const itemsFactory = ({ config: { pageLimitDefault, pageLimitMax = 100 } = {}, models }, typeName, schema) => {
   const Model = models[typeName];
   const createWhere = createWhereFactory(schema, typeName);
 
-  return async (_, { filter, sort, offset, limit }) => {
+  return async (_, { filter, sort, offset, limit = pageLimitDefault }) => {
+    if (offset) {
+      offset = Math.max(0, offset);
+    }
+    if (limit) {
+      limit = Math.min(pageLimitMax, Math.max(1, limit));
+    }
+
     const result = await Model.findAll({
       where: createWhere(filter),
       limit,
@@ -38,16 +48,13 @@ const itemsFactory = ({ models }, typeName, schema) => {
   };
 };
 
-const itemFactory = ({ config, models }, typeName, schema) => async (_, { id }) => {
-  const Model = models[typeName];
-  const result = Model.findById(id);
-  return result;
-};
+const itemFactory = ({ models }, typeName) => (_, { id }) => models[typeName].findById(id)
 
 const createFactory = ({ config, models }, typeName, schema) => {
   const Model = models[typeName];
 
-  return async (_, { record }) => {
+  return async (_, { new: record }) => {
+    // console.log(record)
     return await Model.create(record);
   };
 };
