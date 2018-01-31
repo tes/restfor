@@ -237,7 +237,7 @@ const createEntityQuery = (context, typeName) => {
       items: {
         type: new GraphQLList(context.schema._typeMap[typeName]),
         args: {
-          query: { type: GraphQLString, defaultValue: '' },
+          filter: { type: GraphQLString, defaultValue: '' },
           sort: { type: GraphQLString, defaultValue: primaryKeyName },
           offset: { type: GraphQLInt, defaultValue: 0 },
           limit: { type: GraphQLInt, defaultValue: DEFAULT_LIMIT }
