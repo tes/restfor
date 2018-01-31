@@ -1,4 +1,4 @@
-const { Op } = require('sequelize');
+const { Op, QueryTypes } = require('sequelize');
 
 //TODO exception handling ?
 
@@ -70,10 +70,22 @@ const updateFactory = ({ config, models }, typeName, schema) => {
 
 const deleteFactory = ({ config, models }, typeName, schema) => {
   const Model = models[typeName];
+  const { sequelize, tableName } = Model;
 
-  return (_, { ids }) => {
-    // Model.findAll
-    return null;
+  return async (_, { ids }) => {
+    if (!ids.length) return []
+    const foundIds = (await sequelize.query(`select id from ${tableName} where id in (:ids)`,
+        { replacements: { ids }, type: QueryTypes.SELECT })
+      ).map(({ id }) => id);
+    //TODO affectedRows <> foundIds.length ?
+    const affectedRows = await Model.destroy({
+      where: {
+        id: {
+          [Op.in]: foundIds
+        }
+      }
+    });
+    return foundIds
   };
 };
 
