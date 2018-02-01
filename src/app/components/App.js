@@ -8,8 +8,7 @@ import Typography from 'material-ui/Typography';
 import List, { ListItem, ListItemText } from 'material-ui/List';
 import Snackbar from 'material-ui/Snackbar';
 import { MenuItem } from 'material-ui/Menu';
-import { fetchSchemas, dismissError } from '../actionCreators';
-import { invoke } from '../actionCreators';
+import { fetchSchemas, fetchItems, fetchItem, dismissError } from '../actionCreators';
 import {
   getPage,
   getResourceName,
@@ -56,27 +55,13 @@ class App extends React.PureComponent {
   }
 
   fetchItems() {
-    const { items, resourceName, id, limit, page, segment } = this.props;
+    const { items, resourceName, id } = this.props;
     if (!resourceName) return;
     if (id && id !== 'new') {
       if (items && items.find(item => item.id === Number(id))) return;
-      this.props.invoke('GET', resourceName, '/:id', { params: { id: Number(id) } }, (state, error, result) => {
-        if (error) return state;
-        if (result) return { ...state, items: [result], count: 1 };
-        return state;
-      });
+      this.props.fetchItem();
     } else {
-      this.props.invoke(
-        'GET',
-        resourceName,
-        '/',
-        { query: { offset: page * limit, limit, segment } },
-        (state, error, result) => {
-          if (error) return state;
-          if (result) return { ...state, items: result.rows, count: result.count };
-          return state;
-        }
-      );
+      this.props.fetchItems();
     }
   }
 
@@ -143,5 +128,5 @@ export default connect(
     id: getId(state),
     error: state.error
   }),
-  { fetchSchemas, invoke, dismissError }
+  { fetchSchemas, fetchItems, fetchItem, dismissError }
 )(App);

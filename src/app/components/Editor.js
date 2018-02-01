@@ -7,7 +7,7 @@ import AppBar from 'material-ui/AppBar';
 import Toolbar from 'material-ui/Toolbar';
 import Button from 'material-ui/Button';
 import { Link } from 'react-router-dom';
-import { invoke, closeDetails } from '../actionCreators';
+import { invoke, closeDetails, createItem, updateItem } from '../actionCreators';
 import { getField, getAdditionalProperties } from './ViewProvider';
 import { getRecord, getSchema, getId, getResourceName } from '../selectors';
 
@@ -50,14 +50,10 @@ class Editor extends React.PureComponent {
       {}
     );
     if (id === 'new') {
-      await invoke('POST', resourceName, '/', { body: [record] });
+      await this.props.createItem(record);
       closeDetails();
     } else {
-      await invoke('PUT', resourceName, '/:id', { params: { id }, body: record }, (state, error, result) => {
-        if (error) return state;
-        if (result) return { ...state, items: state.items.map(item => (item.id === id ? result : item)) };
-        return state;
-      });
+      await this.props.updateItem(record);
     }
   };
 
@@ -146,11 +142,11 @@ class Editor extends React.PureComponent {
 
 const getDefaultValue = schema => {
   switch (schema.type) {
-    case 'BOOLEAN':
+    case 'bool':
       return false;
-    case 'DATE':
+    case 'date':
       return new Date().toISOString();
-    case 'ENUM':
+    case 'enum':
       return (schema.values && schema.values[0]) || null;
     default:
       return schema.type === 'number' ? 1 : '';
@@ -164,5 +160,5 @@ export default connect(
     schema: getSchema(state),
     record: getRecord(state)
   }),
-  { invoke, closeDetails }
+  { invoke, closeDetails, createItem, updateItem }
 )(Editor);

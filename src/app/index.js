@@ -12,6 +12,7 @@ import createApi from './createApi';
 import { history } from './createHashHistory';
 import createStore from './createStore';
 import createViews from './createViews';
+import createApolloClient from './createApolloClient';
 
 export default (config, viewFactory = () => {}) => {
   const theme = createMuiTheme({
@@ -23,7 +24,8 @@ export default (config, viewFactory = () => {}) => {
   });
 
   const api = createApi(config.apiUrl);
-  const store = createStore({ api, history });
+  const graphql = createApolloClient(config.apiUrl);
+  const store = createStore({ api, graphql, history });
   const views = createViews(viewFactory);
   return (
     <MuiThemeProvider theme={theme}>

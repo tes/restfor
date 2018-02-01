@@ -35,6 +35,9 @@
     "JayStack (https://github.com/jaystack)"
   ],
   "dependencies": {
+    "apollo-cache-inmemory": "^1.1.5",
+    "apollo-client": "^2.2.1",
+    "apollo-link-http": "^1.3.2",
     "apollo-server-express": "^1.3.2",
     "babel-polyfill": "^6.26.0",
     "body-parser": "^1.18.2",
@@ -45,6 +48,7 @@
     "express": "^4.16.2",
     "fs-extra": "^5.0.0",
     "graphql": "^0.12.3",
+    "graphql-tag": "^2.6.1",
     "graphql-tools": "^2.19.0",
     "history": "^4.7.2",
     "material-ui": "^1.0.0-beta.30",

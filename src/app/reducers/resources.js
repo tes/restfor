@@ -1,4 +1,11 @@
-import { RESOLVE_FETCHING_SCHEMAS, RESOLVE_INVOKING, REJECT_INVOKING } from '../actionTypes';
+import {
+  RESOLVE_FETCHING_SCHEMAS,
+  RESOLVE_INVOKING,
+  REJECT_INVOKING,
+  RESOLVE_FETCHING_ITEMS,
+  RESOLVE_FETCHING_ITEM,
+  RESOLVE_UPDATING_ITEM
+} from '../actionTypes';
 
 export default (state = {}, action) => {
   switch (action.type) {
@@ -10,25 +17,31 @@ export default (state = {}, action) => {
         }),
         {}
       );
-    case RESOLVE_INVOKING:
+    case RESOLVE_FETCHING_ITEMS:
       return Object.keys(state).reduce(
         (nextState, name) => ({
           ...nextState,
-          [name]:
-            action.request.resourceName === name && action.reducer
-              ? action.reducer(state[name], null, action.result)
-              : state[name]
+          [name]: action.resourceName === name
+            ? { ...state[name], items: action.items, count: action.count }
+            : state[name]
         }),
         {}
       );
-    case REJECT_INVOKING:
+    case RESOLVE_UPDATING_ITEM:
       return Object.keys(state).reduce(
         (nextState, name) => ({
           ...nextState,
-          [name]:
-            action.request.resourceName === name && action.reducer
-              ? action.reducer(state[name], action.error)
-              : state[name]
+          [name]: action.resourceName === name
+            ? { ...state[name], items: state[name].items.map(item => (item.id === action.id ? action.item : item)) }
+            : state[name]
+        }),
+        {}
+      );
+    case RESOLVE_FETCHING_ITEM:
+      return Object.keys(state).reduce(
+        (nextState, name) => ({
+          ...nextState,
+          [name]: action.resourceName === name ? { ...state[name], items: [action.item] } : state[name]
         }),
         {}
       );

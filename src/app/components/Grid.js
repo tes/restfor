@@ -11,7 +11,7 @@ import NavigateBefore from 'material-ui-icons/NavigateBefore';
 import NavigateNext from 'material-ui-icons/NavigateNext';
 import Table, { TableHead, TableBody, TableRow, TableCell } from 'material-ui/Table';
 import Checkbox from 'material-ui/Checkbox';
-import { invoke, openDetails } from '../actionCreators';
+import { invoke, openDetails, deleteItems } from '../actionCreators';
 import { getSchema, getItems, getPage, getMaxPage, getLimit, getResourceName, getPathname } from '../selectors';
 import { getField, getAdditionalProperties } from './ViewProvider';
 import DeleteDialog from './DeleteDialog';
@@ -49,11 +49,10 @@ class Grid extends React.PureComponent {
   };
 
   handleRemoveItems = async () => {
-    const { invoke, items, match: { params: { resourceName } } } = this.props;
+    const { items } = this.props;
     const itemIds = this.state.selection.map(index => items[index].id);
-    await invoke('DELETE', resourceName, '/', { body: itemIds });
+    await this.props.deleteItems(itemIds);
     this.setState({ selection: [] });
-    await this.fetchItems();
   };
 
   handleRowClick = rowIndex => evt => {
@@ -181,7 +180,7 @@ export default connect(
     limit: getLimit(state),
     items: getItems(state)
   }),
-  { invoke, openDetails }
+  { invoke, openDetails, deleteItems }
 )(Grid);
 
 class PageSwitch extends React.PureComponent {

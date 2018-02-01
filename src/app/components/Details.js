@@ -7,7 +7,7 @@ import Toolbar from 'material-ui/Toolbar';
 import Button from 'material-ui/Button';
 import { Link } from 'react-router-dom';
 import Card, { CardActions, CardContent } from 'material-ui/Card';
-import { invoke, closeDetails } from '../actionCreators';
+import { invoke, closeDetails, deleteItems } from '../actionCreators';
 import { getRecord, getSchema, getId, getResourceName, getPathname, getSegment } from '../selectors';
 import { getField, getAdditionalProperties } from './ViewProvider';
 import DeleteDialog from './DeleteDialog';
@@ -31,8 +31,8 @@ class Details extends React.PureComponent {
   };
 
   handleRemove = async () => {
-    const { invoke, closeDetails, resourceName, id } = this.props;
-    await invoke('DELETE', resourceName, '/', { body: [id] });
+    const { closeDetails, resourceName, id } = this.props;
+    await this.props.deleteItems([id]);
     closeDetails();
   };
 
@@ -128,5 +128,5 @@ export default connect(
     pathname: getPathname(state),
     segment: getSegment(state)
   }),
-  { invoke, closeDetails }
+  { invoke, closeDetails, deleteItems }
 )(Details);
