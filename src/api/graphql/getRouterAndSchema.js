@@ -10,8 +10,11 @@ const initModels = require('../initModels');
 const createRestforSchema = require('./createRestforSchema');
 const createDefaultSchemas = require('./createDefaultSchemas');
 const getSchemas = require('./getSchemas');
+const getResolvers = require('./getResolvers');
 
-module.exports = async (models, collections, schmemasPath, resolversPath) => {
+module.exports = async (models, collections = [], schmemasPath, resolversPath) => {
+  if (!schmemasPath) return { schema: {}, router: express.Router() };
+  const resolvers = getResolvers(resolversPath);
   const schemas = getSchemas(schmemasPath);
   const ast = parse(schemas, { noLocation: true });
   const thirdPartySchema = buildASTSchema(ast);

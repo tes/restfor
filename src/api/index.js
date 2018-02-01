@@ -10,7 +10,7 @@ const getSequelizeRouterAndSchema = require('./sequelize/getRouterAndSchema');
 const getGraphqlRouterAndSchema = require('./graphql/getRouterAndSchema');
 const schemaService = require('./schemaService');
 
-module.exports = async ({ db: dbConfig, collections, modelsPath, routesPath, schemasPath, resolversPath }) => {
+module.exports = async ({ db: dbConfig, collections = [], modelsPath, routesPath, schemasPath, resolversPath }) => {
   const { models, sequelize } = await getModels(dbConfig, modelsPath);
   const router = express.Router();
   router.use(cors());
