@@ -1,10 +1,7 @@
 const { Op, QueryTypes } = require('sequelize');
 
-//TODO exception handling ?
-
-const createWhereFactory = (schema, typeName) => {
+const createFilterFactory = (schema, typeName) => {
   const fieldNames = Object.keys(schema.fields);
-
   return filterStr => {
     const filter = filterStr ? JSON.parse(filterStr) : [];
     return {
@@ -16,30 +13,24 @@ const createWhereFactory = (schema, typeName) => {
         if (!Op.hasOwnProperty(operator)) {
           throw new Error(`Predicate > unsupported operator "${operator}"`);
         }
-        //TODO check type similarity
-        //TODO type conversion ?
         return { [field]: { [Op[operator]]: value } };
       })
     };
   };
 };
 
-const itemsFactory = (typeName, schema) => {
-  const createWhere = createWhereFactory(schema, typeName);
-
+const allFactory = (typeName, schema) => {
+  const createFilter = createFilterFactory(schema, typeName);
   return async (_, { filter, sort, offset, limit }, { models }) => {
     if (offset) {
       offset = Math.max(0, offset);
     }
-
-    const result = await models[typeName].findAll({
-      where: createWhere(filter),
-      limit,
-      offset
-      // sort,
-    });
-
-    return result;
+    const where = createFilter(filter);
+    const [items, count] = await Promise.all([
+      models[typeName].findAll({ where, limit, offset }),
+      models[typeName].count({ where }),
+    ]);
+    return { items, count };
   };
 };
 
@@ -47,7 +38,7 @@ const itemFactory = typeName => (_, { id }, { models }) => models[typeName].find
 
 const createFactory = typeName => (_, { new: record }, { models }) => models[typeName].create(record);
 
-const updateFactory = (typeName, schema) => {
+const updateFactory = typeName => {
   return async (_, { id, delta }, { models }) => {
     const record = await models[typeName].findById(id);
     if (!record) {
@@ -58,7 +49,7 @@ const updateFactory = (typeName, schema) => {
   };
 };
 
-const deleteFactory = (typeName, schema) => {
+const deleteFactory = typeName => {
   return async (_, { ids }, { models }) => {
     const { sequelize, tableName } = models[typeName];
     if (!ids.length) return [];
@@ -76,10 +67,16 @@ const deleteFactory = (typeName, schema) => {
   };
 };
 
+const countFactory = (typeName, schema) => {
+  const createFilter = createFilterFactory(schema, typeName);
+  return (_, { filter }, { models }) => models[typeName].count({ where: createFilter(filter) });
+};
+
 module.exports = {
-  itemsFactory,
+  allFactory,
   itemFactory,
   createFactory,
   updateFactory,
-  deleteFactory
+  deleteFactory,
+  countFactory
 };

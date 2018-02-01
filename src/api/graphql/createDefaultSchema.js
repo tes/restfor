@@ -16,7 +16,7 @@ const {
 const { op, directive, DEFAULT_PRIMARY_KEY_NAME, DEFAULT_PRIMARY_KEY_TYPE, DEFAULT_LIMIT } = require('./consts');
 const getDefaultValue = require('./getDefaultValue');
 
-const { itemsFactory, itemFactory, createFactory, updateFactory, deleteFactory } = require('./defaultResolvers');
+const { allFactory, itemFactory, createFactory, updateFactory, deleteFactory, countFactory } = require('./defaultResolvers');
 
 module.exports = ({ models, ast, restforSchema, schema }) => {
   const typeNames = Object.keys(restforSchema);
@@ -142,15 +142,21 @@ const createEntityQuery = (context, typeName) => {
   return new GraphQLObjectType({
     name: `${typeName}Query`,
     fields: {
-      items: {
-        type: new GraphQLList(context.schema._typeMap[typeName]),
+      all: {
+        type: new GraphQLObjectType({
+          name: `${typeName}AllResult`,
+          fields: {
+            items: { type: new GraphQLList(context.schema._typeMap[typeName]) },
+            count: { type: GraphQLInt }
+          }
+        }),
         args: {
           filter: { type: GraphQLString, defaultValue: '' },
           sort: { type: GraphQLString, defaultValue: primaryKeyName },
           offset: { type: GraphQLInt, defaultValue: 0 },
           limit: { type: GraphQLInt, defaultValue: DEFAULT_LIMIT }
         },
-        resolve: itemsFactory(typeName, context.restforSchema[typeName])
+        resolve: allFactory(typeName, context.restforSchema[typeName])
       },
       item: {
         type: context.schema._typeMap[typeName],
@@ -158,6 +164,13 @@ const createEntityQuery = (context, typeName) => {
           [primaryKeyName]: { type: primaryKeyType }
         },
         resolve: itemFactory(typeName, context.restforSchema[typeName])
+      },
+      countItems: {
+        type: GraphQLInt,
+        args: {
+          filter: { type: GraphQLString, defaultValue: '' }
+        },
+        resolve: countFactory(typeName, context.restforSchema[typeName])
       }
     }
   });
