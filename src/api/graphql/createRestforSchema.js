@@ -45,6 +45,7 @@ const resolveField = (field, ast, enumTypes) => ({
 const getType = (field, enumTypes) => {
   const isEnumType = !!getRelatedEnumType(field, enumTypes);
   if (isEnumType) return 'enum';
+  if (isDate(field)) return 'date';
   switch (field.type.name.value) {
     case 'Int':
       return 'number';
@@ -56,8 +57,6 @@ const getType = (field, enumTypes) => {
       return 'bool';
     case 'ID':
       return 'number';
-    case 'Date':
-      return 'date';
     default:
       return 'string';
   }
@@ -70,3 +69,5 @@ const getEnumValues = (field, enumTypes) => {
   const enumType = getRelatedEnumType(field, enumTypes);
   return enumType ? enumType.values.map(value => value.name.value) : null;
 };
+
+const isDate = field => field.directives.some(directive => directive.name.value === 'date');
