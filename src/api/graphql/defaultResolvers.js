@@ -6,7 +6,6 @@ const createFilterFactory = (schema, typeName) => {
     const filter = filterStr ? JSON.parse(filterStr) : [];
     return {
       [Op.and]: filter.map(({ field, operator, value }) => {
-        console.log(fieldNames);
         if (!fieldNames.includes(field)) {
           throw new Error(`Predicate > unknown field "${field}" on type "${typeName}"`);
         }
