@@ -10,11 +10,29 @@ import Snackbar from 'material-ui/Snackbar';
 import { MenuItem } from 'material-ui/Menu';
 import { fetchSchemas, dismissError } from '../actionCreators';
 import { invoke } from '../actionCreators';
-import { getPage, getResourceName, getId, getItems, getLimit, getSchemaList } from '../selectors';
+import { getPage, getResourceName, getId, getItems, getLimit, getSchemaList, getSegment, getSchemas } from '../selectors';
 import Grid from './Grid';
 import Details from './Details';
 import Editor from './Editor';
 
+
+const SchemaMenuItem = ({ schema, resourceName, segment }) => {
+  const { __metadata: { name, segments } } = schema
+  return (
+    <div>
+      <Link to={`/${name}?page=1`} key={name}>
+        <ListItem button disabled={name === resourceName}>
+          <ListItemText primary={name.toUpperCase()} />
+        </ListItem>
+      </Link>
+      {!!segments && segments.map( ({ segmentKey }) => <Link to={`/${name}/segment/${segmentKey}?page=1`} key={segmentKey}>
+        <ListItem button disabled={segment === segmentKey}>
+          <ListItemText primary={segmentKey} />
+        </ListItem>
+      </Link>)}
+    </div>
+  )
+}
 class App extends React.PureComponent {
   async componentDidMount() {
     await this.props.fetchSchemas();
@@ -27,7 +45,7 @@ class App extends React.PureComponent {
   }
 
   fetchItems() {
-    const { items, resourceName, id, limit, page } = this.props;
+    const { items, resourceName, id, limit, page, segment } = this.props;
     if (!resourceName) return;
     if (id && id !== 'new') {
       if (items && items.find(item => item.id === Number(id))) return;
@@ -41,7 +59,7 @@ class App extends React.PureComponent {
         'GET',
         resourceName,
         '/',
-        { query: { offset: page * limit, limit } },
+        { query: { offset: page * limit, limit, segment } },
         (state, error, result) => {
           if (error) return state;
           if (result) return { ...state, items: result.rows, count: result.count };
@@ -56,7 +74,7 @@ class App extends React.PureComponent {
   };
 
   render() {
-    const { schemaList, resourceName, history, error } = this.props;
+    const { resourceName, history, error, schemas, segment } = this.props;
     return (
       <div className="absolute column layout App">
         {/* <header className="dynamic high">
@@ -71,20 +89,20 @@ class App extends React.PureComponent {
         <div className="fitted row low layout">
           <nav className="dynamic column high shadowed layout overflow">
             <List>
-              {schemaList.map(name => (
-                <Link to={`/${name}?page=1`} key={name}>
-                  <ListItem button disabled={name === resourceName}>
-                    <ListItemText primary={name.toUpperCase()} />
-                  </ListItem>
-                </Link>
-              ))}
+              {schemas.map( (schema,key) => 
+                <SchemaMenuItem {...{resourceName, schema, segment, key}} />)}
             </List>
           </nav>
           <Router history={history}>
             <main className="relative fitted column low layout">
               <Route exact path="/:resourceName" component={Grid} />
-              <Route exact path="/:resourceName/:id" component={Details} />
-              <Route exact path="/:resourceName/:id/edit" component={Editor} />
+              <Route exact path="/:resourceName/segment/:segment" component={Grid} />
+
+              <Route exact path="/:resourceName/item/:id" component={Details} />
+              <Route exact path="/:resourceName/segment/:segment/item/:id" component={Details} />
+
+              <Route exact path="/:resourceName/item/:id/edit" component={Editor} />
+              <Route exact path="/:resourceName/segment/:segment/item/:id/edit" component={Editor} />
             </main>
           </Router>
         </div>
@@ -106,10 +124,12 @@ class App extends React.PureComponent {
 export default connect(
   state => ({
     schemaList: getSchemaList(state),
+    schemas: getSchemas(state),
     limit: getLimit(state),
     items: getItems(state),
     page: getPage(state),
     resourceName: getResourceName(state),
+    segment: getSegment(state),
     id: getId(state),
     error: state.error
   }),

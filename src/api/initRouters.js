@@ -12,7 +12,7 @@ module.exports = (models, routesPath, router) => {
   router.get('/schemas', (req, res) => {
     res.json(
       modelNames.reduce(
-        (schemas, name) => ({ ...schemas, [name.toLowerCase()]: getJsonSchema(models[name].attributes) }),
+        (schemas, name) => ({ ...schemas, [name.toLowerCase()]: getJsonSchema(models[name]) }),
         {}
       )
     );
@@ -24,13 +24,13 @@ const initRouter = (dependencies, resourceRouter, routeOverrides) => name => {
   const overrideRouter = routeOverrides[key];
   const router = express.Router();
 
+  if (overrideRouter) overrideRouter(dependencies, router);
+  
   router.get('/', findAll(name)(dependencies));
   router.get('/:id', findById(name)(dependencies));
   router.post('/', bulkCreate(name)(dependencies));
   router.put('/:id', updateById(name)(dependencies));
   router.delete('/', bulkDelete(name)(dependencies));
-
-  if (overrideRouter) overrideRouter(dependencies, router);
-
+  
   resourceRouter.use(`/${key}`, router);
 };
