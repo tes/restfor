@@ -4,7 +4,15 @@ module.exports = (collectionNames, ast) => {
   const enumTypes = getEnumTypes(ast);
   const collectionTypes = getCollectionTypes(collectionNames, ast);
   return collectionTypes.reduce(
-    (schema, type) => ({ ...schema, [type.name.value]: resolveFields(type, ast, enumTypes) }),
+    (schema, type) => ({
+      ...schema,
+      [type.name.value]: {
+        name: type.name.value,
+        type: 'graphql',
+        segments: [],
+        fields: resolveFields(type, ast, enumTypes)
+      }
+    }),
     {}
   );
 };

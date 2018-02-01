@@ -10,14 +10,22 @@ import Snackbar from 'material-ui/Snackbar';
 import { MenuItem } from 'material-ui/Menu';
 import { fetchSchemas, dismissError } from '../actionCreators';
 import { invoke } from '../actionCreators';
-import { getPage, getResourceName, getId, getItems, getLimit, getSchemaList, getSegment, getSchemas } from '../selectors';
+import {
+  getPage,
+  getResourceName,
+  getId,
+  getItems,
+  getLimit,
+  getSchemaList,
+  getSegment,
+  getSchemas
+} from '../selectors';
 import Grid from './Grid';
 import Details from './Details';
 import Editor from './Editor';
 
-
 const SchemaMenuItem = ({ schema, resourceName, segment }) => {
-  const { __metadata: { name, segments } } = schema
+  const { name, segments } = schema;
   return (
     <div>
       <Link to={`/${name}?page=1`} key={name}>
@@ -25,14 +33,17 @@ const SchemaMenuItem = ({ schema, resourceName, segment }) => {
           <ListItemText primary={name.toUpperCase()} />
         </ListItem>
       </Link>
-      {!!segments && segments.map( ({ segmentKey }) => <Link to={`/${name}/segment/${segmentKey}?page=1`} key={segmentKey}>
-        <ListItem button disabled={segment === segmentKey}>
-          <ListItemText primary={segmentKey} />
-        </ListItem>
-      </Link>)}
+      {!!segments &&
+        segments.map(({ segmentKey }) => (
+          <Link to={`/${name}/segment/${segmentKey}?page=1`} key={segmentKey}>
+            <ListItem button disabled={segment === segmentKey}>
+              <ListItemText primary={segmentKey} />
+            </ListItem>
+          </Link>
+        ))}
     </div>
-  )
-}
+  );
+};
 class App extends React.PureComponent {
   async componentDidMount() {
     await this.props.fetchSchemas();
@@ -89,8 +100,7 @@ class App extends React.PureComponent {
         <div className="fitted row low layout">
           <nav className="dynamic column high shadowed layout overflow">
             <List>
-              {schemas.map( (schema,key) => 
-                <SchemaMenuItem {...{resourceName, schema, segment, key}} />)}
+              {schemas.map((schema, key) => <SchemaMenuItem {...{ resourceName, schema, segment, key }} />)}
             </List>
           </nav>
           <Router history={history}>

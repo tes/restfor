@@ -91,7 +91,7 @@ export const getField = view => (views, resourceName, props) => {
     const Component = views[view].properties[resourceName] && views[view].properties[resourceName][props.propertyName];
     return <Component {...props} />;
   }
-  const type = props.schema[props.propertyName].type;
+  const type = props.schema.fields[props.propertyName].type;
   const Component =
     (views[view].properties[resourceName] && views[view].properties[resourceName][props.propertyName]) ||
     views[view].types[type] ||
@@ -114,7 +114,7 @@ export const getActionParamComponent = (views, resourceName, paramName, paramTyp
 
 export const getAdditionalProperties = (views, viewName, schema, resourceName) => {
   if (!schema) return [];
-  const schemaProperties = Object.keys(schema);
+  const schemaProperties = Object.keys(schema.fields);
   if (schemaProperties.length === 0) return [];
   const viewProperties = (views[viewName].properties[resourceName] &&
     Object.keys(views[viewName].properties[resourceName])) || [];

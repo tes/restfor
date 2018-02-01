@@ -1,8 +1,11 @@
 const resolveType = require('./resolveType');
 
 module.exports = model => {
-  return Object.keys(model.attributes).reduce(
-    (properties, name) => {
+  return {
+    name: model.name.toLowerCase(),
+    type: 'sequelize',
+    segments: model.options.segments || [],
+    fields: Object.keys(model.attributes).reduce((properties, name) => {
       const attribute = model.attributes[name];
       return {
         ...properties,
@@ -19,12 +22,6 @@ module.exports = model => {
           references: attribute.references || null
         }
       };
-    },
-    {
-      __metadata: {
-        name: model.name.toLowerCase(),
-        segments: model.options.segments
-      }
-    }
-  );
+    }, {})
+  };
 };

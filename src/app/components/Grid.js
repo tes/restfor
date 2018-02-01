@@ -116,6 +116,7 @@ class Grid extends React.PureComponent {
           </AppBar>
         </header>
         {schema &&
+          schema.fields &&
           items &&
           <main className="fitted layout overflow">
             <Table>
@@ -128,7 +129,7 @@ class Grid extends React.PureComponent {
                       indeterminate={selection.length > 0 && selection.length < items.length}
                     />
                   </TableCell>
-                  {[...Object.keys(schema), ...additionalProperties].map(propertyName => (
+                  {[...Object.keys(schema.fields), ...additionalProperties].map(propertyName => (
                     <TableCell key={propertyName}>
                       <span className="sorter">{propertyName}</span>
                     </TableCell>

@@ -51,7 +51,7 @@ export default register => {
   register.editor.bool(({ value, schema, propertyName, onChange }) => (
     <Switch
       checked={value}
-      disabled={schema[propertyName].readOnly}
+      disabled={schema.fields[propertyName].readOnly}
       onChange={evt => onChange(evt.target.checked)}
     />
   ));
@@ -59,14 +59,14 @@ export default register => {
     <DateTimePicker
       value={value ? new Date(value) : null}
       onChange={value => onChange(value.toISOString())}
-      disabled={schema[propertyName].readOnly}
+      disabled={schema.fields[propertyName].readOnly}
       leftArrowIcon={<ArrowLeft />}
       rightArrowIcon={<ArrowRight />}
     />
   ));
   register.editor.enum(({ value, onChange, schema, propertyName }) => (
     <Select value={value} onChange={evt => onChange(evt.target.value)}>
-      {schema[propertyName].values.map(v => (
+      {schema.fields[propertyName].values.map(v => (
         <MenuItem key={v} value={v}>
           {v}
         </MenuItem>
@@ -79,7 +79,7 @@ export default register => {
       type="number"
       value={value}
       onChange={evt => onChange(Number(evt.target.value))}
-      disabled={schema[propertyName].readOnly}
+      disabled={schema.fields[propertyName].readOnly}
     />
   ));
   register.editor.string(({ propertyName, value, onChange, schema }) => (
@@ -87,7 +87,7 @@ export default register => {
       name={propertyName}
       value={value}
       onChange={evt => onChange(evt.target.value)}
-      disabled={schema[propertyName].readOnly}
+      disabled={schema.fields[propertyName].readOnly}
     />
   ));
   register.editor.any(({ value }) => value || null);
