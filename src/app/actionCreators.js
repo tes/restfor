@@ -27,8 +27,9 @@ export const fetchSchemas = () => async (dispatch, getState, { api, history }) =
   try {
     dispatch(startFetchingSchemas());
     const schemas = await api.get('/schemas');
+    const schemaList = Object.keys(schemas);
     dispatch(resolveFetchingSchemas(schemas));
-    if (schemas.length > 0) history.push('/' + schemas[0].toLowerCase());
+    if (schemaList.length > 0) history.push('/' + schemaList[0].toLowerCase());
   } catch (error) {
     dispatch(rejectFetchingSchemas(error.message));
   }

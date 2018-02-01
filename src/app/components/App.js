@@ -28,7 +28,7 @@ const SchemaMenuItem = ({ schema, resourceName, segment }) => {
   const { name, segments } = schema;
   return (
     <div>
-      <Link to={`/${name}?page=1`} key={name}>
+      <Link to={`/${name.toLowerCase()}?page=1`} key={name}>
         <ListItem button disabled={name === resourceName}>
           <ListItemText primary={name.toUpperCase()} />
         </ListItem>

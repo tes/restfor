@@ -124,7 +124,7 @@ class Grid extends React.PureComponent {
                 <TableRow>
                   <TableCell padding="checkbox">
                     <Checkbox
-                      checked={selection.length === items.length}
+                      checked={selection.length > 0 && selection.length === items.length}
                       onChange={this.handleAllSelection}
                       indeterminate={selection.length > 0 && selection.length < items.length}
                     />
