@@ -20,7 +20,7 @@ module.exports = async ({ db: dbConfig, collections = [], modelsPath, routesPath
   router.use(cookieParser());
   const { schema: sequelizeSchema, router: sequelizeRouter } = getSequelizeRouterAndSchema(models, routesPath);
   const { schama: graphqlSchema, router: graphqlRouter } = await getGraphqlRouterAndSchema(
-    models,
+    { models },
     collections,
     schemasPath,
     resolversPath

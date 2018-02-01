@@ -11,16 +11,16 @@ const createDefaultSchema = require('./createDefaultSchema');
 const getSchemas = require('./getSchemas');
 const getResolvers = require('./getResolvers');
 
-module.exports = async (models, collections = [], schmemasPath, resolversPath) => {
+module.exports = async (context, collections = [], schmemasPath, resolversPath) => {
   if (!schmemasPath) return { schema: {}, router: express.Router() };
   const resolvers = getResolvers(resolversPath);
   const schemas = getSchemas(schmemasPath);
   const ast = parse(schemas, { noLocation: true });
   const thirdPartySchema = buildASTSchema(ast);
   const restforSchema = createRestforSchema(collections, ast);
-  const defaultSchema = createDefaultSchema({ models, ast, restforSchema, schema: thirdPartySchema });
+  const defaultSchema = createDefaultSchema({ ast, restforSchema, schema: thirdPartySchema });
   const router = graphqlExpress({
-    schema: mergeSchemas({ schemas: [defaultSchema, schemas], resolvers })
+    schema: mergeSchemas({ schemas: [defaultSchema, schemas], resolvers, context })
   });
   return { schema: restforSchema, router };
 };

@@ -150,14 +150,14 @@ const createEntityQuery = (context, typeName) => {
           offset: { type: GraphQLInt, defaultValue: 0 },
           limit: { type: GraphQLInt, defaultValue: DEFAULT_LIMIT }
         },
-        resolve: itemsFactory({ models: context.models }, typeName, context.restforSchema[typeName])
+        resolve: itemsFactory(typeName, context.restforSchema[typeName])
       },
       item: {
         type: context.schema._typeMap[typeName],
         args: {
           [primaryKeyName]: { type: primaryKeyType }
         },
-        resolve: itemFactory({ models: context.models }, typeName, context.restforSchema[typeName])
+        resolve: itemFactory(typeName, context.restforSchema[typeName])
       }
     }
   });
@@ -172,17 +172,17 @@ const createMutationQuery = (context, typeName) => {
       create: {
         type: context.schema._typeMap[typeName],
         args: { new: { type: context.deltas[typeName] } },
-        resolve: createFactory({ models: context.models }, typeName, context.restforSchema[typeName])
+        resolve: createFactory(typeName, context.restforSchema[typeName])
       },
       update: {
         type: context.schema._typeMap[typeName],
         args: { [primaryKeyName]: { type: primaryKeyType }, delta: { type: context.deltas[typeName] } },
-        resolve: updateFactory({ models: context.models }, typeName, context.restforSchema[typeName])
+        resolve: updateFactory(typeName, context.restforSchema[typeName])
       },
       delete: {
         type: new GraphQLList(primaryKeyType),
         args: { ids: { type: new GraphQLList(primaryKeyType) } },
-        resolve: deleteFactory({ models: context.models }, typeName, context.restforSchema[typeName])
+        resolve: deleteFactory(typeName, context.restforSchema[typeName])
       }
     }
   });
