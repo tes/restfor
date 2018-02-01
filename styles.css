@@ -115,3 +115,7 @@ a {
 .param-container table td {
   padding: 20px;
 }
+
+.segment {
+  padding-left: 30px !important;
+}

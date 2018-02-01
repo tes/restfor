@@ -36,7 +36,7 @@ const SchemaMenuItem = ({ schema, resourceName, segment }) => {
       {!!segments &&
         segments.map(({ segmentKey }) => (
           <Link to={`/${name}/segment/${segmentKey}?page=1`} key={segmentKey}>
-            <ListItem button disabled={segment === segmentKey}>
+            <ListItem button disabled={segment === segmentKey} className="segment">
               <ListItemText primary={segmentKey} />
             </ListItem>
           </Link>
