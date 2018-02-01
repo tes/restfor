@@ -141,7 +141,7 @@ class Grid extends React.PureComponent {
                     <TableCell padding="checkbox">
                       <Checkbox checked={selection.includes(i)} onChange={this.handleRowSelection(i)} />
                     </TableCell>
-                    {Object.keys(record).map(propertyName => (
+                    {Object.keys(schema.fields).map(propertyName => (
                       <TableCell key={propertyName} onClick={this.handleRowClick(i)}>
                         {getField('grid')(this.context.views, resourceName, {
                           propertyName,

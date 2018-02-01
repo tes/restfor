@@ -1,3 +1,4 @@
+import gql from 'graphql-tag';
 import {
   TOGGLE_FETCHING,
   REJECT_ERROR,
@@ -7,7 +8,7 @@ import {
   RESOLVE_FETCHING_ITEM,
   RESOLVE_UPDATING_ITEM
 } from './actionTypes';
-import { getResourceName, getLimit, getPage, getItems, getSegment, getId } from './selectors';
+import { getResourceName, getLimit, getPage, getItems, getSegment, getId, getSchema, getFieldList } from './selectors';
 
 export const toggleFetching = value => ({ type: TOGGLE_FETCHING, value });
 
@@ -55,18 +56,36 @@ export const fetchSchemas = () => async (dispatch, getState, { api, history }) =
   }
 };
 
-export const fetchItems = () => async (dispatch, getState, { api }) => {
+export const fetchItems = () => async (dispatch, getState, { api, graphql }) => {
   try {
+    dispatch(toggleFetching(true));
     const state = getState();
     const resourceName = getResourceName(state);
     const limit = getLimit(state);
     const page = getPage(state);
     const segment = getSegment(state);
-    dispatch(toggleFetching(true));
-    const { rows: items, count } = await api.get(`/sequelize/${resourceName}/`, {
-      query: { offset: page * limit, limit, segment }
-    });
-    dispatch(resolveFetchingItems(resourceName, items, count));
+    const schema = getSchema(state);
+    const fieldList = getFieldList(state);
+    if (schema.type === 'graphql') {
+      const query = gql`query ($offset: Int, $limit: Int){
+        ${resourceName} {
+          all(offset: $offset, limit: $limit) {
+            items {
+              ${fieldList.join(',')}
+            }
+            count
+          }
+        }
+      }`;
+      const variables = { offset: page * limit, limit };
+      const { data: { [resourceName]: { all: { items, count } } } } = await graphql.query({ query });
+      dispatch(resolveFetchingItems(resourceName, items, count));
+    } else {
+      const { rows: items, count } = await api.get(`/sequelize/${resourceName}/`, {
+        query: { offset: page * limit, limit, segment }
+      });
+      dispatch(resolveFetchingItems(resourceName, items, count));
+    }
   } catch (error) {
     console.error(error);
     dispatch(rejectError(error.message));
@@ -75,14 +94,28 @@ export const fetchItems = () => async (dispatch, getState, { api }) => {
   }
 };
 
-export const fetchItem = () => async (dispatch, getState, { api }) => {
+export const fetchItem = () => async (dispatch, getState, { api, graphql }) => {
   try {
+    dispatch(toggleFetching(true));
     const state = getState();
     const id = getId(state);
     const resourceName = getResourceName(state);
-    dispatch(toggleFetching(true));
-    const item = await api.get(`/sequelize/${resourceName}/${id}`);
-    dispatch(resolveFetchingItem(resourceName, item));
+    const schema = getSchema(state);
+    const fieldList = getFieldList(state);
+    if (schema.type === 'graphql') {
+      const query = gql`query ($id: Int){
+        ${resourceName} {
+          item(id: $id) {
+            ${fieldList.join(',')}
+          }
+        }
+      }`;
+      const { data: { [resourceName]: { item } } } = await graphql.query({ query, variables: { id } });
+      dispatch(resolveFetchingItem(resourceName, item));
+    } else {
+      const item = await api.get(`/sequelize/${resourceName}/${id}`);
+      dispatch(resolveFetchingItem(resourceName, item));
+    }
   } catch (error) {
     console.error(error);
     dispatch(rejectError(error.message));
@@ -91,12 +124,29 @@ export const fetchItem = () => async (dispatch, getState, { api }) => {
   }
 };
 
-export const createItem = item => async (dispatch, getState, { api }) => {
+export const createItem = item => async (dispatch, getState, { api, graphql }) => {
   try {
+    dispatch(toggleFetching(true));
     const state = getState();
     const resourceName = getResourceName(state);
-    dispatch(toggleFetching(true));
-    await api.post(`/sequelize/${resourceName}/`, { body: [item] });
+    const schema = getSchema(state);
+    const fieldList = getFieldList(state);
+    if (schema.type === 'graphql') {
+      const mutation = gql`mutation ($item: ${schema.name}Delta) {
+        ${resourceName} {
+          create(new: $item) {
+            ${fieldList.join(',')}
+          }
+        }
+      }`;
+      const variables = { item };
+      await graphql.mutate({
+        mutation,
+        variables
+      });
+    } else {
+      await api.post(`/sequelize/${resourceName}/`, { body: [item] });
+    }
   } catch (error) {
     console.error(error);
     dispatch(rejectError(error.message));
@@ -105,14 +155,32 @@ export const createItem = item => async (dispatch, getState, { api }) => {
   }
 };
 
-export const updateItem = delta => async (dispatch, getState, { api }) => {
+export const updateItem = delta => async (dispatch, getState, { api, graphql }) => {
   try {
+    dispatch(toggleFetching(true));
     const state = getState();
     const resourceName = getResourceName(state);
     const id = getId(state);
-    dispatch(toggleFetching(true));
-    const item = await api.put(`/sequelize/${resourceName}/${id}`, { body: delta });
-    dispatch(resolveUpdatingItem(resourceName, id, item));
+    const schema = getSchema(state);
+    const fieldList = getFieldList(state);
+    if (schema.type === 'graphql') {
+      const mutation = gql`mutation ($id: Int, $delta: ${schema.name}Delta) {
+        ${resourceName} {
+          update(id: $id, delta: $delta) {
+            ${fieldList.join(',')}
+          }
+        }
+      }`;
+      const variables = { id, delta };
+      const { data: { [resourceName]: { update: item } } } = await graphql.mutate({
+        mutation,
+        variables
+      });
+      dispatch(resolveUpdatingItem(resourceName, id, item));
+    } else {
+      const item = await api.put(`/sequelize/${resourceName}/${id}`, { body: delta });
+      dispatch(resolveUpdatingItem(resourceName, id, item));
+    }
   } catch (error) {
     console.error(error);
     dispatch(rejectError(error.message));
@@ -121,12 +189,27 @@ export const updateItem = delta => async (dispatch, getState, { api }) => {
   }
 };
 
-export const deleteItems = ids => async (dispatch, getState, { api }) => {
+export const deleteItems = ids => async (dispatch, getState, { api, graphql }) => {
   try {
+    dispatch(toggleFetching(true));
     const state = getState();
     const resourceName = getResourceName(state);
-    dispatch(toggleFetching(true));
-    const item = await api.delete(`/sequelize/${resourceName}/`, { body: ids });
+    const schema = getSchema(state);
+    const fieldList = getFieldList(state);
+    if (schema.type === 'graphql') {
+      const mutation = gql`mutation ($ids: [Int]) {
+        ${resourceName} {
+          delete(ids: $ids)
+        }
+      }`;
+      const variables = { ids };
+      await graphql.mutate({
+        mutation,
+        variables
+      });
+    } else {
+      await api.delete(`/sequelize/${resourceName}/`, { body: ids });
+    }
     await dispatch(fetchItems());
   } catch (error) {
     console.error(error);

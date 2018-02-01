@@ -45,7 +45,7 @@ class Editor extends React.PureComponent {
 
   handleSave = async () => {
     const { invoke, closeDetails, resourceName, id, schema } = this.props;
-    const record = Object.keys(this.state.record).reduce(
+    const record = Object.keys(schema.fields).reduce(
       (record, name) => (schema.fields[name].readOnly ? record : { ...record, [name]: this.state.record[name] }),
       {}
     );

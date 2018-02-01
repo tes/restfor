@@ -41,6 +41,11 @@ export const getSchema = state => {
   return (resourceName && state.schemas && state.schemas[resourceName]) || null;
 };
 
+export const getFieldList = state => {
+  const schema = getSchema(state);
+  return schema && schema.fields ? Object.keys(schema.fields) : [];
+};
+
 export const getSchemaList = ({ schemas }) => (schemas ? Object.keys(schemas) : a);
 
-export const getSchemas = ({schemas}) => Object.keys(schemas).map(schemaKey => schemas[schemaKey])
+export const getSchemas = ({ schemas }) => Object.keys(schemas).map(schemaKey => schemas[schemaKey]);
