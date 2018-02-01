@@ -20,7 +20,8 @@ module.exports = async (context, collections = [], schmemasPath, resolversPath) 
   const restforSchema = createRestforSchema(collections, ast);
   const defaultSchema = createDefaultSchema({ ast, restforSchema, schema: thirdPartySchema });
   const router = graphqlExpress({
-    schema: mergeSchemas({ schemas: [defaultSchema, schemas], resolvers, context })
+    schema: mergeSchemas({ schemas: [defaultSchema, schemas], resolvers }),
+    context
   });
   return { schema: restforSchema, router };
 };
