@@ -2,7 +2,7 @@ const { GraphQLInt } = require('graphql/type');
 
 module.exports.DEFAULT_PRIMARY_KEY_NAME = 'id';
 module.exports.DEFAULT_PRIMARY_KEY_TYPE = GraphQLInt;
-module.exports.DEFAULT_LIMIT = 10;
+module.exports.DEFAULT_LIMIT = 1000;
 
 module.exports.op = {
   EQ: 'eq',

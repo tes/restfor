@@ -29,12 +29,9 @@ const itemsFactory = ({ config: { pageLimitDefault, pageLimitMax = 100 } = {}, m
   const Model = models[typeName];
   const createWhere = createWhereFactory(schema, typeName);
 
-  return async (_, { filter, sort, offset, limit = pageLimitDefault }) => {
+  return async (_, { filter, sort, offset, limit }) => {
     if (offset) {
       offset = Math.max(0, offset);
-    }
-    if (limit) {
-      limit = Math.min(pageLimitMax, Math.max(1, limit));
     }
 
     const result = await Model.findAll({

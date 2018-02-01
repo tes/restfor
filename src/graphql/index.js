@@ -24,6 +24,6 @@ module.exports = async ({ db: dbConfig, collections, schemas: schmemasPath, reso
     bodyParser.json(),
     graphqlExpress({ schema: mergeSchemas({ schemas: [schema, schemaFile], resolvers }) })
   );
-  router.use('/graphiql', graphiqlExpress({ endpointURL: '/graphql' }));
+  router.use('/graphiql', graphiqlExpress({ endpointURL: '/gql/graphql' }));
   return router;
 };
