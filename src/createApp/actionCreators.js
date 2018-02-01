@@ -11,7 +11,7 @@ import { getResourceName } from './selectors';
 
 export const openDetails = id => (dispatch, getState, { history }) => {
   const { pathname } = history.location;
-  history.push(`${pathname}/${id}`);
+  history.push(`${pathname}/item/${id}`);
 };
 export const closeDetails = () => (dispatch, getState, { history }) => {
   const resourceName = getResourceName(getState());
@@ -27,6 +27,14 @@ export const fetchSchemas = () => async (dispatch, getState, { api, history }) =
   try {
     dispatch(startFetchingSchemas());
     const schemas = await api.get('/schemas');
+    // resolve some better bit later
+    Object.keys(schemas).forEach(k => {
+      const m = schemas[k].__metadata
+      Object.defineProperty(schemas[k], '__metadata', {
+        value: m,
+        enumerable: false
+      })
+    })
     dispatch(resolveFetchingSchemas(schemas));
     if (schemas.length > 0) history.push('/' + schemas[0].toLowerCase());
   } catch (error) {

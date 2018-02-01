@@ -10,6 +10,8 @@ export const getId = ({ router: { params: { id } } }) => (id && id !== 'new' ? N
 
 export const getPage = ({ router: { query: { page } } }) => resolvePage(page);
 
+export const getSegment = ({ router: { params: { segment } } }) => segment;
+
 export const getMaxPage = state => {
   const { settings: { limit }, resources } = state;
   const resourceName = getResourceName(state);
@@ -40,3 +42,5 @@ export const getSchema = state => {
 };
 
 export const getSchemaList = ({ schemas }) => (schemas ? Object.keys(schemas) : a);
+
+export const getSchemas = ({schemas}) => Object.keys(schemas).map(schemaKey => schemas[schemaKey])

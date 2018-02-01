@@ -8,7 +8,7 @@ import Button from 'material-ui/Button';
 import { Link } from 'react-router-dom';
 import Card, { CardActions, CardContent } from 'material-ui/Card';
 import { invoke, closeDetails } from '../actionCreators';
-import { getRecord, getSchema, getId, getResourceName } from '../selectors';
+import { getRecord, getSchema, getId, getResourceName, getPathname, getSegment, } from '../selectors';
 import { getField, getAdditionalProperties } from './ViewProvider';
 import DeleteDialog from './DeleteDialog';
 import ActionProvider from './ActionProvider';
@@ -39,7 +39,7 @@ class Details extends React.PureComponent {
   handleCancel = () => this.props.closeDetails();
 
   render() {
-    const { resourceName, id, schema, record, invoke } = this.props;
+    const { resourceName, id, schema, record, invoke, pathname } = this.props;
     const title = `${resourceName.toUpperCase()} / ${id.toString().toUpperCase()}`;
     const additionalProperties = getAdditionalProperties(this.context.views, 'details', schema, resourceName);
     return (
@@ -50,7 +50,7 @@ class Details extends React.PureComponent {
               <Typography type="title">{title}</Typography>
               <div style={{ marginLeft: 'auto' }}>
                 <ActionProvider view="details" actionProps={{ record: this.props.record }} />
-                <Link to={`/${resourceName}/${id}/edit`}>
+                <Link to={`${pathname}/edit`}>
                   <Button raised color="primary" className="left margin">
                     Edit
                   </Button>
@@ -123,7 +123,9 @@ export default connect(
     id: getId(state),
     resourceName: getResourceName(state),
     schema: getSchema(state),
-    record: getRecord(state)
+    record: getRecord(state),
+    pathname: getPathname(state),
+    segment: getSegment(state)
   }),
   { invoke, closeDetails }
 )(Details);
