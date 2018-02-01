@@ -46,7 +46,7 @@ export const invoke = (method, resourceName, path, ...args) => async (dispatch, 
   const request = { method: method.toUpperCase(), resourceName, path, params, query, body };
   try {
     dispatch(startInvoking());
-    const result = await api[method.toLowerCase()](`/resources/${resourceName.toLowerCase()}${path}`, {
+    const result = await api[method.toLowerCase()](`/sequelize/${resourceName.toLowerCase()}${path}`, {
       params,
       query,
       body

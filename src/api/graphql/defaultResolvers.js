@@ -3,7 +3,7 @@ const { Op, QueryTypes } = require('sequelize');
 //TODO exception handling ?
 
 const createWhereFactory = (schema, typeName) => {
-  const fieldNames = Object.keys(schema);
+  const fieldNames = Object.keys(schema.fields);
 
   return filterStr => {
     const filter = filterStr ? JSON.parse(filterStr) : [];

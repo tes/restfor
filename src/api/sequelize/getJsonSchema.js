@@ -1,6 +1,12 @@
 const resolveType = require('./resolveType');
 
-module.exports = model => {
+module.exports = models =>
+  Object.keys(models).reduce(
+    (schema, name) => ({ ...schema, [name.toLowerCase()]: getJsonSchemaOfModel(models[name]) }),
+    {}
+  );
+
+const getJsonSchemaOfModel = model => {
   return {
     name: model.name.toLowerCase(),
     type: 'sequelize',

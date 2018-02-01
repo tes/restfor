@@ -16,7 +16,7 @@ const {
 const { op, directive, DEFAULT_PRIMARY_KEY_NAME, DEFAULT_PRIMARY_KEY_TYPE, DEFAULT_LIMIT } = require('./consts');
 const getDefaultValue = require('./getDefaultValue');
 
-const { itemsFactory, itemFactory, createFactory, updateFactory, deleteFactory } = require('./resolvers');
+const { itemsFactory, itemFactory, createFactory, updateFactory, deleteFactory } = require('./defaultResolvers');
 
 module.exports = ({ models, ast, restforSchema, schema }) => {
   const typeNames = Object.keys(restforSchema);

@@ -1,22 +1,15 @@
 const express = require('express');
-const getJsonSchema = require('./getJsonSchema');
 const getRouteOverrides = require('./getRouteOverrides');
 const { findAll, findById, bulkCreate, updateById, bulkDelete } = require('./defaultRoutes');
+const getJsonSchema = require('./getJsonSchema');
 
-module.exports = (models, routesPath, router) => {
+module.exports = (models, routesPath) => {
   const routeOverrides = getRouteOverrides(routesPath);
   const modelNames = Object.keys(models);
-  const resourceRouter = express.Router();
-  modelNames.forEach(initRouter({ models }, resourceRouter, routeOverrides));
-  router.use('/resources', resourceRouter);
-  router.get('/schemas', (req, res) => {
-    res.json(
-      modelNames.reduce(
-        (schemas, name) => ({ ...schemas, [name.toLowerCase()]: getJsonSchema(models[name]) }),
-        {}
-      )
-    );
-  });
+  const router = express.Router();
+  modelNames.forEach(initRouter({ models }, router, routeOverrides));
+  const schema = getJsonSchema(models);
+  return { schema, router };
 };
 
 const initRouter = (dependencies, resourceRouter, routeOverrides) => name => {
@@ -25,12 +18,12 @@ const initRouter = (dependencies, resourceRouter, routeOverrides) => name => {
   const router = express.Router();
 
   if (overrideRouter) overrideRouter(dependencies, router);
-  
+
   router.get('/', findAll(name)(dependencies));
   router.get('/:id', findById(name)(dependencies));
   router.post('/', bulkCreate(name)(dependencies));
   router.put('/:id', updateById(name)(dependencies));
   router.delete('/', bulkDelete(name)(dependencies));
-  
+
   resourceRouter.use(`/${key}`, router);
 };
