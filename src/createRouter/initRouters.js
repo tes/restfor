@@ -12,7 +12,7 @@ module.exports = (models, routesPath, router) => {
   router.get('/schemas', (req, res) => {
     res.json(
       modelNames.reduce(
-        (schemas, name) => ({ ...schemas, [name.toLowerCase()]: getJsonSchema(models[name].attributes) }),
+        (schemas, name) => ({ ...schemas, [name.toLowerCase()]: getJsonSchema(models[name]) }),
         {}
       )
     );
