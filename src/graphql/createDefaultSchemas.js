@@ -27,6 +27,7 @@ module.exports = ({ models, ast, restforSchema, schema }) => {
     }),
     {}
   );
+  const inputs = typeNames.map(typeName => createInput(schema, ast, typeName));
   const entrySchema = createSchema({ models, ast, deltas, typeNames, restforSchema, schema });
   return entrySchema;
 };
@@ -65,6 +66,24 @@ const getPrimaryKeyType = (schema, ast, typeName) => {
   } catch (error) {
     return DEFAULT_PRIMARY_KEY_TYPE;
   }
+};
+
+const createInput = (schema, ast, typeName) => {
+  const objectDefinition = getTypeDefinition(ast, typeName);
+  const freeFields = objectDefinition.fields.map(field => field);
+  return new GraphQLInputObjectType({
+    name: `${typeName}Input`,
+    fields: freeFields.reduce(
+      (fields, field) => ({
+        ...fields,
+        [field.name.value]: {
+          type: getFieldType(schema, ast, typeName, field.name.value),
+          defaultValue: getDefaultValue(field.directives)
+        }
+      }),
+      {}
+    )
+  });
 };
 
 const createDelta = (schema, ast, typeName) => {

@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { getType } from '../helpers/types';
 
 export default class extends React.PureComponent {
   static propTypes = {
@@ -92,7 +91,7 @@ export const getField = view => (views, resourceName, props) => {
     const Component = views[view].properties[resourceName] && views[view].properties[resourceName][props.propertyName];
     return <Component {...props} />;
   }
-  const type = getType(props.schema[props.propertyName].type);
+  const type = props.schema[props.propertyName].type;
   const Component =
     (views[view].properties[resourceName] && views[view].properties[resourceName][props.propertyName]) ||
     views[view].types[type] ||

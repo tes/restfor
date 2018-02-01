@@ -8,7 +8,6 @@ import Toolbar from 'material-ui/Toolbar';
 import Button from 'material-ui/Button';
 import { Link } from 'react-router-dom';
 import { invoke, closeDetails } from '../actionCreators';
-import { getType } from '../helpers/types';
 import { getField, getAdditionalProperties } from './ViewProvider';
 import { getRecord, getSchema, getId, getResourceName } from '../selectors';
 
@@ -153,7 +152,7 @@ const getDefaultValue = schema => {
     case 'ENUM':
       return (schema.values && schema.values[0]) || null;
     default:
-      return getType(schema.type) === 'number' ? 1 : '';
+      return schema.type === 'number' ? 1 : '';
   }
 };
 
