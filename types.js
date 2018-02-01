@@ -1,1 +1,1 @@
-module.exports = require('./lib/createApp/types').typeConstructors;
+module.exports = require('./lib/app/types').typeConstructors;
