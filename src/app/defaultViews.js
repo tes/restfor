@@ -57,6 +57,7 @@ export default register => {
   ));
   register.editor.date(({ value, schema, propertyName, onChange }) => (
     <DateTimePicker
+      fullWidth
       value={value ? new Date(value) : null}
       onChange={value => onChange(value.toISOString())}
       disabled={schema.fields[propertyName].readOnly}
@@ -65,7 +66,7 @@ export default register => {
     />
   ));
   register.editor.enum(({ value, onChange, schema, propertyName }) => (
-    <Select value={value} onChange={evt => onChange(evt.target.value)}>
+    <Select value={value} onChange={evt => onChange(evt.target.value)} fullWidth>
       {schema.fields[propertyName].values.map(v => (
         <MenuItem key={v} value={v}>
           {v}
@@ -75,6 +76,7 @@ export default register => {
   ));
   register.editor.number(({ propertyName, value, onChange, schema }) => (
     <TextField
+      fullWidth
       name={propertyName}
       type="number"
       value={value}
@@ -84,6 +86,7 @@ export default register => {
   ));
   register.editor.string(({ propertyName, value, onChange, schema }) => (
     <TextField
+      fullWidth
       name={propertyName}
       value={value}
       onChange={evt => onChange(evt.target.value)}

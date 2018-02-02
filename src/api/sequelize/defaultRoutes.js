@@ -3,19 +3,20 @@ const requestHandler = require('./requestHandler');
 const { getSegmentFilter } = require('./queryCreator');
 
 module.exports.findAll = name => ({ models }) => {
-  const model = models[name]
+  const model = models[name];
+  const defaultOrder = model.options.customOptions && model.options.customOptions.defaultOrder;
   return requestHandler(
     ({ offset, limit, segment }) => {
-      const { where } = getSegmentFilter(segment, model)
-      return model.findAndCount({ offset, limit, where })
+      const { where } = getSegmentFilter(segment, model);
+      return model.findAndCount({ offset, limit, where, order: defaultOrder });
     },
     req => ({
       offset: req.query.offset ? Number(req.query.offset) : null,
       limit: req.query.limit ? Number(req.query.limit) : null,
-      segment: req.query.segment,
+      segment: req.query.segment
     })
   );
-}
+};
 
 module.exports.findById = name => ({ models }) =>
   requestHandler(

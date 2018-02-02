@@ -6,10 +6,11 @@ import Typography from 'material-ui/Typography';
 import AppBar from 'material-ui/AppBar';
 import Toolbar from 'material-ui/Toolbar';
 import Button from 'material-ui/Button';
+import Card, { CardActions, CardContent } from 'material-ui/Card';
 import { Link } from 'react-router-dom';
 import { invoke, closeDetails, createItem, updateItem } from '../actionCreators';
 import { getField, getAdditionalProperties } from './ViewProvider';
-import { getRecord, getSchema, getId, getResourceName } from '../selectors';
+import { getRecord, getSchema, getId, getResourceName, getSegment } from '../selectors';
 
 class Editor extends React.PureComponent {
   static contextTypes = {
@@ -19,7 +20,7 @@ class Editor extends React.PureComponent {
   state = { record: this.getDefaultState() };
 
   getDefaultState() {
-    const { record, schema } = this.props;
+    const { record, schema, segment } = this.props;
     return record
       ? record
       : schema && schema.fields
@@ -29,7 +30,10 @@ class Editor extends React.PureComponent {
                   ? record
                   : {
                       ...record,
-                      [propertyName]: getDefaultValue(schema.fields[propertyName])
+                      [propertyName]: getDefaultValue(
+                        schema.fields[propertyName],
+                        getSegmentValueOfField(schema, segment, propertyName)
+                      )
                     }),
               null
             )
@@ -41,7 +45,10 @@ class Editor extends React.PureComponent {
       this.setState({ record: this.getDefaultState() });
   }
 
-  handleChange = propertyName => value => this.setState({ record: { ...this.state.record, [propertyName]: value } });
+  handleChange = propertyName => arg => {
+    if (typeof arg === 'function') this.setState({ record: arg(this.state.record) });
+    else this.setState({ record: { ...this.state.record, [propertyName]: arg } });
+  };
 
   handleSave = async () => {
     const { invoke, closeDetails, resourceName, id, schema } = this.props;
@@ -65,15 +72,18 @@ class Editor extends React.PureComponent {
   }
 
   render() {
-    const { resourceName, id, schema, invoke } = this.props;
+    const { resourceName, segment, id, schema, invoke } = this.props;
     const { record } = this.state;
+    const title = `${resourceName.toUpperCase()}${segment ? ' / ' + segment.toUpperCase() : ''} / ${id
+      .toString()
+      .toUpperCase()}`;
     const additionalProperties = getAdditionalProperties(this.context.views, 'editor', schema, resourceName);
     return (
       <div className="fitted column layout Editor">
         <header className="dynamic layout">
           <AppBar position="static" color="default">
             <Toolbar style={{ width: '100%' }}>
-              <Typography type="title">{`${resourceName.toUpperCase()} / ${id.toString().toUpperCase()}`}</Typography>
+              <Typography type="title">{title}</Typography>
               <div style={{ marginLeft: 'auto' }}>
                 <Button
                   raised
@@ -92,55 +102,61 @@ class Editor extends React.PureComponent {
           </AppBar>
         </header>
         <main className="fitted column layout overflow-y">
-          {schema &&
-            schema.fields &&
-            record &&
-            <table>
-              <tbody>
-                {Object.keys(schema.fields).map(
-                  propertyName =>
-                    !(id === 'new' && schema.fields[propertyName].readOnly) &&
-                    <tr key={propertyName}>
-                      <td>
-                        <b>{propertyName}</b>
-                      </td>
-                      <td>
-                        {getField('editor')(this.context.views, resourceName, {
-                          propertyName,
-                          value: record[propertyName],
-                          record,
-                          schema,
-                          onChange: this.handleChange(propertyName),
-                          invoke
-                        })}
-                      </td>
-                    </tr>
-                )}
-                {additionalProperties.map(
-                  propertyName =>
-                    id !== 'new' &&
-                    <tr key={propertyName}>
-                      <td>
-                        <b>{propertyName}</b>
-                      </td>
-                      <td>
-                        {getField('editor')(this.context.views, resourceName, {
-                          propertyName,
-                          record,
-                          invoke
-                        })}
-                      </td>
-                    </tr>
-                )}
-              </tbody>
-            </table>}
+          <Card style={{ maxWidth: '800px', minWidth: '50%' }}>
+            <CardContent>
+              {schema &&
+                schema.fields &&
+                record &&
+                <table>
+                  <tbody>
+                    {Object.keys(schema.fields).map(
+                      propertyName =>
+                        !(id === 'new' && schema.fields[propertyName].readOnly) &&
+                        <tr key={propertyName}>
+                          <td>
+                            <b>{propertyName}</b>
+                          </td>
+                          <td>
+                            {getField('editor')(this.context.views, resourceName, {
+                              propertyName,
+                              value: record[propertyName],
+                              record,
+                              schema,
+                              onChange: this.handleChange(propertyName),
+                              invoke
+                            })}
+                          </td>
+                        </tr>
+                    )}
+                    {additionalProperties.map(
+                      propertyName =>
+                        id !== 'new' &&
+                        <tr key={propertyName}>
+                          <td>
+                            <b>{propertyName}</b>
+                          </td>
+                          <td>
+                            {getField('editor')(this.context.views, resourceName, {
+                              propertyName,
+                              record,
+                              invoke
+                            })}
+                          </td>
+                        </tr>
+                    )}
+                  </tbody>
+                </table>}
+            </CardContent>
+          </Card>
+
         </main>
       </div>
     );
   }
 }
 
-const getDefaultValue = schema => {
+const getDefaultValue = (schema, segmentValue) => {
+  if (segmentValue !== null) return segmentValue;
   switch (schema.type) {
     case 'bool':
       return false;
@@ -153,12 +169,21 @@ const getDefaultValue = schema => {
   }
 };
 
+const getSegmentValueOfField = (schema, segmentKey, fieldName) => {
+  if (!schema || !schema.segments) return;
+  const segment = schema.segments.find(
+    segment => segment.segmentKey === segmentKey && segment.segmentField === fieldName
+  );
+  return segment && 'segmentValue' in segment ? segment.segmentValue : null;
+};
+
 export default connect(
   state => ({
     id: getId(state),
     resourceName: getResourceName(state),
     schema: getSchema(state),
-    record: getRecord(state)
+    record: getRecord(state),
+    segment: getSegment(state)
   }),
   { invoke, closeDetails, createItem, updateItem }
 )(Editor);

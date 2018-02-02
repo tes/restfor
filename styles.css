@@ -92,9 +92,22 @@ a {
   padding: 20px 0px;
 }
 
+.Details main table {
+  width: 100%;
+}
+
 .Details main table td {
   padding: 20px;
   vertical-align: middle;
+}
+
+.Editor > main {
+  align-items: center;
+  padding: 20px 0px;
+}
+
+.Editor main table {
+  width: 100%;
 }
 
 .Editor main table td {
@@ -104,7 +117,6 @@ a {
 
 .App > div > nav {
   min-width: 200px;
-  max-width: 300px;
   background-color: white;
 }
 
@@ -116,6 +128,7 @@ a {
   padding: 20px;
 }
 
-.segment {
-  padding-left: 30px !important;
+.active-item {
+  background-color: rgba(0, 0, 0, 0.2) !important;
+  opacity: 1 !important;
 }

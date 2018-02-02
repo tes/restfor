@@ -9,11 +9,23 @@ import Typography from 'material-ui/Typography';
 import Button from 'material-ui/Button';
 import NavigateBefore from 'material-ui-icons/NavigateBefore';
 import NavigateNext from 'material-ui-icons/NavigateNext';
+import IconButton from 'material-ui/IconButton';
+import DetailsIcon from 'material-ui-icons/Pets';
+import EditIcon from 'material-ui-icons/Edit';
 import Table, { TableHead, TableBody, TableRow, TableCell } from 'material-ui/Table';
 import Checkbox from 'material-ui/Checkbox';
 import { invoke, openDetails, deleteItems } from '../actionCreators';
-import { getSchema, getItems, getPage, getMaxPage, getLimit, getResourceName, getPathname } from '../selectors';
-import { getField, getAdditionalProperties } from './ViewProvider';
+import {
+  getSchema,
+  getItems,
+  getPage,
+  getMaxPage,
+  getLimit,
+  getResourceName,
+  getPathname,
+  getSegment
+} from '../selectors';
+import { getField, getVisibleFields } from './ViewProvider';
 import DeleteDialog from './DeleteDialog';
 import ActionProvider from './ActionProvider';
 
@@ -26,15 +38,6 @@ class Grid extends React.PureComponent {
     selection: [],
     deleteDialogWindow: false
   };
-
-  fetchItems() {
-    const { limit, resourceName, page } = this.props;
-    this.props.invoke('GET', resourceName, '/', { query: { offset: page * limit, limit } }, (state, error, result) => {
-      if (error) return state;
-      if (result) return { ...state, items: result.rows, count: result.count };
-      return state;
-    });
-  }
 
   handleAllSelection = evt => {
     this.setState({
@@ -81,15 +84,17 @@ class Grid extends React.PureComponent {
   }
 
   render() {
-    const { schema, items, maxPage, pathname, resourceName, page, invoke } = this.props;
+    const { schema, items, maxPage, pathname, resourceName, page, invoke, segment } = this.props;
     const { selection } = this.state;
-    const additionalProperties = getAdditionalProperties(this.context.views, 'grid', schema, resourceName);
+    const fields = getVisibleFields(this.context.views, 'grid', schema, resourceName);
     return (
       <div className="fitted column layout">
         <header className="dynamic column layout">
           <AppBar position="static" color="default">
             <Toolbar>
-              <Typography type="title">{resourceName.toUpperCase()}</Typography>
+              <Typography type="title">
+                {resourceName.toUpperCase()}{segment && ` / ${segment.toUpperCase()}`}
+              </Typography>
               <Link to={`${pathname}/item/new/edit`}>
                 <Button raised color="primary" className="left margin">
                   Add
@@ -128,9 +133,10 @@ class Grid extends React.PureComponent {
                       indeterminate={selection.length > 0 && selection.length < items.length}
                     />
                   </TableCell>
-                  {[...Object.keys(schema.fields), ...additionalProperties].map(propertyName => (
-                    <TableCell key={propertyName}>
-                      <span className="sorter">{propertyName}</span>
+                  <TableCell />
+                  {fields.map(({ name }) => (
+                    <TableCell key={name}>
+                      <span className="sorter">{name}</span>
                     </TableCell>
                   ))}
                 </TableRow>
@@ -141,8 +147,17 @@ class Grid extends React.PureComponent {
                     <TableCell padding="checkbox">
                       <Checkbox checked={selection.includes(i)} onChange={this.handleRowSelection(i)} />
                     </TableCell>
-                    {Object.keys(schema.fields).map(propertyName => (
-                      <TableCell key={propertyName} onClick={this.handleRowClick(i)}>
+                    <TableCell>
+                      <IconButton aria-label="Delete" onClick={this.handleRowClick(i)}>
+                        <DetailsIcon />
+                      </IconButton>
+                      {/* <IconButton aria-label="Delete" onClick={this.handleRowClick(i)}>
+                          <EditIcon />
+                      </IconButton> */}
+                    </TableCell>
+
+                    {fields.map(({ name: propertyName }) => (
+                      <TableCell key={propertyName}>
                         {getField('grid')(this.context.views, resourceName, {
                           propertyName,
                           value: record[propertyName],
@@ -152,11 +167,7 @@ class Grid extends React.PureComponent {
                         })}
                       </TableCell>
                     ))}
-                    {additionalProperties.map(propertyName => (
-                      <TableCell key={propertyName}>
-                        {getField('grid')(this.context.views, resourceName, { propertyName, record, invoke })}
-                      </TableCell>
-                    ))}
+
                   </TableRow>
                 ))}
               </TableBody>
@@ -178,7 +189,8 @@ export default connect(
     page: getPage(state),
     maxPage: getMaxPage(state),
     limit: getLimit(state),
-    items: getItems(state)
+    items: getItems(state),
+    segment: getSegment(state)
   }),
   { invoke, openDetails, deleteItems }
 )(Grid);

@@ -1,1 +1,1 @@
-export default (state, action) => ({ limit: 10 });
+export default (state, action) => ({ limit: 200 });
