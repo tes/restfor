@@ -7,7 +7,7 @@ module.exports = models =>
   );
 
 const getJsonSchemaOfModel = model => {
-  return {
+  return Object.assign({}, model.options.customOptions, {
     name: model.name.toLowerCase(),
     type: 'sequelize',
     segments: model.options.segments || [],
@@ -29,5 +29,5 @@ const getJsonSchemaOfModel = model => {
         }
       };
     }, {})
-  };
+  });
 };
