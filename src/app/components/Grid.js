@@ -13,7 +13,7 @@ import Table, { TableHead, TableBody, TableRow, TableCell } from 'material-ui/Ta
 import Checkbox from 'material-ui/Checkbox';
 import { invoke, openDetails, deleteItems } from '../actionCreators';
 import { getSchema, getItems, getPage, getMaxPage, getLimit, getResourceName, getPathname } from '../selectors';
-import { getField, getAdditionalProperties } from './ViewProvider';
+import { getField, getAdditionalProperties, getVisibleFields } from './ViewProvider';
 import DeleteDialog from './DeleteDialog';
 import ActionProvider from './ActionProvider';
 
@@ -84,6 +84,8 @@ class Grid extends React.PureComponent {
     const { schema, items, maxPage, pathname, resourceName, page, invoke } = this.props;
     const { selection } = this.state;
     const additionalProperties = getAdditionalProperties(this.context.views, 'grid', schema, resourceName);
+    const fields = getVisibleFields(this.context.views, 'grid', schema, resourceName);
+    console.log('@',fields)
     return (
       <div className="fitted column layout">
         <header className="dynamic column layout">
@@ -128,9 +130,9 @@ class Grid extends React.PureComponent {
                       indeterminate={selection.length > 0 && selection.length < items.length}
                     />
                   </TableCell>
-                  {[...Object.keys(schema.fields), ...additionalProperties].map(propertyName => (
-                    <TableCell key={propertyName}>
-                      <span className="sorter">{propertyName}</span>
+                  {fields.map(({name}) => (
+                    <TableCell key={name}>
+                      <span className="sorter">{name}</span>
                     </TableCell>
                   ))}
                 </TableRow>
@@ -141,7 +143,8 @@ class Grid extends React.PureComponent {
                     <TableCell padding="checkbox">
                       <Checkbox checked={selection.includes(i)} onChange={this.handleRowSelection(i)} />
                     </TableCell>
-                    {Object.keys(schema.fields).map(propertyName => (
+                    
+                    {fields.map(({name: propertyName}) => (
                       <TableCell key={propertyName} onClick={this.handleRowClick(i)}>
                         {getField('grid')(this.context.views, resourceName, {
                           propertyName,
@@ -152,11 +155,7 @@ class Grid extends React.PureComponent {
                         })}
                       </TableCell>
                     ))}
-                    {additionalProperties.map(propertyName => (
-                      <TableCell key={propertyName}>
-                        {getField('grid')(this.context.views, resourceName, { propertyName, record, invoke })}
-                      </TableCell>
-                    ))}
+                    
                   </TableRow>
                 ))}
               </TableBody>

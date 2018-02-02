@@ -87,7 +87,8 @@ const register = views => ({
 });
 
 export const getField = view => (views, resourceName, props) => {
-  if (!props.schema) {
+
+  if (!(props.schema && props.schema.fields[props.propertyName])) {
     const Component = views[view].properties[resourceName] && views[view].properties[resourceName][props.propertyName];
     return <Component {...props} />;
   }
@@ -120,3 +121,16 @@ export const getAdditionalProperties = (views, viewName, schema, resourceName) =
     Object.keys(views[viewName].properties[resourceName])) || [];
   return viewProperties.filter(viewProperty => !schemaProperties.includes(viewProperty));
 };
+
+export function getVisibleFields(views, viewName, schema, resourceName) {
+  if (!schema) return [];
+  const schemaProperties = Object.keys(schema.fields);
+  const viewProperties = (views[viewName].properties[resourceName] &&
+    Object.keys(views[viewName].properties[resourceName])) || [];
+  const fieldNames = (schema.grid && schema.grid.visibleFields) || 
+    Object.keys([...schemaProperties, ...viewProperties].reduce( (p, c) => ({...p, [c]: c}), {}) )
+  return fieldNames.map(fname => ({
+    name: fname,
+    type: schemaProperties.indexOf(fname) > -1 ? 'schema' : 'extension',
+  }))
+}
