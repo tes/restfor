@@ -20,7 +20,6 @@ export default class extends React.PureComponent {
     return <div className="absolute">{this.props.children}</div>;
   }
 }
-const viewMap = {}
 
 export const getViews = (defaultViewFactory, viewFactory) => {
   let views = {
@@ -28,20 +27,21 @@ export const getViews = (defaultViewFactory, viewFactory) => {
     details: { properties: {}, types: {}, actions: {} },
     editor: { properties: {}, types: {}, actions: {} },
     actions: { properties: {}, types: {}, actions: {} },
-    panels: { 
-      register: (resourceName, panel, component)  => { views[`${resourceName}-${panel}`] = component },
-      resolve: (resourceName, panel) => views[`${resourceName}-${panel}`] = component 
+    panels: {
+      register: (resourceName, panel, component) => {
+        views[`${resourceName}-${panel}`] = component;
+      },
+      resolve: (resourceName, panel) => views[`${resourceName}-${panel}`] = component
     }
   };
   defaultViewFactory(register(views));
   viewFactory(register(views));
-  views.panels.register('*','details', Details)
-  views.panels.register('*','edit', Editor)
+  views.panels.register('*', 'details', Details);
+  views.panels.register('*', 'edit', Editor);
 
-//  views.register
+  //  views.register
   return views;
 };
-
 
 const registerType = (views, viewName, typeName) => component => {
   views[viewName].types[typeName] = component;
@@ -95,11 +95,13 @@ const register = views => ({
     date: registerType(views, 'actions', 'date'),
     enum: registerType(views, 'actions', 'enum'),
     any: registerType(views, 'actions', 'any')
-  }, panels: { 
-    register: (resourceName, panel, component)  => { views[`${resourceName}-${panel}`] = component },
-    resolve: (resourceName, panel) => views[`${resourceName}-${panel}`] = component 
+  },
+  panels: {
+    register: (resourceName, panel, component) => {
+      views[`${resourceName}-${panel}`] = component;
+    },
+    resolve: (resourceName, panel) => views[`${resourceName}-${panel}`] = component
   }
-
 });
 
 export const getField = view => (views, resourceName, props) => {
@@ -142,10 +144,11 @@ export function getVisibleFields(views, viewName, schema, resourceName) {
   const schemaProperties = Object.keys(schema.fields);
   const viewProperties = (views[viewName].properties[resourceName] &&
     Object.keys(views[viewName].properties[resourceName])) || [];
-  const fieldNames = (schema.grid && schema.grid.visibleFields) || 
-    Object.keys([...schemaProperties, ...viewProperties].reduce( (p, c) => ({...p, [c]: c}), {}) )
+  const fieldNames =
+    (schema.grid && schema.grid.visibleFields) ||
+    Object.keys([...schemaProperties, ...viewProperties].reduce((p, c) => ({ ...p, [c]: c }), {}));
   return fieldNames.map(fname => ({
     name: fname,
-    type: schemaProperties.indexOf(fname) > -1 ? 'schema' : 'extension',
-  }))
+    type: schemaProperties.indexOf(fname) > -1 ? 'schema' : 'extension'
+  }));
 }
