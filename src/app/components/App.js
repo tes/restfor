@@ -6,7 +6,7 @@ import Toolbar from 'material-ui/Toolbar';
 import AppBar from 'material-ui/AppBar';
 import Typography from 'material-ui/Typography';
 import List, { ListItem, ListItemText, ListItemIcon } from 'material-ui/List';
-import InboxIcon from 'material-ui-icons/Inbox'
+import InboxIcon from 'material-ui-icons/Inbox';
 import Snackbar from 'material-ui/Snackbar';
 import { MenuItem } from 'material-ui/Menu';
 import PropTypes from 'prop-types';
@@ -20,21 +20,22 @@ import {
   getSchemaList,
   getSegment,
   getSchemas,
-  getVisibleSchemas,
+  getVisibleSchemas
 } from '../selectors';
 import Grid from './Grid';
 import Details from './Details';
 import Editor from './Editor';
-class ViewShell extends React.PureComponent  {
-    static contextTypes = {
-      views: PropTypes.object
-    };
-    render() {
-      const {views} = this.context
-      const { resourceName, view } = this.props.match.params
-      const Component = views[`${resourceName}-${view}`] || views[`*-${view}`] || Details
-      return <Component {...this.props} />
-    }
+
+class ViewShell extends React.PureComponent {
+  static contextTypes = {
+    views: PropTypes.object
+  };
+  render() {
+    const { views } = this.context;
+    const { resourceName, view } = this.props.match.params;
+    const Component = views[`${resourceName}-${view}`] || views[`*-${view}`] || Details;
+    return <Component {...this.props} />;
+  }
 }
 
 const SchemaMenuItem = ({ schema, resourceName, segment }) => {
@@ -43,9 +44,9 @@ const SchemaMenuItem = ({ schema, resourceName, segment }) => {
     <div>
       <Link to={`/${name.toLowerCase()}?page=1`} key={name}>
         <ListItem button disabled={name.toLowerCase() === resourceName}>
-        <ListItemIcon>
+          <ListItemIcon>
             <InboxIcon />
-          </ListItemIcon>        
+          </ListItemIcon>
           <ListItemText primary={name.toUpperCase()} />
         </ListItem>
       </Link>
@@ -60,12 +61,13 @@ const SchemaMenuItem = ({ schema, resourceName, segment }) => {
     </div>
   );
 };
+
 class App extends React.PureComponent {
   async componentDidMount() {
     await this.props.fetchSchemas();
     await this.fetchItems();
   }
-  
+
   static contextTypes = {
     views: PropTypes.object
   };
@@ -92,7 +94,6 @@ class App extends React.PureComponent {
 
   render() {
     const { resourceName, history, error, schemas, segment } = this.props;
-    const { views } = this.context
     return (
       <div className="absolute column layout App">
         <div className="fitted row low layout">
