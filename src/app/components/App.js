@@ -30,6 +30,7 @@ class ViewShell extends React.PureComponent {
   static contextTypes = {
     views: PropTypes.object
   };
+
   render() {
     const { views } = this.context;
     const { resourceName, view } = this.props.match.params;
@@ -65,7 +66,7 @@ const SchemaMenuItem = ({ schema, resourceName, segment }) => {
 class App extends React.PureComponent {
   async componentDidMount() {
     await this.props.fetchSchemas();
-    await this.fetchItems();
+    await this.ensureItems();
   }
 
   static contextTypes = {
@@ -74,10 +75,10 @@ class App extends React.PureComponent {
 
   componentDidUpdate(prevProps) {
     if (prevProps.location.pathname !== this.props.location.pathname || prevProps.page !== this.props.page)
-      this.fetchItems();
+      this.ensureItems();
   }
 
-  fetchItems() {
+  ensureItems() {
     const { items, resourceName, id } = this.props;
     if (!resourceName) return;
     if (id && id !== 'new') {
@@ -99,7 +100,9 @@ class App extends React.PureComponent {
         <div className="fitted row low layout">
           <nav className="dynamic column high shadowed layout overflow">
             <List component="nav">
-              {schemas.map((schema, key) => <SchemaMenuItem {...{ resourceName, schema, segment, key }} />)}
+              {schemas.map((schema, index) => (
+                <SchemaMenuItem key={index} resourceName={resourceName} schema={schema} segment={segment} />
+              ))}
             </List>
           </nav>
           <Router history={history}>
@@ -113,12 +116,10 @@ class App extends React.PureComponent {
         </div>
         <Snackbar
           anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
-          open={error ? true : false}
+          open={!!error}
           onClose={this.closeSnackBar}
           autoHideDuration={7000}
-          SnackbarContentProps={{
-            'aria-describedby': 'message-id'
-          }}
+          SnackbarContentProps={{ 'aria-describedby': 'message-id' }}
           message={<span id="message-id">{error ? error : 'Something wrong'}</span>}
         />
       </div>
