@@ -102,7 +102,7 @@ class Editor extends React.PureComponent {
           </AppBar>
         </header>
         <main className="fitted column layout overflow-y">
-          <Card style={{ maxWidth: '800px' }}>
+          <Card style={{ maxWidth: '800px', minWidth: '50%' }}>
             <CardContent>
               {schema &&
                 schema.fields &&

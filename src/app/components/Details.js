@@ -69,7 +69,7 @@ class Details extends React.PureComponent {
           </AppBar>
         </header>
         <main className="fitted column layout overflow">
-          <Card style={{ maxWidth: '800px' }}>
+          <Card style={{ maxWidth: '800px', minWidth: '50%' }}>
             <CardContent>
               {schema &&
                 schema.fields &&

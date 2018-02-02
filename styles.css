@@ -92,6 +92,10 @@ a {
   padding: 20px 0px;
 }
 
+.Details main table {
+  width: 100%;
+}
+
 .Details main table td {
   padding: 20px;
   vertical-align: middle;
@@ -100,6 +104,10 @@ a {
 .Editor > main {
   align-items: center;
   padding: 20px 0px;
+}
+
+.Editor main table {
+  width: 100%;
 }
 
 .Editor main table td {
