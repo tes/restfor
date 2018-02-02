@@ -95,15 +95,6 @@ class App extends React.PureComponent {
     const { views } = this.context
     return (
       <div className="absolute column layout App">
-        {/* <header className="dynamic high">
-          <AppBar position="static">
-            <Toolbar>
-              <Typography type="title" color="inherit">
-                Restfor
-              </Typography>
-            </Toolbar>
-          </AppBar>
-        </header> */}
         <div className="fitted row low layout">
           <nav className="dynamic column high shadowed layout overflow">
             <List component="nav">
