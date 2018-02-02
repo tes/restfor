@@ -91,7 +91,6 @@ class App extends React.PureComponent {
   };
 
   render() {
-    console.log(this.context.views)
     const { resourceName, history, error, schemas, segment } = this.props;
     const { views } = this.context
     return (
