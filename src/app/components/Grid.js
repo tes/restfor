@@ -85,7 +85,6 @@ class Grid extends React.PureComponent {
     const { selection } = this.state;
     const additionalProperties = getAdditionalProperties(this.context.views, 'grid', schema, resourceName);
     const fields = getVisibleFields(this.context.views, 'grid', schema, resourceName);
-    console.log('@',fields)
     return (
       <div className="fitted column layout">
         <header className="dynamic column layout">
