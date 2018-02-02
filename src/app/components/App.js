@@ -7,10 +7,12 @@ import AppBar from 'material-ui/AppBar';
 import Typography from 'material-ui/Typography';
 import List, { ListItem, ListItemText, ListItemIcon } from 'material-ui/List';
 import InboxIcon from 'material-ui-icons/Inbox';
+import ChevronRight from 'material-ui-icons/ChevronRight';
 import Snackbar from 'material-ui/Snackbar';
 import { MenuItem } from 'material-ui/Menu';
 import PropTypes from 'prop-types';
 import { fetchSchemas, fetchItems, fetchItem, dismissError } from '../actionCreators';
+import classnames from 'classnames';
 import {
   getPage,
   getResourceName,
@@ -41,10 +43,12 @@ class ViewShell extends React.PureComponent {
 
 const SchemaMenuItem = ({ schema, resourceName, segment }) => {
   const { name, segments } = schema;
+  const isActiveResource = name.toLowerCase() === resourceName && !segment;
+  const hasActiveSegment = name.toLowerCase() === resourceName;
   return (
     <div>
       <Link to={`/${name.toLowerCase()}?page=1`} key={name}>
-        <ListItem button disabled={name.toLowerCase() === resourceName && !segment}>
+        <ListItem button disabled={isActiveResource} className={classnames(isActiveResource && 'active-item')}>
           <ListItemIcon>
             <InboxIcon />
           </ListItemIcon>
@@ -52,9 +56,17 @@ const SchemaMenuItem = ({ schema, resourceName, segment }) => {
         </ListItem>
       </Link>
       {!!segments &&
+        hasActiveSegment &&
         segments.map(({ segmentKey }) => (
           <Link to={`/${name.toLowerCase()}/segment/${segmentKey}?page=1`} key={segmentKey}>
-            <ListItem button disabled={segment === segmentKey} className="segment">
+            <ListItem
+              button
+              disabled={segment === segmentKey}
+              className={classnames(segment === segmentKey && 'active-item')}
+            >
+              <ListItemIcon>
+                <ChevronRight />
+              </ListItemIcon>
               <ListItemText primary={segmentKey} />
             </ListItem>
           </Link>
