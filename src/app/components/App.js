@@ -44,7 +44,7 @@ const SchemaMenuItem = ({ schema, resourceName, segment }) => {
   return (
     <div>
       <Link to={`/${name.toLowerCase()}?page=1`} key={name}>
-        <ListItem button disabled={name.toLowerCase() === resourceName}>
+        <ListItem button disabled={name.toLowerCase() === resourceName && !segment}>
           <ListItemIcon>
             <InboxIcon />
           </ListItemIcon>
@@ -53,7 +53,7 @@ const SchemaMenuItem = ({ schema, resourceName, segment }) => {
       </Link>
       {!!segments &&
         segments.map(({ segmentKey }) => (
-          <Link to={`/${name}/segment/${segmentKey}?page=1`} key={segmentKey}>
+          <Link to={`/${name.toLowerCase()}/segment/${segmentKey}?page=1`} key={segmentKey}>
             <ListItem button disabled={segment === segmentKey} className="segment">
               <ListItemText primary={segmentKey} />
             </ListItem>
