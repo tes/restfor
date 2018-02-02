@@ -97,6 +97,11 @@ a {
   vertical-align: middle;
 }
 
+.Editor > main {
+  align-items: center;
+  padding: 20px 0px;
+}
+
 .Editor main table td {
   padding: 20px;
   vertical-align: middle;

@@ -6,6 +6,7 @@ import Typography from 'material-ui/Typography';
 import AppBar from 'material-ui/AppBar';
 import Toolbar from 'material-ui/Toolbar';
 import Button from 'material-ui/Button';
+import Card, { CardActions, CardContent } from 'material-ui/Card';
 import { Link } from 'react-router-dom';
 import { invoke, closeDetails, createItem, updateItem } from '../actionCreators';
 import { getField, getAdditionalProperties } from './ViewProvider';
@@ -101,48 +102,53 @@ class Editor extends React.PureComponent {
           </AppBar>
         </header>
         <main className="fitted column layout overflow-y">
-          {schema &&
-            schema.fields &&
-            record &&
-            <table>
-              <tbody>
-                {Object.keys(schema.fields).map(
-                  propertyName =>
-                    !(id === 'new' && schema.fields[propertyName].readOnly) &&
-                    <tr key={propertyName}>
-                      <td>
-                        <b>{propertyName}</b>
-                      </td>
-                      <td>
-                        {getField('editor')(this.context.views, resourceName, {
-                          propertyName,
-                          value: record[propertyName],
-                          record,
-                          schema,
-                          onChange: this.handleChange(propertyName),
-                          invoke
-                        })}
-                      </td>
-                    </tr>
-                )}
-                {additionalProperties.map(
-                  propertyName =>
-                    id !== 'new' &&
-                    <tr key={propertyName}>
-                      <td>
-                        <b>{propertyName}</b>
-                      </td>
-                      <td>
-                        {getField('editor')(this.context.views, resourceName, {
-                          propertyName,
-                          record,
-                          invoke
-                        })}
-                      </td>
-                    </tr>
-                )}
-              </tbody>
-            </table>}
+          <Card style={{ maxWidth: '800px' }}>
+            <CardContent>
+              {schema &&
+                schema.fields &&
+                record &&
+                <table>
+                  <tbody>
+                    {Object.keys(schema.fields).map(
+                      propertyName =>
+                        !(id === 'new' && schema.fields[propertyName].readOnly) &&
+                        <tr key={propertyName}>
+                          <td>
+                            <b>{propertyName}</b>
+                          </td>
+                          <td>
+                            {getField('editor')(this.context.views, resourceName, {
+                              propertyName,
+                              value: record[propertyName],
+                              record,
+                              schema,
+                              onChange: this.handleChange(propertyName),
+                              invoke
+                            })}
+                          </td>
+                        </tr>
+                    )}
+                    {additionalProperties.map(
+                      propertyName =>
+                        id !== 'new' &&
+                        <tr key={propertyName}>
+                          <td>
+                            <b>{propertyName}</b>
+                          </td>
+                          <td>
+                            {getField('editor')(this.context.views, resourceName, {
+                              propertyName,
+                              record,
+                              invoke
+                            })}
+                          </td>
+                        </tr>
+                    )}
+                  </tbody>
+                </table>}
+            </CardContent>
+          </Card>
+
         </main>
       </div>
     );
