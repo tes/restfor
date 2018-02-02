@@ -19,7 +19,7 @@ class Editor extends React.PureComponent {
   state = { record: this.getDefaultState() };
 
   getDefaultState() {
-    const { record, schema } = this.props;
+    const { record, schema, segment } = this.props;
     return record
       ? record
       : schema && schema.fields
@@ -29,7 +29,10 @@ class Editor extends React.PureComponent {
                   ? record
                   : {
                       ...record,
-                      [propertyName]: getDefaultValue(schema.fields[propertyName])
+                      [propertyName]: getDefaultValue(
+                        schema.fields[propertyName],
+                        getSegmentValueOfField(schema, segment, propertyName)
+                      )
                     }),
               null
             )
@@ -146,7 +149,8 @@ class Editor extends React.PureComponent {
   }
 }
 
-const getDefaultValue = schema => {
+const getDefaultValue = (schema, segmentValue) => {
+  if (segmentValue !== null) return segmentValue;
   switch (schema.type) {
     case 'bool':
       return false;
@@ -157,6 +161,14 @@ const getDefaultValue = schema => {
     default:
       return schema.type === 'number' ? 1 : '';
   }
+};
+
+const getSegmentValueOfField = (schema, segmentKey, fieldName) => {
+  if (!schema || !schema.segments) return;
+  const segment = schema.segments.find(
+    segment => segment.segmentKey === segmentKey && segment.segmentField === fieldName
+  );
+  return segment && 'segmentValue' in segment ? segment.segmentValue : null;
 };
 
 export default connect(
