@@ -41,7 +41,10 @@ class Editor extends React.PureComponent {
       this.setState({ record: this.getDefaultState() });
   }
 
-  handleChange = propertyName => value => this.setState({ record: { ...this.state.record, [propertyName]: value } });
+  handleChange = propertyName => arg => {
+    if (typeof arg === 'function') this.setState({ record: arg(this.state.record) });
+    else this.setState({ record: { ...this.state.record, [propertyName]: arg } });
+  };
 
   handleSave = async () => {
     const { invoke, closeDetails, resourceName, id, schema } = this.props;
