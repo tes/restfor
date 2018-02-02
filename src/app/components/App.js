@@ -5,7 +5,8 @@ import { Router, Route, Link } from 'react-router-dom';
 import Toolbar from 'material-ui/Toolbar';
 import AppBar from 'material-ui/AppBar';
 import Typography from 'material-ui/Typography';
-import List, { ListItem, ListItemText } from 'material-ui/List';
+import List, { ListItem, ListItemText, ListItemIcon } from 'material-ui/List';
+import InboxIcon from 'material-ui-icons/Inbox'
 import Snackbar from 'material-ui/Snackbar';
 import { MenuItem } from 'material-ui/Menu';
 import { fetchSchemas, fetchItems, fetchItem, dismissError } from '../actionCreators';
@@ -28,7 +29,10 @@ const SchemaMenuItem = ({ schema, resourceName, segment }) => {
   return (
     <div>
       <Link to={`/${name.toLowerCase()}?page=1`} key={name}>
-        <ListItem button disabled={name === resourceName}>
+        <ListItem button disabled={name.toLowerCase() === resourceName}>
+        <ListItemIcon>
+            <InboxIcon />
+          </ListItemIcon>        
           <ListItemText primary={name.toUpperCase()} />
         </ListItem>
       </Link>
@@ -84,7 +88,7 @@ class App extends React.PureComponent {
         </header> */}
         <div className="fitted row low layout">
           <nav className="dynamic column high shadowed layout overflow">
-            <List>
+            <List component="nav">
               {schemas.map((schema, key) => <SchemaMenuItem {...{ resourceName, schema, segment, key }} />)}
             </List>
           </nav>
