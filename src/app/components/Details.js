@@ -39,8 +39,10 @@ class Details extends React.PureComponent {
   handleCancel = () => this.props.closeDetails();
 
   render() {
-    const { resourceName, id, schema, record, invoke, pathname } = this.props;
-    const title = `${resourceName.toUpperCase()} / ${id.toString().toUpperCase()}`;
+    const { resourceName, id, schema, record, invoke, pathname, segment } = this.props;
+    const title = `${resourceName.toUpperCase()}${segment ? ' / ' + segment.toUpperCase() : ''} / ${id
+      .toString()
+      .toUpperCase()}`;
     const additionalProperties = getAdditionalProperties(this.context.views, 'details', schema, resourceName);
     return (
       <div className="fitted column layout Details">

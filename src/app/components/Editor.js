@@ -9,7 +9,7 @@ import Button from 'material-ui/Button';
 import { Link } from 'react-router-dom';
 import { invoke, closeDetails, createItem, updateItem } from '../actionCreators';
 import { getField, getAdditionalProperties } from './ViewProvider';
-import { getRecord, getSchema, getId, getResourceName } from '../selectors';
+import { getRecord, getSchema, getId, getResourceName, getSegment } from '../selectors';
 
 class Editor extends React.PureComponent {
   static contextTypes = {
@@ -68,15 +68,18 @@ class Editor extends React.PureComponent {
   }
 
   render() {
-    const { resourceName, id, schema, invoke } = this.props;
+    const { resourceName, segment, id, schema, invoke } = this.props;
     const { record } = this.state;
+    const title = `${resourceName.toUpperCase()}${segment ? ' / ' + segment.toUpperCase() : ''} / ${id
+      .toString()
+      .toUpperCase()}`;
     const additionalProperties = getAdditionalProperties(this.context.views, 'editor', schema, resourceName);
     return (
       <div className="fitted column layout Editor">
         <header className="dynamic layout">
           <AppBar position="static" color="default">
             <Toolbar style={{ width: '100%' }}>
-              <Typography type="title">{`${resourceName.toUpperCase()} / ${id.toString().toUpperCase()}`}</Typography>
+              <Typography type="title">{title}</Typography>
               <div style={{ marginLeft: 'auto' }}>
                 <Button
                   raised
@@ -161,7 +164,8 @@ export default connect(
     id: getId(state),
     resourceName: getResourceName(state),
     schema: getSchema(state),
-    record: getRecord(state)
+    record: getRecord(state),
+    segment: getSegment(state)
   }),
   { invoke, closeDetails, createItem, updateItem }
 )(Editor);

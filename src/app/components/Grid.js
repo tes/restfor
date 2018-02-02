@@ -10,12 +10,21 @@ import Button from 'material-ui/Button';
 import NavigateBefore from 'material-ui-icons/NavigateBefore';
 import NavigateNext from 'material-ui-icons/NavigateNext';
 import IconButton from 'material-ui/IconButton';
-import DetailsIcon from 'material-ui-icons/Pets'
+import DetailsIcon from 'material-ui-icons/Pets';
 import EditIcon from 'material-ui-icons/Edit';
 import Table, { TableHead, TableBody, TableRow, TableCell } from 'material-ui/Table';
 import Checkbox from 'material-ui/Checkbox';
 import { invoke, openDetails, deleteItems } from '../actionCreators';
-import { getSchema, getItems, getPage, getMaxPage, getLimit, getResourceName, getPathname } from '../selectors';
+import {
+  getSchema,
+  getItems,
+  getPage,
+  getMaxPage,
+  getLimit,
+  getResourceName,
+  getPathname,
+  getSegment
+} from '../selectors';
 import { getField, getVisibleFields } from './ViewProvider';
 import DeleteDialog from './DeleteDialog';
 import ActionProvider from './ActionProvider';
@@ -75,7 +84,7 @@ class Grid extends React.PureComponent {
   }
 
   render() {
-    const { schema, items, maxPage, pathname, resourceName, page, invoke } = this.props;
+    const { schema, items, maxPage, pathname, resourceName, page, invoke, segment } = this.props;
     const { selection } = this.state;
     const fields = getVisibleFields(this.context.views, 'grid', schema, resourceName);
     return (
@@ -83,7 +92,9 @@ class Grid extends React.PureComponent {
         <header className="dynamic column layout">
           <AppBar position="static" color="default">
             <Toolbar>
-              <Typography type="title">{resourceName.toUpperCase()}</Typography>
+              <Typography type="title">
+                {resourceName.toUpperCase()}{segment && ` / ${segment.toUpperCase()}`}
+              </Typography>
               <Link to={`${pathname}/item/new/edit`}>
                 <Button raised color="primary" className="left margin">
                   Add
@@ -123,7 +134,7 @@ class Grid extends React.PureComponent {
                     />
                   </TableCell>
                   <TableCell />
-                  {fields.map(({name}) => (
+                  {fields.map(({ name }) => (
                     <TableCell key={name}>
                       <span className="sorter">{name}</span>
                     </TableCell>
@@ -138,15 +149,15 @@ class Grid extends React.PureComponent {
                     </TableCell>
                     <TableCell>
                       <IconButton aria-label="Delete" onClick={this.handleRowClick(i)}>
-                          <DetailsIcon />
+                        <DetailsIcon />
                       </IconButton>
                       {/* <IconButton aria-label="Delete" onClick={this.handleRowClick(i)}>
                           <EditIcon />
                       </IconButton> */}
                     </TableCell>
 
-                    {fields.map(({name: propertyName}) => (
-                      <TableCell key={propertyName} >
+                    {fields.map(({ name: propertyName }) => (
+                      <TableCell key={propertyName}>
                         {getField('grid')(this.context.views, resourceName, {
                           propertyName,
                           value: record[propertyName],
@@ -156,7 +167,7 @@ class Grid extends React.PureComponent {
                         })}
                       </TableCell>
                     ))}
-                    
+
                   </TableRow>
                 ))}
               </TableBody>
@@ -178,7 +189,8 @@ export default connect(
     page: getPage(state),
     maxPage: getMaxPage(state),
     limit: getLimit(state),
-    items: getItems(state)
+    items: getItems(state),
+    segment: getSegment(state)
   }),
   { invoke, openDetails, deleteItems }
 )(Grid);
