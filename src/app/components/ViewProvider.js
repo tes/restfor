@@ -1,5 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import Details from './Details';
+import Editor from './Editor';
 
 export default class extends React.PureComponent {
   static propTypes = {
@@ -18,18 +20,28 @@ export default class extends React.PureComponent {
     return <div className="absolute">{this.props.children}</div>;
   }
 }
+const viewMap = {}
 
 export const getViews = (defaultViewFactory, viewFactory) => {
   let views = {
     grid: { properties: {}, types: {}, actions: {} },
     details: { properties: {}, types: {}, actions: {} },
     editor: { properties: {}, types: {}, actions: {} },
-    actions: { properties: {}, types: {}, actions: {} }
+    actions: { properties: {}, types: {}, actions: {} },
+    panels: { 
+      register: (resourceName, panel, component)  => { views[`${resourceName}-${panel}`] = component },
+      resolve: (resourceName, panel) => views[`${resourceName}-${panel}`] = component 
+    }
   };
   defaultViewFactory(register(views));
   viewFactory(register(views));
+  views.panels.register('*','details', Details)
+  views.panels.register('*','edit', Editor)
+
+//  views.register
   return views;
 };
+
 
 const registerType = (views, viewName, typeName) => component => {
   views[viewName].types[typeName] = component;
@@ -83,11 +95,14 @@ const register = views => ({
     date: registerType(views, 'actions', 'date'),
     enum: registerType(views, 'actions', 'enum'),
     any: registerType(views, 'actions', 'any')
+  }, panels: { 
+    register: (resourceName, panel, component)  => { views[`${resourceName}-${panel}`] = component },
+    resolve: (resourceName, panel) => views[`${resourceName}-${panel}`] = component 
   }
+
 });
 
 export const getField = view => (views, resourceName, props) => {
-
   if (!(props.schema && props.schema.fields[props.propertyName])) {
     const Component = views[view].properties[resourceName] && views[view].properties[resourceName][props.propertyName];
     return <Component {...props} />;

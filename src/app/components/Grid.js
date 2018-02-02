@@ -9,11 +9,14 @@ import Typography from 'material-ui/Typography';
 import Button from 'material-ui/Button';
 import NavigateBefore from 'material-ui-icons/NavigateBefore';
 import NavigateNext from 'material-ui-icons/NavigateNext';
+import IconButton from 'material-ui/IconButton';
+import DetailsIcon from 'material-ui-icons/Pets'
+import EditIcon from 'material-ui-icons/Edit';
 import Table, { TableHead, TableBody, TableRow, TableCell } from 'material-ui/Table';
 import Checkbox from 'material-ui/Checkbox';
 import { invoke, openDetails, deleteItems } from '../actionCreators';
 import { getSchema, getItems, getPage, getMaxPage, getLimit, getResourceName, getPathname } from '../selectors';
-import { getField, getAdditionalProperties, getVisibleFields } from './ViewProvider';
+import { getField, getVisibleFields } from './ViewProvider';
 import DeleteDialog from './DeleteDialog';
 import ActionProvider from './ActionProvider';
 
@@ -83,7 +86,6 @@ class Grid extends React.PureComponent {
   render() {
     const { schema, items, maxPage, pathname, resourceName, page, invoke } = this.props;
     const { selection } = this.state;
-    const additionalProperties = getAdditionalProperties(this.context.views, 'grid', schema, resourceName);
     const fields = getVisibleFields(this.context.views, 'grid', schema, resourceName);
     return (
       <div className="fitted column layout">
@@ -129,6 +131,7 @@ class Grid extends React.PureComponent {
                       indeterminate={selection.length > 0 && selection.length < items.length}
                     />
                   </TableCell>
+                  <TableCell />
                   {fields.map(({name}) => (
                     <TableCell key={name}>
                       <span className="sorter">{name}</span>
@@ -142,9 +145,17 @@ class Grid extends React.PureComponent {
                     <TableCell padding="checkbox">
                       <Checkbox checked={selection.includes(i)} onChange={this.handleRowSelection(i)} />
                     </TableCell>
-                    
+                    <TableCell>
+                      <IconButton aria-label="Delete" onClick={this.handleRowClick(i)}>
+                          <DetailsIcon />
+                      </IconButton>
+                      {/* <IconButton aria-label="Delete" onClick={this.handleRowClick(i)}>
+                          <EditIcon />
+                      </IconButton> */}
+                    </TableCell>
+
                     {fields.map(({name: propertyName}) => (
-                      <TableCell key={propertyName} onClick={this.handleRowClick(i)}>
+                      <TableCell key={propertyName} >
                         {getField('grid')(this.context.views, resourceName, {
                           propertyName,
                           value: record[propertyName],

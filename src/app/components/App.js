@@ -9,6 +9,7 @@ import List, { ListItem, ListItemText, ListItemIcon } from 'material-ui/List';
 import InboxIcon from 'material-ui-icons/Inbox'
 import Snackbar from 'material-ui/Snackbar';
 import { MenuItem } from 'material-ui/Menu';
+import PropTypes from 'prop-types';
 import { fetchSchemas, fetchItems, fetchItem, dismissError } from '../actionCreators';
 import {
   getPage,
@@ -24,6 +25,17 @@ import {
 import Grid from './Grid';
 import Details from './Details';
 import Editor from './Editor';
+class ViewShell extends React.PureComponent  {
+    static contextTypes = {
+      views: PropTypes.object
+    };
+    render() {
+      const {views} = this.context
+      const { resourceName, view } = this.props.match.params
+      const Component = views[`${resourceName}-${view}`] || views[`*-${view}`] || Details
+      return <Component {...this.props} />
+    }
+}
 
 const SchemaMenuItem = ({ schema, resourceName, segment }) => {
   const { name, segments } = schema;
@@ -53,6 +65,10 @@ class App extends React.PureComponent {
     await this.props.fetchSchemas();
     await this.fetchItems();
   }
+  
+  static contextTypes = {
+    views: PropTypes.object
+  };
 
   componentDidUpdate(prevProps) {
     if (prevProps.location.pathname !== this.props.location.pathname || prevProps.page !== this.props.page)
@@ -75,7 +91,9 @@ class App extends React.PureComponent {
   };
 
   render() {
+    console.log(this.context.views)
     const { resourceName, history, error, schemas, segment } = this.props;
+    const { views } = this.context
     return (
       <div className="absolute column layout App">
         {/* <header className="dynamic high">
@@ -97,12 +115,8 @@ class App extends React.PureComponent {
             <main className="relative fitted column low layout">
               <Route exact path="/:resourceName" component={Grid} />
               <Route exact path="/:resourceName/segment/:segment" component={Grid} />
-
-              <Route exact path="/:resourceName/item/:id" component={Details} />
-              <Route exact path="/:resourceName/segment/:segment/item/:id" component={Details} />
-
-              <Route exact path="/:resourceName/item/:id/edit" component={Editor} />
-              <Route exact path="/:resourceName/segment/:segment/item/:id/edit" component={Editor} />
+              <Route exact path="/:resourceName/item/:id/:view?" component={ViewShell} />
+              <Route exact path="/:resourceName/segment/:segment/item/:id/:view?" component={ViewShell} />
             </main>
           </Router>
         </div>
