@@ -30,15 +30,6 @@ class Grid extends React.PureComponent {
     deleteDialogWindow: false
   };
 
-  fetchItems() {
-    const { limit, resourceName, page } = this.props;
-    this.props.invoke('GET', resourceName, '/', { query: { offset: page * limit, limit } }, (state, error, result) => {
-      if (error) return state;
-      if (result) return { ...state, items: result.rows, count: result.count };
-      return state;
-    });
-  }
-
   handleAllSelection = evt => {
     this.setState({
       selection: evt.target.checked && this.state.selection.length === 0 ? this.props.items.map((_, i) => i) : []
