@@ -49,3 +49,5 @@ export const getFieldList = state => {
 export const getSchemaList = ({ schemas }) => (schemas ? Object.keys(schemas) : a);
 
 export const getSchemas = ({ schemas }) => Object.keys(schemas).map(schemaKey => schemas[schemaKey]).filter(s => !s.hidden);
+
+export const getVisibleSchemas = ({schemas}) => getSchemas({schemas}).filter(s => !s.hidden);

@@ -18,7 +18,8 @@ import {
   getLimit,
   getSchemaList,
   getSegment,
-  getSchemas
+  getSchemas,
+  getVisibleSchemas,
 } from '../selectors';
 import Grid from './Grid';
 import Details from './Details';
@@ -123,7 +124,7 @@ class App extends React.PureComponent {
 export default connect(
   state => ({
     schemaList: getSchemaList(state),
-    schemas: getSchemas(state),
+    schemas: getVisibleSchemas(state),
     limit: getLimit(state),
     items: getItems(state),
     page: getPage(state),
